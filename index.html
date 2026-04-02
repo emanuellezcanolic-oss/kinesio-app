@@ -3557,39 +3557,52 @@ async function regenerarInforme() {
     eva: s.kinesio.form?.eva ?? '—'
   } : null;
 
-  const prompt = `Kinesiólogo/preparador físico experto. Informe clínico deportivo conciso en español rioplatense.
+const prompt = `Eres un kinesiólogo deportivo especialista en evaluación funcional y rendimiento. Redactá un informe TÉCNICO y PROFESIONAL en español rioplatense. Usá el siguiente formato EXACTO:
 
-ATLETA: ${s.nombre}, ${s.edad || '?'}a, ${s.peso || '?'}kg, ${s.talla || '?'}cm
-DEPORTE: ${s.deporte || '—'}${s.puesto ? ' (' + s.puesto + ')' : ''} | Nivel: ${s.nivel || '—'} | Enfoque: ${s.servicio === 'kinesio' ? 'Kinesio' : 'Rendimiento'}
-${s.lesion ? 'LESIÓN: ' + s.lesion : ''}
+📋 **RESUMEN EJECUTIVO**
+(2 párrafos: estado actual del atleta, principales hallazgos de la evaluación, diagnóstico funcional resumido)
 
-DATOS CLAVE:
-• F-V: ${fv ? `${fv.ej} | 1RM: ${fv.oneRM}kg | V0: ${fv.V0}m/s | Pmax: ${fv.Pmax}W | R²: ${fv.r2}` : 'Sin datos'}
-• Fuerza relativa: ${ftRel || '—'}×PC ${frSt}${norm ? ` (ref: <${norm.red} déf, >${norm.amber} elite)` : ''}
-• Saltos: CMJ ${sal?.avg?.cmj?.toFixed(1) || '—'}cm | BJ ${sal?.avg?.bj?.toFixed(1) || '—'}cm | LSI Hop: ${lsi || '—'}%${lsi && +lsi < 90 ? ' ⚠️' : ''}
-• Movilidad: Lunge D/I ${s.lungeD || '—'}°/${s.lungeI || '—'}° | TROM Cad D/I ${s.tromCadD || '—'}°/${s.tromCadI || '—'}°
-• Sprint: 10m ${sp?.sp10 || '—'}s | 30m ${sp?.sp30 || '—'}s | T-Test ${sp?.ttest || '—'}s
-${kine ? `• Kinesio: Zonas ${kine.zonas} | Tests+ ${kine.positivos} | Dx ${kine.dx} | EVA ${kine.eva}/10` : ''}
+📊 **TABLA DE MÉTRICAS CLAVE**
+| VARIABLE | VALOR | REFERENCIA | ESTADO | INTERPRETACIÓN CLÍNICA |
+|----------|-------|------------|--------|------------------------|
+| 1RM/Peso corporal | X | >1.5 elite / 1.0-1.5 moderado / <1.0 déficit | 🟢/🟡/🔴 | (explicación breve) |
+| CMJ | X cm | >40cm excelente / 30-40cm regular / <30cm bajo | 🟢/🟡/🔴 | (explicación breve) |
+| LSI Hop | X% | >90% simétrico / 85-90% leve / <85% asimétrico | 🟢/🟡/🔴 | (explicación breve) |
+| Lunge D/I | X°/X° | >40° normal / 35-40° límite / <35° déficit | 🟢/🟡/🔴 | (explicación breve) |
+| TROM Cadera D/I | X°/X° | >90° normal / 80-90° límite / <80° déficit | 🟢/🟡/🔴 | (explicación breve) |
 
-Generá el informe con ESTE FORMATO EXACTO (usá los emojis como encabezados, sin texto introductorio):
+💪 **FORTALEZAS DETECTADAS**
+(Listado de 3-5 puntos con valores concretos y justificación biomecánica. Ej: "Fuerza relativa de 1.43×PC en sentadilla - posiciona al atleta en percentil superior para su categoría amateur")
 
-📋 RESUMEN EJECUTIVO
-[3 líneas: estado actual con valores, diagnóstico funcional]
+⚠️ **ÁREAS DE MEJORA PRIORITARIAS**
+(Listado de 3-5 déficits con valores específicos, umbrales de referencia y riesgo funcional asociado)
 
-📊 TABLA COMPARATIVA
-[Tabla texto con columnas: VARIABLE | VALOR | REFERENCIA | ESTADO]
+📅 **PLAN DE ACCIÓN RECOMENDADO**
+(Escribí 4-6 prescripciones específicas con: ejercicio, frecuencia semanal, series × repeticiones, intensidad sugerida, y objetivo de cada intervención)
 
-💪 FORTALEZAS
-[2-3 puntos con valores concretos]
+🔁 **CRITERIOS DE RE-EVALUACIÓN**
+(Plazo sugerido en semanas, métricas a mejorar, valores objetivo para considerar evolución positiva, y criterios de alta o progresión)
 
-⚠️ ÁREAS DE MEJORA
-[2-3 déficits con valores y umbral de referencia]
+---
+DATOS DEL ATLETA:
+Nombre: ${s.nombre}
+Edad: ${s.edad || '?'} años
+Deporte: ${s.deporte || '—'} ${s.puesto ? '(' + s.puesto + ')' : ''}
+Nivel: ${s.nivel || '—'}
+Peso: ${s.peso || '?'} kg | Talla: ${s.talla || '?'} cm
+${s.lesion ? 'Lesión actual: ' + s.lesion : 'Sin lesiones activas'}
 
-📅 PLAN DE ACCIÓN
-[3 prescripciones específicas con parámetros]
+RESULTADOS DE LA EVALUACIÓN:
+• Fuerza (F-V): ${fv ? `${fv.ej} | 1RM: ${fv.oneRM}kg | R²: ${fv.r2}` : 'Sin datos'}
+• Fuerza relativa: ${ftRel || '—'}×PC (${frSt})
+• Saltos: CMJ ${sal?.avg?.cmj?.toFixed(1) || '—'}cm | BJ ${sal?.avg?.bj?.toFixed(1) || '—'}cm
+• Simetría (Hop): LSI ${lsi || '—'}% ${lsi && +lsi < 90 ? '(ASIMETRÍA DETECTADA)' : ''}
+• Movilidad tobillo (Lunge): D ${s.lungeD || '—'}° / I ${s.lungeI || '—'}°
+• Movilidad cadera (TROM): D ${s.tromCadD || '—'}° / I ${s.tromCadI || '—'}°
+• Sprint: 10m ${sp?.sp10 || '—'}s | 30m ${sp?.sp30 || '—'}s
+${kine ? `• Evaluación kinesiológica: ${kine.zonas !== '—' ? 'Zonas afectadas: ' + kine.zonas : 'Sin zonas lesionadas'} | EVA: ${kine.eva}/10` : ''}
 
-🔁 RE-EVALUACIÓN
-[Plazo y criterio]`;
+Redactá con lenguaje técnico pero accesible para un deportista. Incluí recomendaciones específicas y cuantificables.`;
 
   try {
     // Usando GROQ - mucho más económico
@@ -3666,140 +3679,277 @@ MoveMetrics v12 · Informe generado automáticamente`;
 function exportarPDF() {
   const { jsPDF } = window.jspdf;
   if (!jsPDF) { alert('Error al cargar jsPDF'); return; }
+  
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const s = cur;
   if (!s) { alert('Sin atleta'); return; }
+  
   const prof = document.getElementById('prof-nombre')?.value || 'Lic. Emanuel Lezcano';
   const inst = document.getElementById('prof-inst')?.value || 'MOVE Centro de Evaluación';
   const texto = document.getElementById('informe-text')?.value || 'Sin informe';
   const fecha = new Date().toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' });
   
-  doc.setFillColor(0, 0, 0);
-  doc.rect(0, 0, 210, 297, 'F');
-  doc.setFillColor(8, 8, 8);
-  doc.rect(0, 0, 210, 44, 'F');
-  doc.setDrawColor(57, 255, 122);
-  doc.setLineWidth(0.4);
-  doc.line(0, 44, 210, 44);
-  doc.setTextColor(57, 255, 122);
-  doc.setFontSize(18);
-  doc.setFont('courier', 'bold');
-  doc.text('MOVEMETRICS', 14, 20);
-  doc.setTextColor(50, 50, 50);
-  doc.setFontSize(7);
-  doc.setFont('courier', 'normal');
-  doc.text('PLATAFORMA DEPORTIVO-CLÍNICA v12', 14, 27);
-  doc.text('INFORME ANALÍTICO PROFESIONAL', 14, 33);
-  doc.setTextColor(120, 120, 120);
-  doc.setFontSize(8);
-  doc.text(prof, 196, 18, { align: 'right' });
-  doc.text(inst, 196, 24, { align: 'right' });
-  doc.text(fecha, 196, 30, { align: 'right' });
+  // ========== CONFIGURACIÓN ==========
+  const colors = {
+    bg: '#0a0a0a',
+    card: '#121212',
+    neon: '#39FF7A',
+    neonDark: '#1a3a1a',
+    text: '#f0f0f0',
+    textDim: '#888888',
+    red: '#FF4444',
+    amber: '#FFB020',
+    blue: '#4D9EFF'
+  };
   
-  doc.setFillColor(12, 12, 12);
-  doc.roundedRect(14, 50, 182, 36, 2, 2, 'F');
+  // ========== PORTADA ==========
+  doc.setFillColor(5, 5, 10);
+  doc.rect(0, 0, 210, 297, 'F');
+  
+  // Línea superior decorativa
+  doc.setDrawColor(57, 255, 122);
+  doc.setLineWidth(1.5);
+  doc.line(20, 25, 190, 25);
+  doc.setLineWidth(0.5);
+  doc.line(20, 27, 190, 27);
+  
+  // Título principal
+  doc.setTextColor(57, 255, 122);
+  doc.setFontSize(28);
+  doc.setFont('helvetica', 'bold');
+  doc.text('MOVEMETRICS', 105, 70, { align: 'center' });
+  
+  doc.setTextColor(100, 100, 100);
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text('PLATAFORMA DEPORTIVO-CLÍNICA', 105, 82, { align: 'center' });
+  
+  // Línea decorativa
   doc.setDrawColor(57, 255, 122);
   doc.setLineWidth(0.3);
-  doc.roundedRect(14, 50, 182, 36, 2, 2, 'S');
-  doc.setTextColor(57, 255, 122);
-  doc.setFontSize(15);
-  doc.setFont('courier', 'bold');
-  doc.text(s.nombre, 20, 61);
-  doc.setTextColor(160, 160, 160);
-  doc.setFontSize(8.5);
-  doc.setFont('courier', 'normal');
-  doc.text(`${s.deporte || '—'}${s.puesto ? ' · ' + s.puesto : ''} · ${s.edad || '?'} años · ${s.peso || '?'}kg · ${s.talla || '?'}cm`, 20, 68);
-  doc.text(`Objetivo: ${s.objetivo || '—'} · Nivel: ${s.nivel || '—'} · ${s.servicio === 'kinesio' ? 'Kinesiología' : 'Rendimiento'}`, 20, 74);
-  if (s.lesion) {
-    doc.setTextColor(255, 176, 32);
-    doc.text(`Lesión: ${s.lesion}`, 20, 80);
-  }
+  doc.line(70, 95, 140, 95);
   
-  const kpis = [
-    ['CMJ', s.lastCMJ ? s.lastCMJ.toFixed(1) + 'cm' : '—'],
-    ['1RM', s.lastFV?.oneRM ? s.lastFV.oneRM.toFixed(0) + 'kg' : '—'],
-    ['Fza.Rel.', s.lastFV && s.peso ? (s.lastFV.oneRM / +s.peso).toFixed(2) + '×PC' : '—'],
-    ['R²', s.lastFV?.r2?.toFixed(4) || '—']
+  // Nombre del atleta
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(22);
+  doc.setFont('helvetica', 'bold');
+  doc.text(s.nombre.toUpperCase(), 105, 125, { align: 'center' });
+  
+  // Datos del atleta
+  doc.setTextColor(150, 150, 150);
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`${s.deporte || 'Deporte no especificado'} · ${s.edad || '?'} años · ${s.peso || '?'} kg · ${s.talla || '?'} cm`, 105, 145, { align: 'center' });
+  
+  // Fecha
+  doc.setTextColor(100, 100, 100);
+  doc.setFontSize(9);
+  doc.text(fecha, 105, 165, { align: 'center' });
+  
+  // Línea inferior
+  doc.setDrawColor(57, 255, 122);
+  doc.setLineWidth(0.5);
+  doc.line(60, 185, 150, 185);
+  
+  // Footer portada
+  doc.setTextColor(80, 80, 80);
+  doc.setFontSize(8);
+  doc.text(prof, 105, 270, { align: 'center' });
+  doc.text(inst, 105, 278, { align: 'center' });
+  
+  // ========== PÁGINA 2 - DATOS DEL ATLETA ==========
+  doc.addPage();
+  doc.setFillColor(10, 10, 15);
+  doc.rect(0, 0, 210, 297, 'F');
+  
+  // Título de sección
+  doc.setTextColor(57, 255, 122);
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  doc.text('DATOS DEL ATLETA', 20, 30);
+  doc.setDrawColor(57, 255, 122);
+  doc.setLineWidth(0.5);
+  doc.line(20, 35, 80, 35);
+  
+  // Tarjeta de datos
+  doc.setFillColor(18, 18, 24);
+  doc.roundedRect(20, 45, 170, 50, 3, 3, 'F');
+  doc.setDrawColor(57, 255, 122);
+  doc.setLineWidth(0.3);
+  doc.roundedRect(20, 45, 170, 50, 3, 3, 'S');
+  
+  // Datos en dos columnas
+  const datosLeft = [
+    ['Nombre', s.nombre],
+    ['Edad', s.edad + ' años'],
+    ['Sexo', s.sexo === 'M' ? 'Masculino' : s.sexo === 'F' ? 'Femenino' : 'Otro']
   ];
-  kpis.forEach(([lbl, val], i) => {
-    const x = 14 + i * 46;
-    doc.setFillColor(15, 15, 15);
-    doc.roundedRect(x, 92, 42, 20, 1.5, 1.5, 'F');
-    doc.setTextColor(50, 50, 50);
-    doc.setFontSize(7);
-    doc.setFont('courier', 'normal');
-    doc.text(lbl.toUpperCase(), x + 3, 99);
+  const datosRight = [
+    ['Deporte', s.deporte || '—'],
+    ['Puesto', s.puesto || '—'],
+    ['Nivel', s.nivel || '—']
+  ];
+  
+  doc.setTextColor(150, 150, 150);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  
+  datosLeft.forEach(([label, value], i) => {
+    doc.text(label + ':', 30, 60 + i * 8);
+    doc.setTextColor(255, 255, 255);
+    doc.text(value, 55, 60 + i * 8);
+    doc.setTextColor(150, 150, 150);
+  });
+  
+  datosRight.forEach(([label, value], i) => {
+    doc.text(label + ':', 120, 60 + i * 8);
+    doc.setTextColor(255, 255, 255);
+    doc.text(value, 145, 60 + i * 8);
+    doc.setTextColor(150, 150, 150);
+  });
+  
+  // Peso/Talla
+  doc.text('Peso:', 30, 84);
+  doc.setTextColor(255, 255, 255);
+  doc.text(s.peso + ' kg', 55, 84);
+  doc.setTextColor(150, 150, 150);
+  doc.text('Talla:', 120, 84);
+  doc.setTextColor(255, 255, 255);
+  doc.text(s.talla + ' cm', 145, 84);
+  
+  // ========== PÁGINA 3 - INFORME IA ==========
+  doc.addPage();
+  doc.setFillColor(10, 10, 15);
+  doc.rect(0, 0, 210, 297, 'F');
+  
+  doc.setTextColor(57, 255, 122);
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  doc.text('INFORME ANALÍTICO', 20, 30);
+  doc.setDrawColor(57, 255, 122);
+  doc.line(20, 35, 100, 35);
+  
+  // Contenido del informe
+  doc.setTextColor(220, 220, 220);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  
+  // Procesar el texto del informe
+  const lines = doc.splitTextToSize(texto, 170);
+  let y = 50;
+  
+  lines.forEach(line => {
+    if (y > 270) {
+      doc.addPage();
+      doc.setFillColor(10, 10, 15);
+      doc.rect(0, 0, 210, 297, 'F');
+      y = 30;
+    }
+    
+    // Resaltar encabezados con emojis
+    if (line.includes('📋') || line.includes('💪') || line.includes('⚠️') || 
+        line.includes('📅') || line.includes('🔁') || line.includes('📊')) {
+      doc.setTextColor(57, 255, 122);
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'bold');
+      doc.text(line, 20, y);
+      y += 7;
+      doc.setTextColor(220, 220, 220);
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+    } else if (line.includes('|')) {
+      // Tablas - formato especial
+      doc.setTextColor(100, 100, 100);
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'normal');
+      doc.text(line, 20, y);
+      y += 5;
+      doc.setTextColor(220, 220, 220);
+    } else {
+      doc.text(line, 20, y);
+      y += 5;
+    }
+  });
+  
+  // ========== PÁGINA 4 - MÉTRICAS CLAVE ==========
+  doc.addPage();
+  doc.setFillColor(10, 10, 15);
+  doc.rect(0, 0, 210, 297, 'F');
+  
+  doc.setTextColor(57, 255, 122);
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  doc.text('MÉTRICAS CLAVE', 20, 30);
+  doc.setDrawColor(57, 255, 122);
+  doc.line(20, 35, 90, 35);
+  
+  // Métricas en tarjetas
+  const metricas = [
+    { label: 'CMJ', value: s.lastCMJ ? s.lastCMJ.toFixed(1) + ' cm' : '—', color: s.lastCMJ && s.lastCMJ >= 40 ? '#39FF7A' : s.lastCMJ && s.lastCMJ >= 30 ? '#FFB020' : '#FF4444' },
+    { label: '1RM', value: s.lastFV?.oneRM ? s.lastFV.oneRM.toFixed(0) + ' kg' : '—', color: '#4D9EFF' },
+    { label: 'Fza. Relativa', value: s.lastFV && s.peso ? (s.lastFV.oneRM / +s.peso).toFixed(2) + '×PC' : '—', color: '#39FF7A' },
+    { label: 'R²', value: s.lastFV?.r2?.toFixed(3) || '—', color: s.lastFV?.r2 >= 0.99 ? '#39FF7A' : s.lastFV?.r2 >= 0.95 ? '#FFB020' : '#FF4444' }
+  ];
+  
+  metricas.forEach((m, i) => {
+    const x = 20 + (i % 2) * 95;
+    const y = 55 + Math.floor(i / 2) * 45;
+    
+    doc.setFillColor(18, 18, 24);
+    doc.roundedRect(x, y, 80, 35, 3, 3, 'F');
+    doc.setDrawColor(57, 255, 122);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(x, y, 80, 35, 3, 3, 'S');
+    
+    doc.setTextColor(100, 100, 100);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.text(m.label, x + 10, y + 12);
+    
+    doc.setTextColor(m.color);
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text(m.value, x + 10, y + 28);
+  });
+  
+  // Lunge Test
+  if (s.lungeD || s.lungeI) {
+    doc.setFillColor(18, 18, 24);
+    doc.roundedRect(20, 145, 170, 40, 3, 3, 'F');
+    doc.setDrawColor(57, 255, 122);
+    doc.roundedRect(20, 145, 170, 40, 3, 3, 'S');
+    
     doc.setTextColor(57, 255, 122);
     doc.setFontSize(10);
-    doc.setFont('courier', 'bold');
-    doc.text(val, x + 3, 108);
-  });
-  
-  const radarCanvas = document.getElementById('radar-chart');
-  if (radarCanvas) {
-    try {
-      const img = radarCanvas.toDataURL('image/png');
-      doc.addImage(img, 'PNG', 14, 118, 86, 70);
-    } catch (e) {}
-  }
-  const fvCanvas = document.getElementById('fv-chart') || document.getElementById('dash-fv-chart');
-  if (fvCanvas) {
-    try {
-      const img = fvCanvas.toDataURL('image/png');
-      doc.addImage(img, 'PNG', 106, 118, 90, 70);
-    } catch (e) {}
+    doc.setFont('helvetica', 'bold');
+    doc.text('LUNGE TEST (Dorsiflexión de tobillo)', 30, 160);
+    
+    doc.setTextColor(200, 200, 200);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    const lungeD = s.lungeD || '—';
+    const lungeI = s.lungeI || '—';
+    doc.text(`Derecha: ${lungeD}°`, 30, 175);
+    doc.text(`Izquierda: ${lungeI}°`, 130, 175);
   }
   
-  doc.setTextColor(210, 210, 210);
-  const lines = doc.splitTextToSize(texto, 182);
-  let y = 198;
-  lines.forEach(line => {
-    if (y > 275) {
-      doc.addPage();
-      doc.setFillColor(0, 0, 0);
-      doc.rect(0, 0, 210, 297, 'F');
-      y = 20;
-    }
-    const isSec = line.startsWith('📋') || line.startsWith('💪') || line.startsWith('⚠️') || line.startsWith('🎯') || line.startsWith('📅') || line.startsWith('🔁');
-    if (isSec) {
-      doc.setFont('courier', 'bold');
-      doc.setFontSize(10);
-      doc.setTextColor(57, 255, 122);
-      y += 2;
-    } else {
-      doc.setFont('courier', 'normal');
-      doc.setFontSize(8.5);
-      doc.setTextColor(200, 200, 200);
-    }
-    doc.text(line, 14, y);
-    y += isSec ? 6 : 5;
-  });
-  
-  const total = doc.getNumberOfPages();
-  for (let i = 1; i <= total; i++) {
+  // Footer en todas las páginas
+  const totalPages = doc.getNumberOfPages();
+  for (let i = 1; i <= totalPages; i++) {
     doc.setPage(i);
-    doc.setFillColor(6, 6, 6);
-    doc.rect(0, 286, 210, 11, 'F');
+    doc.setFillColor(8, 8, 12);
+    doc.rect(0, 285, 210, 12, 'F');
     doc.setDrawColor(57, 255, 122);
     doc.setLineWidth(0.2);
-    doc.line(0, 286, 210, 286);
-    doc.setTextColor(50, 50, 50);
+    doc.line(0, 285, 210, 285);
+    doc.setTextColor(60, 60, 60);
     doc.setFontSize(7);
-    doc.setFont('courier', 'normal');
-    doc.text(`MOVEMETRICS v12 · ${prof} · ${inst}`, 14, 292);
-    doc.text(`${i} / ${total}`, 196, 292, { align: 'right' });
+    doc.setFont('helvetica', 'normal');
+    doc.text(`MOVEMETRICS v12 · ${prof} · ${inst}`, 20, 292);
+    doc.text(`${i} / ${totalPages}`, 190, 292, { align: 'right' });
   }
+  
   doc.save(`MoveMetrics_${s.nombre.replace(/\s/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
-}
-
-function exportAllData() {
-  const blob = new Blob([JSON.stringify(atletas, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'movemetrics_data_' + new Date().toISOString().split('T')[0] + '.json';
-  a.click();
-  URL.revokeObjectURL(url);
 }
 // ══════════════════════════════════════════════════════
 //  INIT
