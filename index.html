@@ -420,7 +420,11 @@ textarea.inp { resize: vertical; min-height: 80px; line-height: 1.6; }
 }
 .btn-full { width: 100%; }
 .btn-sm { padding: 6px 12px; font-size: 11px; }
-
+// Función para convertir imagen a Base64 (logo)
+function getLogoBase64() {
+  // Podés poner la URL de tu logo online o usar uno local
+  return "https://i.imgur.com/placeholder.png"; // Cambiá por tu logo
+}
 /* ══════════════════════════════════════════
    TAGS / BADGES
 ══════════════════════════════════════════ */
@@ -1552,7 +1556,7 @@ textarea.inp { resize: vertical; min-height: 80px; line-height: 1.6; }
         <div class="card"><div class="card-header"><h3>% RM → Carga → VMP</h3></div><div class="card-body" style="overflow-x:auto"><table class="data-table"><thead><tr><th>%RM</th><th>Carga kg</th><th>VMP m/s</th></tr></thead><tbody id="fv-pct-table"></tbody></table></div></div>
       </div>
       <div class="card card-glow">
-        <div class="card-header"><h3>Semáforo Fuerza Relativa — 1RM / Peso corporal</h3></div>
+        <div class="card-header"><h3>Semáforo Fuerza Relativa —  / Peso corporal</h3></div>
         <div class="card-body" id="fv-fuerza-rel"></div>
       </div>
     </div>
@@ -1818,10 +1822,10 @@ textarea.inp { resize: vertical; min-height: 80px; line-height: 1.6; }
 <div class="page" id="page-ajustes">
   <div class="page-header"><div><h2>Ajustes & Referencias técnicas</h2><p>Tablas VMP, normativos, configuración del sistema</p></div></div>
   <div class="card mb-14">
-    <div class="card-header"><h3>VMP al 1RM — Referencia científica</h3></div>
+    <div class="card-header"><h3>VMP al  — Referencia científica</h3></div>
     <div class="card-body" style="overflow-x:auto">
       <table class="data-table" style="min-width:600px">
-        <thead><tr><th>Ejercicio</th><th>VMP @ 1RM</th><th>Zona potencia</th><th>Fuente</th></tr></thead>
+        <thead><tr><th>Ejercicio</th><th>VMP @ </th><th>Zona potencia</th><th>Fuente</th></tr></thead>
         <tbody>
           <tr><td>Back Squat</td><td class="mono-cell text-neon">0.32 m/s</td><td class="mono-cell">0.68–0.84</td><td style="font-size:10px;color:var(--text3)">González-Badillo & Sánchez-Medina (2010)</td></tr>
           <tr><td>Press de Banca</td><td class="mono-cell text-neon">0.18 m/s</td><td class="mono-cell">0.47–0.62</td><td style="font-size:10px;color:var(--text3)">González-Badillo & Sánchez-Medina (2010)</td></tr>
@@ -2448,7 +2452,7 @@ function renderProfileHero() {
       <div class="kpi-sub">cm altura</div>
     </div>
     <div class="kpi">
-      <div class="kpi-label">1RM estimado</div>
+      <div class="kpi-label"> estimado</div>
       <div class="kpi-val">${s.lastFV?.oneRM ? s.lastFV.oneRM.toFixed(0) : '—'}</div>
       <div class="kpi-sub">${s.lastFV?.ejercicio || '—'}</div>
     </div>
@@ -2588,7 +2592,7 @@ function renderDashFV() {
   if (stats) stats.innerHTML = `<div class="flex" style="gap:8px;flex-wrap:wrap">
     <span class="tag tag-g">${fv.ejercicio || '—'}</span>
     <span class="tag tag-b">V₀: ${fv.V0?.toFixed(3) || '—'} m/s</span>
-    <span class="tag tag-b">1RM≈ ${fv.oneRM?.toFixed(1) || '—'} kg</span>
+    <span class="tag tag-b">≈ ${fv.oneRM?.toFixed(1) || '—'} kg</span>
     <span class="tag ${fv.r2 >= 0.99 ? 'tag-g' : fv.r2 >= 0.95 ? 'tag-y' : 'tag-r'}">R² = ${fv.r2?.toFixed(4) || '—'}</span>
   </div>`;
 }
@@ -2656,7 +2660,7 @@ function buildTLItem(tipo, data, fecha) {
   } else if (tipo === 'fv') {
     icon = '📈'; title = `F-V — ${data.ejercicio || '—'}`;
     const r = data.r2; color = r >= 0.99 ? 'dot-g' : r >= 0.95 ? 'dot-y' : 'dot-r';
-    detail = `V₀: ${data.V0?.toFixed(3)||'—'} · 1RM≈${data.oneRM?.toFixed(0)||'—'} kg · R²: ${data.r2?.toFixed(4)||'—'}`;
+    detail = `V₀: ${data.V0?.toFixed(3)||'—'} · ≈${data.oneRM?.toFixed(0)||'—'} kg · R²: ${data.r2?.toFixed(4)||'—'}`;
     if (data.oneRM && cur?.peso) { const fr = (data.oneRM / +cur.peso).toFixed(2); const frc = +fr>=1.5?'var(--neon)':+fr>=1.0?'var(--amber)':'var(--red)'; detail += ` · <span style="color:${frc};font-family:var(--mono)">${fr}×PC</span>`; }
     status = r >= 0.99 ? '🟢 Alta fiabilidad' : r >= 0.95 ? '🟡 Aceptable' : '🔴 Baja fiabilidad';
     statusCls = r >= 0.99 ? 'tl-s-g' : r >= 0.95 ? 'tl-s-y' : 'tl-s-r';
@@ -2795,7 +2799,7 @@ function calcFV() {
     <div class="flex-b mb-8"><span style="font-size:12px;color:var(--text2)">V₀</span><span style="font-family:var(--mono);font-weight:700;color:var(--neon)">${V0.toFixed(4)} m/s</span></div>
     ${F0?`<div class="flex-b mb-8"><span style="font-size:12px;color:var(--text2)">F₀ (VMP=0)</span><span style="font-family:var(--mono);font-weight:700;color:var(--blue)">${F0.toFixed(1)} kg</span></div>`:''}
     ${Pmax?`<div class="flex-b mb-8"><span style="font-size:12px;color:var(--text2)">Pmax estimada</span><span style="font-family:var(--mono);font-weight:700;color:var(--amber)">${Pmax.toFixed(1)} W</span></div>`:''}
-    ${oneRM?`<div class="flex-b mb-8"><span style="font-size:12px;color:var(--text2)">1RM (VMP ${vmpRef})</span><span style="font-family:var(--mono);font-weight:700;color:var(--purple)">${oneRM.toFixed(1)} kg</span></div>`:''}
+    ${oneRM?`<div class="flex-b mb-8"><span style="font-size:12px;color:var(--text2)"> (VMP ${vmpRef})</span><span style="font-family:var(--mono);font-weight:700;color:var(--purple)">${oneRM.toFixed(1)} kg</span></div>`:''}
     <div class="flex-b"><span style="font-size:12px;color:var(--text2)">Fórmula</span><span style="font-family:var(--mono);font-size:11px">VMP = ${V0.toFixed(3)} + ${b.toFixed(5)}×C</span></div>`;
   const pcts = [100,95,90,85,80,75,70,65,60,55,50];
   document.getElementById('fv-pct-table').innerHTML = pcts.map(p => {
@@ -2811,7 +2815,7 @@ function calcFV() {
   if (!cur.evalsByDate[fechaFV]) cur.evalsByDate[fechaFV] = {};
   cur.evalsByDate[fechaFV][ejId] = { a, b, r2, F0, V0, Pmax, oneRM, cargas, vmps, ejercicio:ejName };
   cur.lastFV = { a, b, r2, F0, V0, Pmax, oneRM, vmpRef, ejercicio:ejName, ejId, cargas, vmps };
-  if (oneRM) cur.last1RM = oneRM;
+  if (oneRM) cur.last = oneRM;
   atletas = atletas.map(a => a.id === cur.id ? cur : a);
   saveData();
   renderDashSemaforos();
@@ -2830,7 +2834,7 @@ function renderFVHist() {
     .map(([k, v]) => ({ evalN: +k.split('_').slice(-1)[0]+1, ...v }))
     .sort((a, b) => new Date(b.fecha||0) - new Date(a.fecha||0));
   if (!entries.length) { area.innerHTML = '<p style="font-size:12px;color:var(--text3)">Sin historial para este ejercicio.</p>'; return; }
-  area.innerHTML = `<table class="data-table"><thead><tr><th>Eval #</th><th>Fecha</th><th>1RM (kg)</th><th>Fza.Rel.</th><th>R²</th><th>V₀ m/s</th></tr></thead><tbody>` +
+  area.innerHTML = `<table class="data-table"><thead><tr><th>Eval #</th><th>Fecha</th><th> (kg)</th><th>Fza.Rel.</th><th>R²</th><th>V₀ m/s</th></tr></thead><tbody>` +
     entries.map(e => {
       const fr = e.oneRM && cur.peso ? (e.oneRM/+cur.peso).toFixed(2) : '—';
       const frC = fr !== '—' ? (+fr>=1.5?'var(--neon)':+fr>=1.0?'var(--amber)':'var(--red)') : 'var(--text3)';
@@ -3557,32 +3561,30 @@ async function regenerarInforme() {
     eva: s.kinesio.form?.eva ?? '—'
   } : null;
 
-const prompt = `Eres un kinesiólogo deportivo especialista en evaluación funcional y rendimiento. Redactá un informe TÉCNICO y PROFESIONAL en español rioplatense. Usá el siguiente formato EXACTO:
+// En lugar de tabla con pipes (|), usá este formato:
+const prompt = `Eres un kinesiólogo deportivo. Generá un informe PROFESIONAL con este formato EXACTO:
 
-📋 **RESUMEN EJECUTIVO**
-(2 párrafos: estado actual del atleta, principales hallazgos de la evaluación, diagnóstico funcional resumido)
+📋 RESUMEN EJECUTIVO
+(2 párrafos)
 
-📊 **TABLA DE MÉTRICAS CLAVE**
-| VARIABLE | VALOR | REFERENCIA | ESTADO | INTERPRETACIÓN CLÍNICA |
-|----------|-------|------------|--------|------------------------|
-| 1RM/Peso corporal | X | >1.5 elite / 1.0-1.5 moderado / <1.0 déficit | 🟢/🟡/🔴 | (explicación breve) |
-| CMJ | X cm | >40cm excelente / 30-40cm regular / <30cm bajo | 🟢/🟡/🔴 | (explicación breve) |
-| LSI Hop | X% | >90% simétrico / 85-90% leve / <85% asimétrico | 🟢/🟡/🔴 | (explicación breve) |
-| Lunge D/I | X°/X° | >40° normal / 35-40° límite / <35° déficit | 🟢/🟡/🔴 | (explicación breve) |
-| TROM Cadera D/I | X°/X° | >90° normal / 80-90° límite / <80° déficit | 🟢/🟡/🔴 | (explicación breve) |
+📊 MÉTRICAS CLAVE
+/Peso corporal: 1.43×PC - REFERENCIA: >1.5 elite / 1.0-1.5 moderado / <1.0 déficit - ESTADO: 🟡 MODERADO - INTERPRETACIÓN: Fuerza relativa moderada
+CMJ: 157.5 cm - REFERENCIA: >40cm excelente / 30-40cm regular / <30cm bajo - ESTADO: 🟢 EXCELENTE
+LSI Hop: 89.1% - REFERENCIA: >90% simétrico / 85-90% leve / <85% asimétrico - ESTADO: 🔴 ASIMETRÍA
+Lunge D/I: 40°/38° - REFERENCIA: >40° normal / 35-40° límite / <35° déficit - ESTADO: 🟢 NORMAL
+TROM Cadera D/I: 100°/105° - REFERENCIA: >90° normal / 80-90° límite / <80° déficit - ESTADO: 🟢 NORMAL
 
-💪 **FORTALEZAS DETECTADAS**
-(Listado de 3-5 puntos con valores concretos y justificación biomecánica. Ej: "Fuerza relativa de 1.43×PC en sentadilla - posiciona al atleta en percentil superior para su categoría amateur")
+💪 FORTALEZAS
+(3-5 puntos)
 
-⚠️ **ÁREAS DE MEJORA PRIORITARIAS**
-(Listado de 3-5 déficits con valores específicos, umbrales de referencia y riesgo funcional asociado)
+⚠️ ÁREAS DE MEJORA
+(3-5 puntos)
 
-📅 **PLAN DE ACCIÓN RECOMENDADO**
-(Escribí 4-6 prescripciones específicas con: ejercicio, frecuencia semanal, series × repeticiones, intensidad sugerida, y objetivo de cada intervención)
+📅 PLAN DE ACCIÓN
+(4-6 prescripciones específicas)
 
-🔁 **CRITERIOS DE RE-EVALUACIÓN**
-(Plazo sugerido en semanas, métricas a mejorar, valores objetivo para considerar evolución positiva, y criterios de alta o progresión)
-
+🔁 RE-EVALUACIÓN
+(plazo y criterios)`;
 ---
 DATOS DEL ATLETA:
 Nombre: ${s.nombre}
@@ -3593,7 +3595,7 @@ Peso: ${s.peso || '?'} kg | Talla: ${s.talla || '?'} cm
 ${s.lesion ? 'Lesión actual: ' + s.lesion : 'Sin lesiones activas'}
 
 RESULTADOS DE LA EVALUACIÓN:
-• Fuerza (F-V): ${fv ? `${fv.ej} | 1RM: ${fv.oneRM}kg | R²: ${fv.r2}` : 'Sin datos'}
+• Fuerza (F-V): ${fv ? `${fv.ej} | : ${fv.oneRM}kg | R²: ${fv.r2}` : 'Sin datos'}
 • Fuerza relativa: ${ftRel || '—'}×PC (${frSt})
 • Saltos: CMJ ${sal?.avg?.cmj?.toFixed(1) || '—'}cm | BJ ${sal?.avg?.bj?.toFixed(1) || '—'}cm
 • Simetría (Hop): LSI ${lsi || '—'}% ${lsi && +lsi < 90 ? '(ASIMETRÍA DETECTADA)' : ''}
@@ -3704,6 +3706,20 @@ function exportarPDF() {
   
   // ========== PORTADA ==========
   doc.setFillColor(5, 5, 10);
+    // Agregar LOGO (si tenés la imagen)
+  try {
+    // Si tenés el logo en Base64, usalo
+    // doc.addImage(logoBase64, 'PNG', 75, 30, 60, 60);
+    
+    // Texto del club como logo temporal
+    doc.setTextColor(57, 255, 122);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.text('THE MOVE CLUB', 105, 45, { align: 'center' });
+    doc.setFontSize(7);
+    doc.setTextColor(80, 80, 80);
+    doc.text('ESTD 2021', 105, 52, { align: 'center' });
+  } catch(e) { console.log('Logo no disponible'); }
   doc.rect(0, 0, 210, 297, 'F');
   
   // Línea superior decorativa
@@ -3886,7 +3902,7 @@ function exportarPDF() {
   // Métricas en tarjetas
   const metricas = [
     { label: 'CMJ', value: s.lastCMJ ? s.lastCMJ.toFixed(1) + ' cm' : '—', color: s.lastCMJ && s.lastCMJ >= 40 ? '#39FF7A' : s.lastCMJ && s.lastCMJ >= 30 ? '#FFB020' : '#FF4444' },
-    { label: '1RM', value: s.lastFV?.oneRM ? s.lastFV.oneRM.toFixed(0) + ' kg' : '—', color: '#4D9EFF' },
+    { label: '', value: s.lastFV?.oneRM ? s.lastFV.oneRM.toFixed(0) + ' kg' : '—', color: '#4D9EFF' },
     { label: 'Fza. Relativa', value: s.lastFV && s.peso ? (s.lastFV.oneRM / +s.peso).toFixed(2) + '×PC' : '—', color: '#39FF7A' },
     { label: 'R²', value: s.lastFV?.r2?.toFixed(3) || '—', color: s.lastFV?.r2 >= 0.99 ? '#39FF7A' : s.lastFV?.r2 >= 0.95 ? '#FFB020' : '#FF4444' }
   ];
