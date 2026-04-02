@@ -3517,7 +3517,7 @@ function saveKinesio(){
 }
 
 // ══════════════════════════════════════════════════════
-//  INFORME IA + PDF 
+//  INFORME IA + PDF (con GROQ - GRATUITO)
 // ══════════════════════════════════════════════════════
 
 function openInformeIA() {
@@ -3534,10 +3534,10 @@ async function regenerarInforme() {
   document.getElementById('informe-loading').classList.remove('hidden');
   document.getElementById('informe-editor-wrap').classList.add('hidden');
 
-  // 🔑 TU API KEY DE GROQ (la misma que tenés)
+  // 🔑 USANDO GROQ (gratis y rápido)
   const GROQ_API_KEY = "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";
   
-  // 📊 Datos esenciales compactos
+  // Datos esenciales compactos
   const sal = getLastEval('saltos');
   const sp = getLastEval('sprint');
   const fv = s.lastFV ? { ej: s.lastFV.ejercicio, oneRM: s.lastFV.oneRM?.toFixed(1), V0: s.lastFV.V0?.toFixed(3), Pmax: s.lastFV.Pmax?.toFixed(0), r2: s.lastFV.r2?.toFixed(4) } : null;
@@ -3577,7 +3577,7 @@ Generá el informe con ESTE FORMATO EXACTO (usá los emojis como encabezados, si
 [3 líneas: estado actual con valores, diagnóstico funcional]
 
 📊 TABLA COMPARATIVA
-[Tabla texto con columnas: VARIABLE | VALOR | REFERENCIA | ESTADO. Incluir: 1RM/PC, CMJ, LSI, Lunge, TROM]
+[Tabla texto con columnas: VARIABLE | VALOR | REFERENCIA | ESTADO]
 
 💪 FORTALEZAS
 [2-3 puntos con valores concretos]
@@ -3592,7 +3592,7 @@ Generá el informe con ESTE FORMATO EXACTO (usá los emojis como encabezados, si
 [Plazo y criterio]`;
 
   try {
-    // Usar GROQ (gratis y rápido)
+    // Usando GROQ - mucho más económico
     const respuesta = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -3609,8 +3609,7 @@ Generá el informe con ESTE FORMATO EXACTO (usá los emojis como encabezados, si
           { role: 'user', content: prompt }
         ],
         temperature: 0.5,
-        max_tokens: 800,
-        top_p: 0.9
+        max_tokens: 800
       })
     });
 
@@ -3627,11 +3626,11 @@ Generá el informe con ESTE FORMATO EXACTO (usá los emojis como encabezados, si
     document.getElementById('informe-sub').textContent = '✅ Informe generado - Editá y exportá a PDF';
     
   } catch (e) {
-    console.error('Error GROQ:', e);
+    console.error('Error:', e);
     document.getElementById('informe-loading').classList.add('hidden');
     document.getElementById('informe-sub').textContent = 'Error: ' + e.message;
     
-    // Fallback: generar informe local sin IA
+    // Generar informe local sin IA (fallback)
     const informeLocal = `📋 INFORME KINESIOLÓGICO - ${s.nombre}
 Fecha: ${new Date().toLocaleDateString('es-AR')}
 
@@ -3641,20 +3640,20 @@ ${s.lesion ? 'Motivo de consulta: ' + s.lesion : 'Evaluación de rendimiento dep
 ${kine?.zonas !== '—' ? 'Zonas afectadas: ' + kine.zonas : 'Sin zonas lesionadas activas.'}
 
 💪 FORTALEZAS
-• ${s.lastCMJ && s.lastCMJ >= 40 ? `CMJ de ${s.lastCMJ.toFixed(1)} cm - buena capacidad elástica` : 'Evaluación de saltos pendiente'}
-• ${ftRel && +ftRel >= 1.5 ? `Fuerza relativa de ${ftRel}×PC - excelente nivel` : 'Desarrollar fuerza progresivamente'}
+• ${s.lastCMJ && s.lastCMJ >= 40 ? `CMJ de ${s.lastCMJ.toFixed(1)} cm` : 'Evaluación de saltos pendiente'}
+• ${ftRel && +ftRel >= 1.5 ? `Fuerza relativa de ${ftRel}×PC` : 'Desarrollar fuerza progresivamente'}
 
 ⚠️ ÁREAS DE MEJORA
-${kine?.zonas !== '—' ? '• Zonas con dolor: ' + kine.zonas + ' - priorizar readaptación' : '• Sin lesiones activas detectadas'}
-${lsi && +lsi < 90 ? '• Asimetría en Hop: ' + lsi + '% LSI - trabajar bilateralidad' : ''}
+${kine?.zonas !== '—' ? '• Zonas con dolor: ' + kine.zonas : '• Sin lesiones activas'}
+${lsi && +lsi < 90 ? '• Asimetría en Hop: ' + lsi + '%' : ''}
 
 📅 PLAN DE ACCIÓN
-• Continuar con plan de entrenamiento específico
+• Continuar con plan de entrenamiento
 • Registrar evaluaciones periódicas
-• Monitorear evolución semanal
+• Monitorear evolución
 
 🔁 RE-EVALUACIÓN
-15 días - objetivo: mejorar métricas en déficit
+15 días
 
 ---
 MoveMetrics v12 · Informe generado automáticamente`;
@@ -3675,10 +3674,8 @@ function exportarPDF() {
   const texto = document.getElementById('informe-text')?.value || 'Sin informe';
   const fecha = new Date().toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' });
   
-  // Fondo negro
   doc.setFillColor(0, 0, 0);
   doc.rect(0, 0, 210, 297, 'F');
-  // Header
   doc.setFillColor(8, 8, 8);
   doc.rect(0, 0, 210, 44, 'F');
   doc.setDrawColor(57, 255, 122);
@@ -3699,7 +3696,6 @@ function exportarPDF() {
   doc.text(inst, 196, 24, { align: 'right' });
   doc.text(fecha, 196, 30, { align: 'right' });
   
-  // Atleta box
   doc.setFillColor(12, 12, 12);
   doc.roundedRect(14, 50, 182, 36, 2, 2, 'F');
   doc.setDrawColor(57, 255, 122);
@@ -3719,7 +3715,6 @@ function exportarPDF() {
     doc.text(`Lesión: ${s.lesion}`, 20, 80);
   }
   
-  // KPIs
   const kpis = [
     ['CMJ', s.lastCMJ ? s.lastCMJ.toFixed(1) + 'cm' : '—'],
     ['1RM', s.lastFV?.oneRM ? s.lastFV.oneRM.toFixed(0) + 'kg' : '—'],
@@ -3740,7 +3735,6 @@ function exportarPDF() {
     doc.text(val, x + 3, 108);
   });
   
-  // Charts
   const radarCanvas = document.getElementById('radar-chart');
   if (radarCanvas) {
     try {
@@ -3756,7 +3750,6 @@ function exportarPDF() {
     } catch (e) {}
   }
   
-  // Contenido
   doc.setTextColor(210, 210, 210);
   const lines = doc.splitTextToSize(texto, 182);
   let y = 198;
@@ -3782,75 +3775,6 @@ function exportarPDF() {
     y += isSec ? 6 : 5;
   });
   
-  // Página Kinesio
-  if (s.kinesio && (Object.keys(s.kinesio.bodyZones || {}).length || Object.values(s.kinesio.tests || {}).some(t => t.result === 'pos'))) {
-    doc.addPage();
-    doc.setFillColor(0, 0, 0);
-    doc.rect(0, 0, 210, 297, 'F');
-    doc.setFillColor(8, 8, 8);
-    doc.rect(0, 0, 210, 34, 'F');
-    doc.setDrawColor(57, 255, 122);
-    doc.setLineWidth(0.4);
-    doc.line(0, 34, 210, 34);
-    doc.setTextColor(57, 255, 122);
-    doc.setFontSize(14);
-    doc.setFont('courier', 'bold');
-    doc.text('EVALUACIÓN KINESIOLÓGICA', 14, 18);
-    doc.setTextColor(100, 100, 100);
-    doc.setFontSize(8);
-    doc.setFont('courier', 'normal');
-    doc.text(`${s.nombre} · ${new Date().toLocaleDateString('es-AR')}`, 14, 26);
-    let ky = 44;
-    const zonas = Object.entries(s.kinesio.bodyZones || {}).filter(([, v]) => !v.recuperado);
-    if (zonas.length) {
-      doc.setFillColor(20, 5, 5);
-      doc.roundedRect(14, ky, 182, 8 + zonas.length * 7, 2, 2, 'F');
-      doc.setDrawColor(255, 68, 68);
-      doc.setLineWidth(0.3);
-      doc.roundedRect(14, ky, 182, 8 + zonas.length * 7, 2, 2, 'S');
-      doc.setTextColor(255, 68, 68);
-      doc.setFontSize(9);
-      doc.setFont('courier', 'bold');
-      doc.text('ZONAS LESIONADAS', 18, ky + 7);
-      doc.setFont('courier', 'normal');
-      doc.setFontSize(8.5);
-      doc.setTextColor(200, 150, 150);
-      zonas.forEach(([, z], i) => {
-        doc.text(`• ${z.label}  EVA: ${z.eva || '—'}/10`, 22, ky + 7 + 7 * (i + 1));
-      });
-      ky += 14 + zonas.length * 7;
-    }
-    const posTests = Object.entries(s.kinesio.tests || {}).filter(([, v]) => v.result === 'pos');
-    const allTests = [...ORTHO_TESTS.subacro, ...ORTHO_TESTS.manguito, ...ORTHO_TESTS.biceps, ...ORTHO_TESTS.ligamentos, ...ORTHO_TESTS.meniscos, ...ORTHO_TESTS.funcionales, ...ORTHO_TESTS.tobillo, ...ORTHO_TESTS.lumbar, ...ORTHO_TESTS.cadera];
-    if (posTests.length) {
-      ky += 6;
-      doc.setFillColor(20, 5, 5);
-      doc.roundedRect(14, ky, 182, 10 + posTests.length * 9, 2, 2, 'F');
-      doc.setDrawColor(255, 68, 68);
-      doc.setLineWidth(0.3);
-      doc.roundedRect(14, ky, 182, 10 + posTests.length * 9, 2, 2, 'S');
-      doc.setTextColor(255, 68, 68);
-      doc.setFontSize(9);
-      doc.setFont('courier', 'bold');
-      doc.text('TESTS ORTOPÉDICOS POSITIVOS', 18, ky + 8);
-      ky += 12;
-      posTests.forEach(([id, v]) => {
-        const t = allTests.find(x => x.id === id);
-        if (!t) return;
-        doc.setFont('courier', 'bold');
-        doc.setFontSize(8.5);
-        doc.setTextColor(255, 100, 100);
-        doc.text(`+ ${t.name}`, 18, ky);
-        doc.setFont('courier', 'normal');
-        doc.setTextColor(150, 150, 150);
-        const subt = ` — ${t.sub}${v.obs ? ' — ' + v.obs : ''}`;
-        doc.text(subt, 18 + doc.getTextWidth(`+ ${t.name}`), ky);
-        ky += 7;
-      });
-    }
-  }
-  
-  // Footer
   const total = doc.getNumberOfPages();
   for (let i = 1; i <= total; i++) {
     doc.setPage(i);
@@ -3877,7 +3801,6 @@ function exportAllData() {
   a.click();
   URL.revokeObjectURL(url);
 }
-
 // ══════════════════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════════════════
