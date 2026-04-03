@@ -2057,7 +2057,7 @@ textarea.inp { resize: vertical; min-height: 80px; line-height: 1.6; }
 //  MoveMetrics v12 — JavaScript completo
 //  CONFIG: colocá tu API Key de Anthropic acá abajo
 // ══════════════════════════════════════════════════════════════
-window.MM_API_KEY = 'TU_API_KEY_AQUI'; // ← reemplazá con tu key
+const GROQ_API_KEY = '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'; // ← reemplazá con tu key
 //  Todas las funciones referenciadas en el HTML
 // ══════════════════════════════════════════════════════════════
 
@@ -3530,7 +3530,7 @@ function openInformeIA(){
 async function regenerarInforme(){
   try{
     // 🔑 USANDO GROQ (GRATIS - sin bloqueos)
-    const GROQ_API_KEY = "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";
+    const GROQ_API_KEY = "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";
     
     const respuesta = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
