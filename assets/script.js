@@ -191,7 +191,19 @@ function showProfileTab(tab, btn) {
   if (tab === 'kinesio')    initKinesio();
   if (tab === 'fuerza')     renderFVHist();
   if (tab === 'saltos')     renderSimetriasTabla();
-  if (tab === 'movilidad')  setTimeout(redrawGauges, 60);
+  if (tab === 'movilidad') {
+    setTimeout(redrawGauges, 60);
+    const amPanel = document.getElementById('adulto-mayor-tests');
+    if (amPanel && cur) {
+      amPanel.classList.toggle('hidden', cur.deporte !== 'Adulto Mayor');
+      if (cur.deporte === 'Adulto Mayor') {
+        if (cur.sitToStand) document.getElementById('sts-reps').value = cur.sitToStand;
+        if (cur.unipodal)   document.getElementById('unipodal-seg').value = cur.unipodal;
+        if (cur.tug)        document.getElementById('tug-seg').value = cur.tug;
+        if (cur.dist6min)   document.getElementById('dist6min-m').value = cur.dist6min;
+      }
+    }
+  }
 }
 
 function openModal(id)  { document.getElementById(id).classList.add('open');    document.body.style.overflow = 'hidden'; }
@@ -504,45 +516,106 @@ function renderDashboard() {
 
 function renderRadar() {
   const s = cur; if (!s) return;
-  const obj = s.objetivo || 'rendimiento';
-  let labels, actual, ideal, targets;
-  if (obj === 'rendimiento' || obj === 'fuerza') {
-    labels = ['Potencia\n(CMJ)', 'Velocidad\n(Sprint)', 'Movilidad\n(TROM)', 'Simetría\n(LSI)', 'Fuerza\n(F-V)'];
-    const cmjS = s.lastCMJ ? Math.min(100, s.lastCMJ / 60 * 100) : 0;
-    const sp = getLastEval('sprint'); const spS = sp?.sp10 ? Math.min(100, (1.80 / sp.sp10) * 100) : 0;
-    const tromAvg = ((s.tromCadD || 0) + (s.tromCadI || 0)) / 2; const tromS = Math.min(100, tromAvg / 120 * 100);
-    const lastSal = getLastEval('saltos');
-    const simS = lastSal?.avg?.shD && lastSal?.avg?.shI ? Math.min(100, Math.min(lastSal.avg.shD, lastSal.avg.shI) / Math.max(lastSal.avg.shD, lastSal.avg.shI) * 100) : 0;
-    const fvS = s.lastFV?.r2 ? s.lastFV.r2 * 100 : 0;
-    actual = [cmjS, spS, tromS, simS, fvS]; ideal = [85, 85, 80, 90, 95];
-    targets = ['saltos', 'velocidad', 'movilidad', 'saltos', 'fuerza'];
-  } else if (obj === 'hipertrofia') {
-    labels = ['Fuerza\nmáx', 'Simetría', 'Volumen', 'Recuperación', 'Técnica'];
-    actual = [s.lastFV?.r2 ? s.lastFV.r2 * 100 : 0, 60, 50, 60, 70]; ideal = [90, 85, 80, 85, 90];
-    targets = ['fuerza', 'saltos', 'fuerza', 'fatiga', 'fms'];
+  const esAdultoMayor = s.deporte === 'Adulto Mayor';
+
+  // ── Helpers de score ──
+  const sp      = getLastEval('sprint');
+  const lastSal = getLastEval('saltos');
+  const lastMov = getLastEval('movilidad') || s;
+
+  // FUERZA: promedio de fuerza relativa de todos los ejercicios F-V registrados
+  const fvEvals = Object.entries(s.evals || {})
+    .filter(([k]) => k.startsWith('fv_'))
+    .map(([,v]) => v)
+    .filter(v => v.oneRM && s.peso);
+  const fzaScores = fvEvals.map(v => {
+    const ratio = v.oneRM / +s.peso;
+    const nk = Object.keys(STR_NORMS).find(k => v.ejercicio?.toLowerCase().includes(STR_NORMS[k].name.toLowerCase().split(' ')[0].toLowerCase()));
+    const norm = nk ? STR_NORMS[nk] : { red: 1.0, amber: 1.5 };
+    return Math.min(100, (ratio / norm.amber) * 100);
+  });
+  const fuerzaS = fzaScores.length ? fzaScores.reduce((a,b)=>a+b,0)/fzaScores.length : 0;
+
+  // MOVILIDAD: promedio tobillo (Lunge), cadera (TROM), hombro (TROM)
+  const lungeAvg   = ((+s.lungeD||0)+(+s.lungeI||0))/2;
+  const tromCadAvg = ((+s.tromCadD||0)+(+s.tromCadI||0))/2;
+  const tromHomAvg = ((+s.tromHomD||0)+(+s.tromHomI||0))/2;
+  const movScores  = [lungeAvg?Math.min(100,lungeAvg/50*100):null, tromCadAvg?Math.min(100,tromCadAvg/120*100):null, tromHomAvg?Math.min(100,tromHomAvg/150*100):null].filter(v=>v!==null);
+  const movilS     = movScores.length ? movScores.reduce((a,b)=>a+b,0)/movScores.length : 0;
+
+  // VELOCIDAD: 10m sprint (deportista) o TUG (adulto mayor)
+  let velS = 0;
+  if (esAdultoMayor) {
+    const tug = s.tug || null; // segundos — referencia: <10s normal, <12s límite
+    velS = tug ? Math.min(100, (12/tug)*100) : 0;
   } else {
-    labels = ['ROM', 'Estabilidad', 'Sin dolor\n(EVA inv.)', 'Funcionalidad', 'Simetría'];
-    const tromAvg = ((s.tromCadD || 0) + (s.tromCadI || 0)) / 2;
-    const lungeAvg = ((s.lungeD || 0) + (s.lungeI || 0)) / 2;
-    actual = [Math.min(100, tromAvg / 120 * 100), Math.min(100, lungeAvg / 60 * 100), 70, 60, 65];
-    ideal = [80, 80, 85, 80, 90]; targets = ['movilidad', 'fms', 'kinesio', 'fms', 'saltos'];
+    velS = sp?.sp10 ? Math.min(100, (1.80/sp.sp10)*100) : 0;
   }
-  document.getElementById('radar-obj-tag').textContent = obj.charAt(0).toUpperCase() + obj.slice(1);
+
+  // RESISTENCIA: VO2max estimado o 6MWT (adulto mayor)
+  let resS = 0;
+  if (esAdultoMayor) {
+    const dist6min = s.dist6min || null; // metros — referencia: >500m bueno
+    resS = dist6min ? Math.min(100, dist6min/600*100) : 0;
+  } else {
+    const lastFat = getLastEval('fatiga');
+    resS = lastFat?.hrv ? Math.min(100, lastFat.hrv/80*100) : 0;
+  }
+
+  let labels, actual, ideal, targets;
+
+  if (esAdultoMayor) {
+    // ── ADULTO MAYOR: salud funcional ──
+    const equilibrioS = s.unipodal ? Math.min(100, s.unipodal/30*100) : 0; // seg apoyo unipodal — ref 30s
+    const stsS        = s.sitToStand ? Math.min(100, s.sitToStand/15*100) : 0; // reps en 30s — ref 15 reps
+    labels  = ['Fuerza
+(Sit-to-Stand)', 'Velocidad
+(TUG)', 'Movilidad
+(Tobillo/Cadera)', 'Resistencia
+(6MWT)', 'Equilibrio
+(Unipodal)'];
+    actual  = [stsS, velS, movilS, resS, equilibrioS];
+    ideal   = [75, 75, 75, 75, 75];
+    targets = ['fuerza','velocidad','movilidad','fatiga','fms'];
+  } else {
+    // ── DEPORTISTA: rendimiento ──
+    labels  = ['Fuerza
+(F-V rel.)', 'Velocidad
+(Sprint)', 'Movilidad
+(Tobillo/Cad/Hom)', 'Resistencia
+(HRV)', 'Potencia
+(CMJ)'];
+    const cmjS = s.lastCMJ ? Math.min(100, s.lastCMJ/60*100) : 0;
+    actual  = [fuerzaS, velS, movilS, resS, cmjS];
+    ideal   = [80, 80, 75, 70, 80];
+    targets = ['fuerza','velocidad','movilidad','fatiga','saltos'];
+  }
+
+  const tag = document.getElementById('radar-obj-tag');
+  if (tag) tag.textContent = esAdultoMayor ? 'Adulto Mayor' : (s.objetivo||'Rendimiento');
+
   const ctx = document.getElementById('radar-chart'); if (!ctx) return;
   if (radarChart) radarChart.destroy();
   radarChart = new Chart(ctx, {
     type: 'radar',
     data: { labels, datasets: [
-      { label:'Objetivo', data:ideal, backgroundColor:'rgba(77,158,255,.08)', borderColor:'rgba(77,158,255,.3)', borderWidth:1.5, pointRadius:3 },
-      { label:'Actual',   data:actual, backgroundColor:'rgba(57,255,122,.12)', borderColor:'rgba(57,255,122,.7)', borderWidth:2, pointRadius:5, pointBackgroundColor:'#39FF7A', pointHoverRadius:8 }
+      { label:'Referencia', data:ideal, backgroundColor:'rgba(77,158,255,.06)', borderColor:'rgba(77,158,255,.25)', borderWidth:1.5, pointRadius:2 },
+      { label:'Actual',     data:actual, backgroundColor:'rgba(57,255,122,.10)', borderColor:'rgba(57,255,122,.8)', borderWidth:2, pointRadius:5, pointBackgroundColor:'#39FF7A', pointHoverRadius:8 }
     ]},
-    options: { responsive:true, animation:{ duration:600 },
-      plugins:{ legend:{ display:false } },
+    options: { responsive:true, animation:{ duration:700 },
+      plugins:{ legend:{ display:false },
+        tooltip:{ callbacks:{ label: ctx => ' ' + ctx.dataset.label + ': ' + ctx.raw.toFixed(0) + '%' } } },
       scales:{ r:{ beginAtZero:true, max:100,
-        grid:{ color:'rgba(255,255,255,.05)' }, angleLines:{ color:'rgba(255,255,255,.06)' },
-        pointLabels:{ color:'#666', font:{ family:'Space Grotesk', size:10, weight:'600' } },
+        grid:{ color:'rgba(255,255,255,.05)' },
+        angleLines:{ color:'rgba(255,255,255,.06)' },
+        pointLabels:{ color:'rgba(255,255,255,.5)', font:{ size:10, weight:'600' } },
         ticks:{ display:false } } },
-      onClick:(e, els) => { if (els.length && targets) { const t = targets[els[0].index]; if (t) { const btn = document.querySelector(`[onclick*="showProfileTab('${t}'"]`); showProfileTab(t, btn); } } }
+      onClick:(e, els) => {
+        if (els.length && targets) {
+          const t = targets[els[0].index];
+          if (t) { const btn = document.querySelector('[onclick*="showProfileTab('' + t + ''"]'); showProfileTab(t, btn); }
+        }
+      }
     }
   });
 }
@@ -1035,7 +1108,6 @@ function onMov() {
   if (tromCadD) { const e=document.getElementById('gv-tcd'); if(e){e.textContent=tromCadD;e.style.color=colors.tcd;} }
   if (tromCadI) { const e=document.getElementById('gv-tci'); if(e){e.textContent=tromCadI;e.style.color=colors.tci;} }
   if (cur) { cur.lungeD=ld;cur.lungeI=li;cur.tromCadD=tromCadD;cur.tromCadI=tromCadI;cur.tromHomD=tromHomD;cur.tromHomI=tromHomI; }
-  drawMovRadar(ld,li,tromCadD,tromCadI,tromHomD,tromHomI);
   renderMovSemaforos(ld,li,tromCadD,tromCadI,tromHomD,tromHomI);
 }
 
@@ -1915,6 +1987,22 @@ function saveVideoSalto() {
   saveData();
   renderProfileHero();
   showSaveToast();
+}
+
+
+function saveFuncTests() {
+  if (!cur) return;
+  const sts  = +document.getElementById('sts-reps')?.value||null;
+  const uni  = +document.getElementById('unipodal-seg')?.value||null;
+  const tug  = +document.getElementById('tug-seg')?.value||null;
+  const d6m  = +document.getElementById('dist6min-m')?.value||null;
+  if (sts)  cur.sitToStand = sts;
+  if (uni)  cur.unipodal   = uni;
+  if (tug)  cur.tug        = tug;
+  if (d6m)  cur.dist6min   = d6m;
+  atletas = atletas.map(a => a.id === cur.id ? cur : a);
+  saveData();
+  renderRadar();
 }
 
 // ══════════════════════════════════════════════════════
