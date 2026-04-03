@@ -355,7 +355,7 @@ function renderAtletas() {
   document.getElementById('atletas-count').textContent =
     atletas.length + ' atleta' + (atletas.length !== 1 ? 's' : '') + ' registrado' + (atletas.length !== 1 ? 's' : '');
   if (!atletas.length) {
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text3)"><div style="font-size:40px;margin-bottom:12px">👤</div><div style="font-size:16px;font-weight:700">Sin atletas</div><p style="font-size:13px;margin-top:6px">Creá tu primer atleta para comenzar</p></div>';
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:80px 20px"><div style="width:72px;height:72px;border-radius:20px;background:rgba(57,255,122,.06);border:1px solid rgba(57,255,122,.12);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 20px">👤</div><div style="font-size:20px;font-weight:800;color:#fff;margin-bottom:8px;letter-spacing:-.4px">Sin atletas</div><p style="font-size:13px;color:rgba(255,255,255,.3);line-height:1.6">Creá tu primer atleta para comenzar<br>a registrar evaluaciones.</p></div>';
     return;
   }
   grid.innerHTML = atletas.map(s => {
@@ -365,25 +365,30 @@ function renderAtletas() {
       ? `<img src="${s.foto}" style="width:40px;height:40px;border-radius:10px;object-fit:cover;border:1px solid var(--border2);flex-shrink:0">`
       : `<div class="athlete-av-sm">${s.nombre.charAt(0)}</div>`;
     return `<div class="athlete-card ${hasInjury ? 'has-injury' : ''}" onclick="selectAtleta(${s.id})">
-      <div class="flex mb-12" style="align-items:flex-start;gap:12px">
-        ${photoHtml}
-        <div style="flex:1;min-width:0">
-          <div style="font-size:15px;font-weight:700;margin-bottom:2px">${s.nombre}</div>
-          <div style="font-size:11px;color:var(--text2)">${s.deporte || 'Sin deporte'}${s.puesto ? ' · ' + s.puesto : ''} · ${s.edad || '?'}a · ${s.peso || '?'}kg</div>
-          <div style="font-size:11px;color:var(--neon);margin-top:2px">${s.servicio === 'kinesio' ? '🏥 Kinesio' : '⚡ Rendimiento'} · ${s.objetivo || '—'}</div>
-          ${s.lesion ? `<div style="font-size:11px;color:var(--amber);margin-top:2px">📌 ${s.lesion}</div>` : ''}
+      <div class="athlete-card-inner">
+        <div class="flex mb-12" style="align-items:flex-start;gap:14px">
+          ${photoHtml}
+          <div style="flex:1;min-width:0">
+            <div style="font-size:16px;font-weight:800;margin-bottom:3px;color:#fff;letter-spacing:-.3px">${s.nombre}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:4px">${s.deporte || 'Sin deporte'}${s.puesto ? ' · ' + s.puesto : ''} · ${s.edad || '?'} años · ${s.peso || '?'} kg</div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <span style="font-size:10px;font-weight:700;color:var(--neon);font-family:var(--mono)">${s.servicio === 'kinesio' ? '🏥 KINESIO' : '⚡ RENDIMIENTO'}</span>
+              ${s.lesion ? `<span style="font-size:10px;color:var(--amber)">· 📌 ${s.lesion}</span>` : ''}
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end">
+            <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();editAtletaById(${s.id})" style="padding:4px 8px;font-size:10px;opacity:.5">✏️</button>
+            <button class="btn btn-red btn-sm"   onclick="deleteAtleta(${s.id},event)" style="padding:4px 8px;font-size:10px;opacity:.5">🗑️</button>
+          </div>
         </div>
-        <div style="display:flex;gap:6px">
-          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();editAtletaById(${s.id})" style="padding:4px 8px;font-size:10px">✏️</button>
-          <button class="btn btn-red btn-sm"   onclick="deleteAtleta(${s.id},event)"                      style="padding:4px 8px;font-size:10px">🗑️</button>
+        <div style="height:1px;background:rgba(255,255,255,.05);margin-bottom:12px"></div>
+        <div style="display:flex;gap:6px;align-items:center;justify-content:space-between">
+          <div style="display:flex;gap:5px">
+            <span class="tag ${s.nivel === 'elite' ? 'tag-g' : s.nivel === 'semi-pro' ? 'tag-b' : 'tag-y'}">${s.nivel || '—'}</span>
+            <span class="tag" style="background:rgba(255,255,255,.05);color:rgba(255,255,255,.4)">${evalCount} eval</span>
+          </div>
+          ${hasInjury ? '<span style="font-size:9px;font-family:var(--mono);color:var(--red);font-weight:700">● LESIÓN ACTIVA</span>' : '<span style="font-size:9px;font-family:var(--mono);color:rgba(57,255,122,.4)">● ACTIVO</span>'}
         </div>
-      </div>
-      <div style="display:flex;gap:6px;align-items:center;justify-content:space-between">
-        <div style="display:flex;gap:5px">
-          <span class="tag ${s.nivel === 'elite' ? 'tag-g' : s.nivel === 'semi-pro' ? 'tag-b' : 'tag-y'}">${s.nivel || '—'}</span>
-          <span class="tag tag-b">${evalCount} eval</span>
-        </div>
-        ${hasInjury ? '<span style="font-size:9px;font-family:var(--mono);color:var(--red)">● LESIÓN ACTIVA</span>' : ''}
       </div>
     </div>`;
   }).join('');
