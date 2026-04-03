@@ -2055,9 +2055,9 @@ textarea.inp { resize: vertical; min-height: 80px; line-height: 1.6; }
 <script>
 // ══════════════════════════════════════════════════════════════
 //  MoveMetrics v12 — JavaScript completo
-//  CONFIG: colocá tu API Key de Anthropic acá abajo
+//  CONFIG: colocá tu API Key de Groq acá abajo
 // ══════════════════════════════════════════════════════════════
-const GROQ_API_KEY = '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'; // ← reemplazá con tu key
+window.MM_API_KEY = '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';
 //  Todas las funciones referenciadas en el HTML
 // ══════════════════════════════════════════════════════════════
 
@@ -2957,13 +2957,13 @@ function renderSimetriasTabla() {
     const c = +lsi>=90?'var(--neon)':+lsi>=85?'var(--amber)':'var(--red)';
     const isCrit = asim!=='—'&&+asim>15;
     return `<tr>
-      <td>${def.icon} ${def.label}</td>
+       <td>${def.icon} ${def.label}</td>
       <td class="mono-cell">${dAvg?dAvg.toFixed(1):'—'} cm</td>
       <td class="mono-cell">${iAvg?iAvg.toFixed(1):'—'} cm</td>
       <td class="mono-cell" style="color:${c};font-weight:800;${isCrit?'text-shadow:0 0 8px rgba(255,68,68,.5)':''}">${lsi}%</td>
       <td class="mono-cell" style="color:${c}">${asim}%</td>
-      <td><span class="tag" style="background:${c}22;color:${c}">${+lsi>=90?'✓ OK':+lsi>=85?'⚠️ Leve':'🔴 CRÍTICA'}</span></td>
-    </tr>`;
+       <td><span class="tag" style="background:${c}22;color:${c}">${+lsi>=90?'✓ OK':+lsi>=85?'⚠️ Leve':'🔴 CRÍTICA'}</span></td>
+     </tr>`;
   }).filter(Boolean);
   if (!rows.length) { area.innerHTML = '<p style="font-size:12px;color:var(--text3)">Completá datos bilaterales de saltos para ver la tabla.</p>'; return; }
   area.innerHTML = `<table class="data-table"><thead><tr><th>Test</th><th>Derecha</th><th>Izquierda</th><th>LSI %</th><th>Asim. %</th><th>Estado</th></tr></thead><tbody>${rows.join('')}</tbody></table>`;
@@ -3092,14 +3092,20 @@ function drawGauge(id,value,min,max,type){
   }
 }
 
-function redrawGauges(){
-  const ld=+document.getElementById('lunge-d')?.value||0,li=+document.getElementById('lunge-i')?.value||0;
+function saveMov(){
+  if(!cur)return;
+  const evalIdx=document.getElementById('mov-eval-num').value;
+  const ld=+document.getElementById('lunge-d')?.value||null,li=+document.getElementById('lunge-i')?.value||null;
   const riD=+document.getElementById('cad-ri-d')?.value||0,reD=+document.getElementById('cad-re-d')?.value||0;
   const riI=+document.getElementById('cad-ri-i')?.value||0,reI=+document.getElementById('cad-re-i')?.value||0;
-  drawGauge('g-ld',ld,0,60,'lunge'); drawGauge('g-li',li,0,60,'lunge');
-  drawGauge('g-tcd',riD+reD,0,120,'trom'); drawGauge('g-tci',riI+reI,0,120,'trom');
-}
-
+  const riHD=+document.getElementById('hom-ri-d')?.value||0,reHD=+document.getElementById('hom-re-d')?.value||0;
+  const riHI=+document.getElementById('hom-ri-i')?.value||0,reHI=+document.getElementById('hom-re-i')?.value||0;
+  const fecha=new Date().toISOString().split('T')[0];
+  const movData={lungeD:ld,lungeI:li,tromCadD:riD+reD||null,tromCadI:riI+reI||null,tromHomD:riHD+reHD||null,tromHomI:riHI+reHI||null,fecha};
+  if(!cur.evals)cur.evals={};
+  cur.evals['mov_'+evalIdx]=movData;
+  if(!cur.evalsByDate)cur.evalsByDate={};
+  if(!cur.evalsByDate[fecha
 function saveMov(){
   if(!cur)return;
   const evalIdx=document.getElementById('mov-eval-num').value;
