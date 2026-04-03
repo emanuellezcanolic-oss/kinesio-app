@@ -1,10 +1,61 @@
 // ══════════════════════════════════════════════════════════════
 //  MoveMetrics v12 — JavaScript completo
-//  CONFIG: colocá tu API Key de Anthropic acá abajo
 // ══════════════════════════════════════════════════════════════
-window.MM_API_KEY = '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'; // ← reemplazá con tu key
-//  Todas las funciones referenciadas en el HTML
-// ══════════════════════════════════════════════════════════════
+
+// ── API KEY MANAGER ──
+// La key se guarda en localStorage del navegador.
+// Nunca queda expuesta en el código fuente.
+function getApiKey() {
+  return localStorage.getItem('mm_api_key') || '';
+}
+function saveApiKey(key) {
+  localStorage.setItem('mm_api_key', key.trim());
+}
+function clearApiKey() {
+  localStorage.removeItem('mm_api_key');
+}
+function hasApiKey() {
+  return !!getApiKey();
+}
+
+function showApiKeyModal() {
+  const existing = getApiKey();
+  const modal = document.createElement('div');
+  modal.id = 'api-key-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)';
+  modal.innerHTML = `
+    <div style="background:#0f0f0f;border:1px solid rgba(57,255,122,.25);border-radius:16px;padding:32px 28px;width:100%;max-width:420px;margin:16px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#39FF7A;letter-spacing:.12em;margin-bottom:8px;text-transform:uppercase">∧ MoveMetrics</div>
+      <div style="font-size:20px;font-weight:700;margin-bottom:6px;color:#f0f0f0">API Key de Anthropic</div>
+      <div style="font-size:13px;color:#888;margin-bottom:20px;line-height:1.6">
+        Ingresá tu API Key para generar informes con IA.<br>
+        Se guarda <b style="color:#f0f0f0">solo en tu navegador</b> — nunca se sube a ningún servidor.
+      </div>
+      <input id="api-key-input" type="password"
+        placeholder="sk-ant-api03-..."
+        value="${existing}"
+        style="width:100%;background:#141414;border:1px solid rgba(57,255,122,.2);border-radius:8px;color:#f0f0f0;padding:10px 14px;font-size:13px;font-family:'JetBrains Mono',monospace;outline:none;margin-bottom:8px;box-sizing:border-box"
+      >
+      <div style="font-size:11px;color:#3a3a3a;margin-bottom:16px;font-family:'JetBrains Mono',monospace">
+        Obtené tu key en console.anthropic.com → API Keys
+      </div>
+      <div style="display:flex;gap:10px">
+        <button onclick="
+          const k=document.getElementById('api-key-input').value.trim();
+          if(!k){alert('Ingresá una API Key');return;}
+          saveApiKey(k);
+          document.getElementById('api-key-modal').remove();
+          showSaveToast();
+        " style="flex:1;background:#39FF7A;color:#000;border:none;border-radius:8px;padding:11px;font-weight:700;font-size:13px;cursor:pointer">
+          Guardar y continuar
+        </button>
+        ${existing ? `<button onclick="document.getElementById('api-key-modal').remove()" style="background:#1c1c1c;color:#888;border:1px solid #252525;border-radius:8px;padding:11px 16px;font-size:13px;cursor:pointer">Cancelar</button>` : ''}
+      </div>
+      ${existing ? `<div style="text-align:center;margin-top:12px"><button onclick="clearApiKey();document.getElementById('api-key-input').value=''" style="background:none;border:none;color:#3a3a3a;font-size:11px;cursor:pointer;text-decoration:underline">Borrar key guardada</button></div>` : ''}
+    </div>`;
+  document.body.appendChild(modal);
+  setTimeout(() => document.getElementById('api-key-input')?.focus(), 100);
+}
 
 // ── DATOS GLOBALES ──
 let atletas = JSON.parse(localStorage.getItem('mm_v12_atletas') || '[]');
@@ -1532,7 +1583,13 @@ Incluir: 1RM/PC, CMJ, LSI, Lunge, TROM. Usá | para separar columnas]
 [Plazo y criterio de alta o progresión]`;
 
   try{
-    const API_KEY=window.MM_API_KEY||'';
+    const API_KEY = getApiKey();
+    if (!API_KEY) {
+      document.getElementById('informe-loading').classList.add('hidden');
+      document.getElementById('informe-sub').textContent = 'Necesitás configurar tu API Key primero';
+      showApiKeyModal();
+      return;
+    }
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':API_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
