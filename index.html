@@ -3679,6 +3679,19 @@ MoveMetrics v12 · Informe generado automáticamente`;
 }
 
 function exportarPDF() {
+function agregarImagenAlPDF(doc, elementoId, x, y, ancho, alto) {
+  try {
+    const imgElement = document.getElementById(elementoId);
+    const imgTag = imgElement?.querySelector('img');
+    if (imgTag && imgTag.src) {
+      doc.addImage(imgTag.src, 'JPEG', x, y, ancho, alto);
+      return true;
+    }
+  } catch(e) {
+    console.log('Error al cargar imagen:', elementoId);
+  }
+  return false;
+}
   const { jsPDF } = window.jspdf;
   if (!jsPDF) { alert('Error al cargar jsPDF'); return; }
   
@@ -3690,6 +3703,26 @@ function exportarPDF() {
   const inst = document.getElementById('prof-inst')?.value || 'MOVE Centro de Evaluación';
   const texto = document.getElementById('informe-text')?.value || 'Sin informe';
   const fecha = new Date().toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' });
+  // Después de las métricas, agregar:
+let yImagen = 200;
+
+// Fotos OHS
+if (agregarImagenAlPDF(doc, 'slot-ohs-frente', 20, yImagen, 80, 60)) {
+  yImagen += 70;
+}
+if (agregarImagenAlPDF(doc, 'slot-ohs-perfil', 110, yImagen - 70, 80, 60)) {
+  // ya se agregó
+}
+
+// Fotos Step-Down
+if (agregarImagenAlPDF(doc, 'slot-sd-fd', 20, yImagen, 80, 60)) {
+  yImagen += 70;
+}
+if (agregarImagenAlPDF(doc, 'slot-sd-pd', 110, yImagen - 70, 80, 60)) {}
+if (agregarImagenAlPDF(doc, 'slot-sd-fi', 20, yImagen, 80, 60)) {
+  yImagen += 70;
+}
+if (agregarImagenAlPDF(doc, 'slot-sd-pi', 110, yImagen - 70, 80, 60)) {}
   
   // ========== CONFIGURACIÓN ==========
   const colors = {
@@ -3706,72 +3739,68 @@ function exportarPDF() {
   
   // ========== PORTADA ==========
   doc.setFillColor(5, 5, 10);
-    // Agregar LOGO (si tenés la imagen)
-  try {
-    // Si tenés el logo en Base64, usalo
-    // doc.addImage(logoBase64, 'PNG', 75, 30, 60, 60);
-    
-    // Texto del club como logo temporal
-    doc.setTextColor(57, 255, 122);
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'bold');
-    doc.text('THE MOVE CLUB', 105, 45, { align: 'center' });
-    doc.setFontSize(7);
-    doc.setTextColor(80, 80, 80);
-    doc.text('ESTD 2021', 105, 52, { align: 'center' });
-  } catch(e) { console.log('Logo no disponible'); }
   doc.rect(0, 0, 210, 297, 'F');
   
-  // Línea superior decorativa
-  doc.setDrawColor(57, 255, 122);
-  doc.setLineWidth(1.5);
-  doc.line(20, 25, 190, 25);
-  doc.setLineWidth(0.5);
-  doc.line(20, 27, 190, 27);
+  // ========== AGREGAR LOGO (si hay URL) ==========
+  // Cambiá esta URL por la de tu logo subido a Imgur o GitHub
+  const logoUrl = "https://i.imgur.com/Gemini_Generated_Image_lsiiuclsiiuclsii.png";
   
-  // Título principal
+  try {
+    // Intentar cargar el logo desde URL
+    const logoImg = await fetch(logoUrl);
+    const logoBlob = await logoImg.blob();
+    const reader = new FileReader();
+    reader.onloadend = function() {
+      // El logo se cargará asincrónicamente
+    };
+    reader.readAsDataURL(logoBlob);
+  } catch(e) {
+    console.log("Logo no cargado, usando texto");
+  }
+  
+  // Texto del club (funciona siempre)
   doc.setTextColor(57, 255, 122);
   doc.setFontSize(28);
   doc.setFont('helvetica', 'bold');
-  doc.text('MOVEMETRICS', 105, 70, { align: 'center' });
-  
-  doc.setTextColor(100, 100, 100);
+  doc.text('THE MOVE CLUB', 105, 50, { align: 'center' });
   doc.setFontSize(10);
-  doc.setFont('helvetica', 'normal');
-  doc.text('PLATAFORMA DEPORTIVO-CLÍNICA', 105, 82, { align: 'center' });
+  doc.setTextColor(80, 80, 80);
+  doc.text('ESTD 2021', 105, 60, { align: 'center' });
   
   // Línea decorativa
   doc.setDrawColor(57, 255, 122);
-  doc.setLineWidth(0.3);
-  doc.line(70, 95, 140, 95);
+  doc.setLineWidth(0.5);
+  doc.line(50, 70, 160, 70);
   
-  // Nombre del atleta
+  // Título
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(22);
+  doc.setFontSize(24);
   doc.setFont('helvetica', 'bold');
-  doc.text(s.nombre.toUpperCase(), 105, 125, { align: 'center' });
+  doc.text('INFORME DE', 105, 110, { align: 'center' });
+  doc.text('EVALUACIÓN', 105, 125, { align: 'center' });
+  
+  doc.setTextColor(57, 255, 122);
+  doc.setFontSize(12);
+  doc.text('MOVEMETRICS v12', 105, 150, { align: 'center' });
   
   // Datos del atleta
-  doc.setTextColor(150, 150, 150);
-  doc.setFontSize(11);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`${s.deporte || 'Deporte no especificado'} · ${s.edad || '?'} años · ${s.peso || '?'} kg · ${s.talla || '?'} cm`, 105, 145, { align: 'center' });
+  doc.setTextColor(200, 200, 200);
+  doc.setFontSize(14);
+  doc.text(s.nombre.toUpperCase(), 105, 185, { align: 'center' });
+  
+  doc.setFontSize(10);
+  doc.setTextColor(120, 120, 120);
+  doc.text(`${s.deporte || 'Deporte'} · ${s.edad || '?'} años · ${s.peso || '?'} kg`, 105, 200, { align: 'center' });
   
   // Fecha
-  doc.setTextColor(100, 100, 100);
   doc.setFontSize(9);
-  doc.text(fecha, 105, 165, { align: 'center' });
-  
-  // Línea inferior
-  doc.setDrawColor(57, 255, 122);
-  doc.setLineWidth(0.5);
-  doc.line(60, 185, 150, 185);
+  doc.setTextColor(80, 80, 80);
+  doc.text(fecha, 105, 230, { align: 'center' });
   
   // Footer portada
-  doc.setTextColor(80, 80, 80);
   doc.setFontSize(8);
-  doc.text(prof, 105, 270, { align: 'center' });
-  doc.text(inst, 105, 278, { align: 'center' });
+  doc.text(prof, 105, 275, { align: 'center' });
+  doc.text(inst, 105, 283, { align: 'center' });
   
   // ========== PÁGINA 2 - DATOS DEL ATLETA ==========
   doc.addPage();
