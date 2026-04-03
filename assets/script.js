@@ -1,5 +1,5 @@
 // ══════════════════════════════════════════════════════════════
-//  MoveMetrics v12 — JavaScript completo
+//  MoveMetrics v12 -- JavaScript completo
 // ══════════════════════════════════════════════════════════════
 
 // ── API KEY MANAGER ──
@@ -29,7 +29,7 @@ function showApiKeyModal() {
       <div style="font-size:20px;font-weight:700;margin-bottom:6px;color:#f0f0f0">API Key de Anthropic</div>
       <div style="font-size:13px;color:#888;margin-bottom:20px;line-height:1.6">
         Ingresá tu API Key para generar informes con IA.<br>
-        Se guarda <b style="color:#f0f0f0">solo en tu navegador</b> — nunca se sube a ningún servidor.
+        Se guarda <b style="color:#f0f0f0">solo en tu navegador</b> -- nunca se sube a ningún servidor.
       </div>
       <input id="api-key-input" type="password"
         placeholder="sk-ant-api03-..."
@@ -110,14 +110,14 @@ const SALTOS_DEF = [
 const ORTHO_TESTS = {
   subacro: [
     { id:'neer',    name:'Neer',            sub:'Compresión subacromial',   ref:'Sn 0.72 / Sp 0.66' },
-    { id:'hawkins', name:'Hawkins-Kennedy', sub:'Compresión subacromial',   ref:'Sn 0.83 / Sp 0.56 — DESCARTAR RC' },
+    { id:'hawkins', name:'Hawkins-Kennedy', sub:'Compresión subacromial',   ref:'Sn 0.83 / Sp 0.56 -- DESCARTAR RC' },
     { id:'yocum',   name:'Yocum',           sub:'Espacio subacromial',      ref:'Sn 0.78 / Sp 0.61' }
   ],
   manguito: [
     { id:'jobe',        name:'Jobe (Empty Can)',   sub:'Supraespinoso',          ref:'Sn 0.69 / Sp 0.66' },
     { id:'patte',       name:'Patte',              sub:'Infraespinoso/Red. menor',ref:'Sn 0.92 / Sp 0.30' },
     { id:'gerber',      name:'Gerber (Lift-off)',  sub:'Subescapular',           ref:'Sn 0.79 / Sp 0.89' },
-    { id:'painful-arc', name:'Arco doloroso',      sub:'60–120° = RC',           ref:'LR+ 3.44 — CONFIRMAR RC' }
+    { id:'painful-arc', name:'Arco doloroso',      sub:'60-120° = RC',           ref:'LR+ 3.44 -- CONFIRMAR RC' }
   ],
   biceps: [
     { id:'speed',       name:'Speed',           sub:'Tendón bíceps proximal', ref:'Sn 0.69 / Sp 0.56' },
@@ -126,18 +126,18 @@ const ORTHO_TESTS = {
     { id:'obrien',      name:"O'Brien (SLAP)",  sub:'Labrum superior',        ref:'Sn 0.47 / Sp 0.89' }
   ],
   ligamentos: [
-    { id:'lachman',    name:'Lachman',           sub:'LCA — Gold standard',  ref:'Sn 0.86 / Sp 0.91' },
+    { id:'lachman',    name:'Lachman',           sub:'LCA -- Gold standard',  ref:'Sn 0.86 / Sp 0.91' },
     { id:'cajon-ant',  name:'Cajón anterior',    sub:'LCA',                  ref:'Sn 0.54 / Sp 0.72' },
     { id:'cajon-post', name:'Cajón posterior',   sub:'LCP',                  ref:'Sn 0.90 / Sp 0.99' },
     { id:'pivot-shift',name:'Pivot Shift',       sub:'LCA rotacional',       ref:'Sn 0.28 / Sp 0.98' },
-    { id:'lelli',      name:'Lelli (Palanca)',   sub:'LCA — alta Sn agudo',  ref:'Sn 1.00 / Sp 0.97' },
+    { id:'lelli',      name:'Lelli (Palanca)',   sub:'LCA -- alta Sn agudo',  ref:'Sn 1.00 / Sp 0.97' },
     { id:'valgo-est',  name:'Stress valgo 0°/30°',sub:'LLI',                ref:'Laxitud LLI' },
     { id:'varo-est',   name:'Stress varo 0°/30°', sub:'LLE',                ref:'Laxitud LLE' }
   ],
   meniscos: [
     { id:'mcmurray', name:'McMurray', sub:'Menisco medial/lateral', ref:'Sn 0.70 / Sp 0.71' },
     { id:'apley',    name:'Apley',    sub:'Menisco',                ref:'Sn 0.61 / Sp 0.70' },
-    { id:'thessaly', name:'Thessaly', sub:'Menisco — carga',        ref:'Sn 0.89 / Sp 0.97' }
+    { id:'thessaly', name:'Thessaly', sub:'Menisco -- carga',        ref:'Sn 0.89 / Sp 0.97' }
   ],
   funcionales: [
     { id:'single-leg', name:'Single Leg Squat', sub:'Control motor rodilla', ref:'Valgo >10° = positivo' },
@@ -404,7 +404,7 @@ function renderAtletas() {
         <div style="height:1px;background:rgba(255,255,255,.05);margin-bottom:12px"></div>
         <div style="display:flex;gap:6px;align-items:center;justify-content:space-between">
           <div style="display:flex;gap:5px">
-            <span class="tag ${s.nivel === 'elite' ? 'tag-g' : s.nivel === 'semi-pro' ? 'tag-b' : 'tag-y'}">${s.nivel || '—'}</span>
+            <span class="tag ${s.nivel === 'elite' ? 'tag-g' : s.nivel === 'semi-pro' ? 'tag-b' : 'tag-y'}">${s.nivel || '--'}</span>
             <span class="tag" style="background:rgba(255,255,255,.05);color:rgba(255,255,255,.4)">${evalCount} eval</span>
           </div>
           ${hasInjury ? '<span style="font-size:9px;font-family:var(--mono);color:var(--red);font-weight:700">● LESIÓN ACTIVA</span>' : '<span style="font-size:9px;font-family:var(--mono);color:rgba(57,255,122,.4)">● ACTIVO</span>'}
@@ -423,7 +423,7 @@ function filterAtletas(q) {
   grid.innerHTML = f.map(s => `
     <div class="athlete-card" onclick="selectAtleta(${s.id})">
       <div class="flex gap-12"><div class="athlete-av-sm">${s.nombre.charAt(0)}</div>
-      <div><div style="font-size:14px;font-weight:700">${s.nombre}</div><div style="font-size:11px;color:var(--text2)">${s.deporte || '—'}</div></div></div>
+      <div><div style="font-size:14px;font-weight:700">${s.nombre}</div><div style="font-size:11px;color:var(--text2)">${s.deporte || '--'}</div></div></div>
     </div>`).join('');
 }
 
@@ -442,11 +442,11 @@ function renderProfileHero() {
     else { av.textContent = s.nombre.charAt(0); av.innerHTML += '<div class="profile-av-edit">✏️</div>'; }
   }
   document.getElementById('profile-meta').textContent =
-    `${s.deporte || '—'}${s.puesto ? ' · ' + s.puesto : ''} · ${s.edad || '?'} años · ${s.peso || '?'} kg · ${s.talla || '?'} cm`;
+    `${s.deporte || '--'}${s.puesto ? ' · ' + s.puesto : ''} · ${s.edad || '?'} años · ${s.peso || '?'} kg · ${s.talla || '?'} cm`;
   const tags = document.getElementById('profile-tags');
   if (tags) tags.innerHTML = [
-    `<span class="tag tag-g">${s.objetivo || '—'}</span>`,
-    `<span class="tag tag-b">${s.nivel || '—'}</span>`,
+    `<span class="tag tag-g">${s.objetivo || '--'}</span>`,
+    `<span class="tag tag-b">${s.nivel || '--'}</span>`,
     s.lesion ? `<span class="tag tag-y">📌 ${s.lesion}</span>` : ''
   ].join(' ');
   // Fuerza relativa KPI
@@ -456,7 +456,7 @@ function renderProfileHero() {
     const normKey = Object.keys(STR_NORMS).find(k => s.lastFV.ejercicio?.toLowerCase().includes(STR_NORMS[k].name.toLowerCase().split(' ')[0].toLowerCase()));
     const norm = STR_NORMS[normKey];
     const color = norm ? (+ratio >= norm.amber ? 'var(--neon)' : +ratio >= norm.red ? 'var(--amber)' : 'var(--red)') : 'var(--neon)';
-    const label = norm ? (+ratio >= norm.amber ? 'Elite' : +ratio >= norm.red ? 'Moderado' : 'Déficit') : '—';
+    const label = norm ? (+ratio >= norm.amber ? 'Elite' : +ratio >= norm.red ? 'Moderado' : 'Déficit') : '--';
     frkpi.innerHTML = `<div style="text-align:right"><div class="il">Fuerza Relativa</div><div style="font-family:var(--mono);font-size:22px;font-weight:800;color:${color};text-shadow:0 0 12px ${color}">${ratio}×PC</div><span class="tag" style="background:${color}22;color:${color}">${label}</span></div>`;
   } else if (frkpi) frkpi.innerHTML = '';
   // Stats
@@ -466,17 +466,17 @@ function renderProfileHero() {
   if (statsRow) statsRow.innerHTML = `
     <div class="kpi ${s.lastCMJ >= 40 ? 'kpi-green' : s.lastCMJ >= 30 ? '' : s.lastCMJ ? 'kpi-red' : ''}">
       <div class="kpi-label">CMJ último</div>
-      <div class="kpi-val">${s.lastCMJ ? s.lastCMJ.toFixed(1) : '—'}</div>
+      <div class="kpi-val">${s.lastCMJ ? s.lastCMJ.toFixed(1) : '--'}</div>
       <div class="kpi-sub">cm altura</div>
     </div>
     <div class="kpi">
       <div class="kpi-label">1RM estimado</div>
-      <div class="kpi-val">${s.lastFV?.oneRM ? s.lastFV.oneRM.toFixed(0) : '—'}</div>
-      <div class="kpi-sub">${s.lastFV?.ejercicio || '—'}</div>
+      <div class="kpi-val">${s.lastFV?.oneRM ? s.lastFV.oneRM.toFixed(0) : '--'}</div>
+      <div class="kpi-sub">${s.lastFV?.ejercicio || '--'}</div>
     </div>
     <div class="kpi">
       <div class="kpi-label">10m sprint</div>
-      <div class="kpi-val">${lastSp?.sp10 || '—'}</div>
+      <div class="kpi-val">${lastSp?.sp10 || '--'}</div>
       <div class="kpi-sub">segundos</div>
     </div>
     <div class="kpi">
@@ -546,7 +546,7 @@ function renderRadar() {
   // VELOCIDAD: 10m sprint (deportista) o TUG (adulto mayor)
   let velS = 0;
   if (esAdultoMayor) {
-    const tug = s.tug || null; // segundos — referencia: <10s normal, <12s límite
+    const tug = s.tug || null; // segundos -- referencia: <10s normal, <12s límite
     velS = tug ? Math.min(100, (12/tug)*100) : 0;
   } else {
     velS = sp?.sp10 ? Math.min(100, (1.80/sp.sp10)*100) : 0;
@@ -555,7 +555,7 @@ function renderRadar() {
   // RESISTENCIA: VO2max estimado o 6MWT (adulto mayor)
   let resS = 0;
   if (esAdultoMayor) {
-    const dist6min = s.dist6min || null; // metros — referencia: >500m bueno
+    const dist6min = s.dist6min || null; // metros -- referencia: >500m bueno
     resS = dist6min ? Math.min(100, dist6min/600*100) : 0;
   } else {
     const lastFat = getLastEval('fatiga');
@@ -566,8 +566,8 @@ function renderRadar() {
 
   if (esAdultoMayor) {
     // ── ADULTO MAYOR: salud funcional ──
-    const equilibrioS = s.unipodal ? Math.min(100, s.unipodal/30*100) : 0; // seg apoyo unipodal — ref 30s
-    const stsS        = s.sitToStand ? Math.min(100, s.sitToStand/15*100) : 0; // reps en 30s — ref 15 reps
+    const equilibrioS = s.unipodal ? Math.min(100, s.unipodal/30*100) : 0; // seg apoyo unipodal -- ref 30s
+    const stsS        = s.sitToStand ? Math.min(100, s.sitToStand/15*100) : 0; // reps en 30s -- ref 15 reps
     labels  = ['Fuerza\n(Sit-to-Stand)', 'Velocidad\n(TUG)', 'Movilidad\n(Tobillo/Cadera)', 'Resistencia\n(6MWT)', 'Equilibrio\n(Unipodal)'];
     actual  = [stsS, velS, movilS, resS, equilibrioS];
     ideal   = [75, 75, 75, 75, 75];
@@ -632,7 +632,7 @@ function renderDashSemaforos() {
       </div>
       <div class="prog-wrap"><div class="prog-bar" style="width:${pct.toFixed(0)}%;background:${color}"></div></div>
       <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:2px">
-        <span>🔴 &lt;${norm.red}</span><span>🟡 ${norm.red}–${norm.amber}</span><span>🟢 &gt;${norm.amber}</span>
+        <span>🔴 &lt;${norm.red}</span><span>🟡 ${norm.red}-${norm.amber}</span><span>🟢 &gt;${norm.amber}</span>
       </div></div>`;
   });
   area.innerHTML = html || '<p style="font-size:12px;color:var(--text3)">Sin datos de fuerza.</p>';
@@ -659,10 +659,10 @@ function renderDashFV() {
   });
   const stats = document.getElementById('dash-fv-stats');
   if (stats) stats.innerHTML = `<div class="flex" style="gap:8px;flex-wrap:wrap">
-    <span class="tag tag-g">${fv.ejercicio || '—'}</span>
-    <span class="tag tag-b">V₀: ${fv.V0?.toFixed(3) || '—'} m/s</span>
-    <span class="tag tag-b">1RM≈ ${fv.oneRM?.toFixed(1) || '—'} kg</span>
-    <span class="tag ${fv.r2 >= 0.99 ? 'tag-g' : fv.r2 >= 0.95 ? 'tag-y' : 'tag-r'}">R² = ${fv.r2?.toFixed(4) || '—'}</span>
+    <span class="tag tag-g">${fv.ejercicio || '--'}</span>
+    <span class="tag tag-b">V₀: ${fv.V0?.toFixed(3) || '--'} m/s</span>
+    <span class="tag tag-b">1RM≈ ${fv.oneRM?.toFixed(1) || '--'} kg</span>
+    <span class="tag ${fv.r2 >= 0.99 ? 'tag-g' : fv.r2 >= 0.95 ? 'tag-y' : 'tag-r'}">R² = ${fv.r2?.toFixed(4) || '--'}</span>
   </div>`;
 }
 
@@ -672,9 +672,9 @@ function renderDashFatiga() {
   if (!lastFat) { area.innerHTML = '<p style="font-size:12px;color:var(--text3)">Sin registros de fatiga.</p>'; return; }
   const t = lastFat.hooper?.reduce((a, b) => a + b, 0) || 0;
   const c = t <= 12 ? 'var(--neon)' : t <= 19 ? 'var(--amber)' : 'var(--red)';
-  area.innerHTML = `<div class="flex-b"><div><div class="il">HOOPER INDEX</div><div style="font-family:var(--mono);font-size:24px;font-weight:800;color:${c}">${t}</div></div><div style="font-size:11px;color:var(--text2)">${lastFat.fecha || '—'}</div></div>
+  area.innerHTML = `<div class="flex-b"><div><div class="il">HOOPER INDEX</div><div style="font-family:var(--mono);font-size:24px;font-weight:800;color:${c}">${t}</div></div><div style="font-size:11px;color:var(--text2)">${lastFat.fecha || '--'}</div></div>
   <div class="prog-wrap mt-8"><div class="prog-bar" style="width:${Math.min(100,t/28*100).toFixed(0)}%;background:${c}"></div></div>
-  <div style="font-size:10px;color:var(--text3);margin-top:4px;font-family:var(--mono)">HRV: ${lastFat.hrv || '—'}ms vs basal ${lastFat.hrvBase || '—'}ms</div>`;
+  <div style="font-size:10px;color:var(--text3);margin-top:4px;font-family:var(--mono)">HRV: ${lastFat.hrv || '--'}ms vs basal ${lastFat.hrvBase || '--'}ms</div>`;
 }
 
 function renderDashTimeline() {
@@ -693,7 +693,7 @@ function renderDashTimeline() {
 }
 
 // ══════════════════════════════════════════════════════
-//  HISTORIAL — TIMELINE COLOREADA
+//  HISTORIAL -- TIMELINE COLOREADA
 // ══════════════════════════════════════════════════════
 
 function buildTimelineItems() {
@@ -727,37 +727,37 @@ function buildTLItem(tipo, data, fecha) {
     status = color === 'dot-g' ? '🟢 Simétrico' : color === 'dot-r' ? '🔴 Asimetría' : '🟡 Moderado';
     statusCls = color === 'dot-g' ? 'tl-s-g' : color === 'dot-r' ? 'tl-s-r' : 'tl-s-y';
   } else if (tipo === 'fv') {
-    icon = '📈'; title = `F-V — ${data.ejercicio || '—'}`;
+    icon = '📈'; title = `F-V -- ${data.ejercicio || '--'}`;
     const r = data.r2; color = r >= 0.99 ? 'dot-g' : r >= 0.95 ? 'dot-y' : 'dot-r';
-    detail = `V₀: ${data.V0?.toFixed(3)||'—'} · 1RM≈${data.oneRM?.toFixed(0)||'—'} kg · R²: ${data.r2?.toFixed(4)||'—'}`;
+    detail = `V₀: ${data.V0?.toFixed(3)||'--'} · 1RM≈${data.oneRM?.toFixed(0)||'--'} kg · R²: ${data.r2?.toFixed(4)||'--'}`;
     if (data.oneRM && cur?.peso) { const fr = (data.oneRM / +cur.peso).toFixed(2); const frc = +fr>=1.5?'var(--neon)':+fr>=1.0?'var(--amber)':'var(--red)'; detail += ` · <span style="color:${frc};font-family:var(--mono)">${fr}×PC</span>`; }
     status = r >= 0.99 ? '🟢 Alta fiabilidad' : r >= 0.95 ? '🟡 Aceptable' : '🔴 Baja fiabilidad';
     statusCls = r >= 0.99 ? 'tl-s-g' : r >= 0.95 ? 'tl-s-y' : 'tl-s-r';
   } else if (tipo === 'sprint') {
     icon = '🏃'; title = 'Sprint & COD';
-    detail = `10m: ${data.sp10||'—'}s · 30m: ${data.sp30||'—'}s · T-Test: ${data.ttest||'—'}s`;
+    detail = `10m: ${data.sp10||'--'}s · 30m: ${data.sp30||'--'}s · T-Test: ${data.ttest||'--'}s`;
     color = 'dot-b';
   } else if (tipo === 'movilidad') {
     icon = '📐'; title = 'Movilidad';
     const ld = data.lungeD, li = data.lungeI;
     const ok = ld && li && ld > 40 && li > 40 && Math.abs(ld - li) <= 5;
     color = ok ? 'dot-g' : (ld && ld < 35 ? 'dot-r' : 'dot-y');
-    detail = `Lunge D/I: ${ld||'—'}°/${li||'—'}° · TROM Cad D: ${data.tromCadD||'—'}°`;
+    detail = `Lunge D/I: ${ld||'--'}°/${li||'--'}° · TROM Cad D: ${data.tromCadD||'--'}°`;
     status = ok ? '🟢 Normal' : ld && ld < 35 ? '🔴 Déficit tobillo' : '🟡 Revisar';
     statusCls = ok ? 'tl-s-g' : ld && ld < 35 ? 'tl-s-r' : 'tl-s-y';
   } else if (tipo === 'fatiga') {
     icon = '⚡'; title = 'Fatiga diaria';
     const t = data.hooper?.reduce((a, b) => a + b, 0) || 0;
     color = t <= 12 ? 'dot-g' : t <= 19 ? 'dot-y' : 'dot-r';
-    detail = `Hooper: ${t} · HRV: ${data.hrv||'—'}ms`;
+    detail = `Hooper: ${t} · HRV: ${data.hrv||'--'}ms`;
     status = t <= 12 ? '🟢 Óptimo' : t <= 19 ? '🟡 Moderado' : '🔴 Sobrecarga';
     statusCls = t <= 12 ? 'tl-s-g' : t <= 19 ? 'tl-s-y' : 'tl-s-r';
   } else if (tipo === 'fms') {
-    icon = '🎯'; title = 'FMS — Calidad Movimiento';
+    icon = '🎯'; title = 'FMS -- Calidad Movimiento';
     const ohsY = (data.ohs?.criterios || []).filter(v => v === 'si').length;
     const pct = ohsY / (data.ohs?.criterios?.length || 4) * 100;
     color = pct >= 80 ? 'dot-g' : pct >= 50 ? 'dot-y' : 'dot-r';
-    detail = `OHS: ${ohsY}/${data.ohs?.criterios?.length||4} criterios · Valgo D: ${data.sd?.valgoD||'—'}°`;
+    detail = `OHS: ${ohsY}/${data.ohs?.criterios?.length||4} criterios · Valgo D: ${data.sd?.valgoD||'--'}°`;
     status = pct >= 80 ? '🟢 Buena calidad' : pct >= 50 ? '🟡 Compensaciones' : '🔴 Déficits';
     statusCls = pct >= 80 ? 'tl-s-g' : pct >= 50 ? 'tl-s-y' : 'tl-s-r';
   } else if (tipo === 'kinesio') {
@@ -861,7 +861,7 @@ function calcFV() {
                y:{grid:{color:'rgba(255,255,255,.03)'},ticks:{color:'#444',font:{family:'JetBrains Mono',size:9}},title:{display:true,text:'VMP (m/s)',color:'#555'}} } }
   });
   const badge = document.getElementById('fv-r2-badge');
-  badge.textContent = `R² = ${r2.toFixed(4)} — ${fiab}`;
+  badge.textContent = `R² = ${r2.toFixed(4)} -- ${fiab}`;
   badge.className = 'tag ' + (r2>=0.99?'tag-g':r2>=0.95?'tag-y':'tag-r');
   document.getElementById('fv-res-table').innerHTML = `
     <div class="flex-b mb-8"><span style="font-size:12px;color:var(--text2)">Ejercicio</span><span style="font-family:var(--mono);font-weight:700">${ejName}</span></div>
@@ -873,7 +873,7 @@ function calcFV() {
   const pcts = [100,95,90,85,80,75,70,65,60,55,50];
   document.getElementById('fv-pct-table').innerHTML = pcts.map(p => {
     const load = oneRM ? (oneRM*p/100) : null; const vmp = load ? (a+b*load) : null; const ok = vmp && vmp > 0;
-    return `<tr><td class="mono-cell">${p}%</td><td class="mono-cell">${load?load.toFixed(1):'—'}</td><td class="mono-cell" style="color:${ok?'var(--neon)':'var(--text3)'}">${ok?vmp.toFixed(3):'—'}</td></tr>`;
+    return `<tr><td class="mono-cell">${p}%</td><td class="mono-cell">${load?load.toFixed(1):'--'}</td><td class="mono-cell" style="color:${ok?'var(--neon)':'var(--text3)'}">${ok?vmp.toFixed(3):'--'}</td></tr>`;
   }).join('');
   // Save
   const evalIdx = document.getElementById('fv-eval-num')?.value || '0';
@@ -905,9 +905,9 @@ function renderFVHist() {
   if (!entries.length) { area.innerHTML = '<p style="font-size:12px;color:var(--text3)">Sin historial para este ejercicio.</p>'; return; }
   area.innerHTML = `<table class="data-table"><thead><tr><th>Eval #</th><th>Fecha</th><th>1RM (kg)</th><th>Fza.Rel.</th><th>R²</th><th>V₀ m/s</th></tr></thead><tbody>` +
     entries.map(e => {
-      const fr = e.oneRM && cur.peso ? (e.oneRM/+cur.peso).toFixed(2) : '—';
-      const frC = fr !== '—' ? (+fr>=1.5?'var(--neon)':+fr>=1.0?'var(--amber)':'var(--red)') : 'var(--text3)';
-      return `<tr><td class="mono-cell">${e.evalN}ra</td><td>${e.fecha||'—'}</td><td class="mono-cell text-neon">${e.oneRM?.toFixed(1)||'—'}</td><td class="mono-cell" style="color:${frC}">${fr}×PC</td><td class="mono-cell ${e.r2>=0.99?'text-neon':e.r2>=0.95?'text-amber':'text-red'}">${e.r2?.toFixed(4)||'—'}</td><td class="mono-cell">${e.V0?.toFixed(3)||'—'}</td></tr>`;
+      const fr = e.oneRM && cur.peso ? (e.oneRM/+cur.peso).toFixed(2) : '--';
+      const frC = fr !== '--' ? (+fr>=1.5?'var(--neon)':+fr>=1.0?'var(--amber)':'var(--red)') : 'var(--text3)';
+      return `<tr><td class="mono-cell">${e.evalN}ra</td><td>${e.fecha||'--'}</td><td class="mono-cell text-neon">${e.oneRM?.toFixed(1)||'--'}</td><td class="mono-cell" style="color:${frC}">${fr}×PC</td><td class="mono-cell ${e.r2>=0.99?'text-neon':e.r2>=0.95?'text-amber':'text-red'}">${e.r2?.toFixed(4)||'--'}</td><td class="mono-cell">${e.V0?.toFixed(3)||'--'}</td></tr>`;
     }).join('') + '</tbody></table>';
 }
 
@@ -927,10 +927,10 @@ function buildSaltosGrid() {
           <div class="ig"><label class="il">Rep 2${def.r2key ? ' (Rep 0)' : ''}</label><input class="inp inp-mono" type="number" step=".1" id="${r2id}" placeholder="0" oninput="calcSalto('${def.key}','${r2id}')"></div>
           <div style="background:var(--bg4);border:1px solid var(--border);border-radius:var(--r);padding:12px;text-align:center;margin-top:8px">
             <div class="il mb-4">Promedio</div>
-            <div id="${def.key}-avg" style="font-family:var(--mono);font-size:28px;font-weight:800;color:var(--neon)">—</div>
+            <div id="${def.key}-avg" style="font-family:var(--mono);font-size:28px;font-weight:800;color:var(--neon)">--</div>
             <div style="font-size:10px;color:var(--text3)">cm</div>
           </div>
-          ${def.key === 'bj' ? `<div class="ig mt-8"><label class="il">Peso corporal (kg)</label><input class="inp inp-mono" type="number" id="bj-pc" placeholder="75" oninput="calcImpulso()"></div><div style="font-size:12px;color:var(--text2);margin-top:4px">Impulso: <span id="bj-imp" style="font-family:var(--mono);color:var(--neon)">—</span> AU</div>` : ''}
+          ${def.key === 'bj' ? `<div class="ig mt-8"><label class="il">Peso corporal (kg)</label><input class="inp inp-mono" type="number" id="bj-pc" placeholder="75" oninput="calcImpulso()"></div><div style="font-size:12px;color:var(--text2);margin-top:4px">Impulso: <span id="bj-imp" style="font-family:var(--mono);color:var(--neon)">--</span> AU</div>` : ''}
           <div id="${def.key}-mejora" style="text-align:center;margin-top:6px"></div>
         </div>
       </div>`;
@@ -943,18 +943,18 @@ function buildSaltosGrid() {
               <div style="font-size:10px;font-weight:700;color:var(--neon);margin-bottom:8px;font-family:var(--mono)">DERECHA</div>
               <div class="ig"><label class="il">Rep 1</label><input class="inp inp-mono" type="number" step=".1" id="${def.key}-d-r1" placeholder="0" oninput="calcSimetriaHop('${def.key}')"></div>
               <div class="ig"><label class="il">Rep 2</label><input class="inp inp-mono" type="number" step=".1" id="${def.key}-d-r2" placeholder="0" oninput="calcSimetriaHop('${def.key}')"></div>
-              <div style="background:var(--bg4);border:1px solid var(--border);border-radius:var(--r);padding:10px;text-align:center"><div class="il mb-4">Avg D</div><div id="${def.key}-d-avg" style="font-family:var(--mono);font-size:22px;font-weight:800;color:var(--neon)">—</div></div>
+              <div style="background:var(--bg4);border:1px solid var(--border);border-radius:var(--r);padding:10px;text-align:center"><div class="il mb-4">Avg D</div><div id="${def.key}-d-avg" style="font-family:var(--mono);font-size:22px;font-weight:800;color:var(--neon)">--</div></div>
             </div>
             <div>
               <div style="font-size:10px;font-weight:700;color:var(--blue);margin-bottom:8px;font-family:var(--mono)">IZQUIERDA</div>
               <div class="ig"><label class="il">Rep 1</label><input class="inp inp-mono" type="number" step=".1" id="${def.key}-i-r1" placeholder="0" oninput="calcSimetriaHop('${def.key}')"></div>
               <div class="ig"><label class="il">Rep 2</label><input class="inp inp-mono" type="number" step=".1" id="${def.key}-i-r2" placeholder="0" oninput="calcSimetriaHop('${def.key}')"></div>
-              <div style="background:var(--bg4);border:1px solid var(--border);border-radius:var(--r);padding:10px;text-align:center"><div class="il mb-4">Avg I</div><div id="${def.key}-i-avg" style="font-family:var(--mono);font-size:22px;font-weight:800;color:var(--blue)">—</div></div>
+              <div style="background:var(--bg4);border:1px solid var(--border);border-radius:var(--r);padding:10px;text-align:center"><div class="il mb-4">Avg I</div><div id="${def.key}-i-avg" style="font-family:var(--mono);font-size:22px;font-weight:800;color:var(--blue)">--</div></div>
             </div>
           </div>
           <div style="background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);padding:12px;text-align:center;margin-top:10px">
-            <div class="il mb-4">LSI — Simetría</div>
-            <div id="${def.key}-sim" style="font-family:var(--mono);font-size:28px;font-weight:800">—</div>
+            <div class="il mb-4">LSI -- Simetría</div>
+            <div id="${def.key}-sim" style="font-family:var(--mono);font-size:28px;font-weight:800">--</div>
             <div id="${def.key}-sim-st" style="font-size:11px;color:var(--text3);margin-top:2px"></div>
           </div>
           <div id="${def.key}-mejora" style="text-align:center;margin-top:6px"></div>
@@ -969,7 +969,7 @@ function calcSalto(key, r2id) {
   const r2 = +document.getElementById(r2id)?.value || 0;
   const avg = r1 && r2 ? (r1+r2)/2 : r1 || r2;
   const el = document.getElementById(key + '-avg');
-  if (el) { el.textContent = avg ? avg.toFixed(1) : '—'; el.dataset.val = avg || ''; }
+  if (el) { el.textContent = avg ? avg.toFixed(1) : '--'; el.dataset.val = avg || ''; }
   if (key === 'bj') calcImpulso();
   if (key === 'cmj' && cur) { cur.lastCMJ = avg || null; atletas = atletas.map(a => a.id===cur.id?cur:a); saveData(); }
   checkMejoraSalto(key, avg);
@@ -987,8 +987,8 @@ function calcSimetriaHop(key) {
   const ir1 = +document.getElementById(key+'-i-r1')?.value||0, ir2 = +document.getElementById(key+'-i-r2')?.value||0;
   const avgD = dr1&&dr2?(dr1+dr2)/2:dr1||dr2, avgI = ir1&&ir2?(ir1+ir2)/2:ir1||ir2;
   const elD = document.getElementById(key+'-d-avg'), elI = document.getElementById(key+'-i-avg');
-  if (elD) { elD.textContent = avgD?avgD.toFixed(1):'—'; elD.dataset.val = avgD||''; }
-  if (elI) { elI.textContent = avgI?avgI.toFixed(1):'—'; elI.dataset.val = avgI||''; }
+  if (elD) { elD.textContent = avgD?avgD.toFixed(1):'--'; elD.dataset.val = avgD||''; }
+  if (elI) { elI.textContent = avgI?avgI.toFixed(1):'--'; elI.dataset.val = avgI||''; }
   if (avgD && avgI) {
     const mayor = Math.max(avgD,avgI), menor = Math.min(avgD,avgI);
     const lsi = (menor/mayor*100).toFixed(1);
@@ -998,7 +998,7 @@ function calcSimetriaHop(key) {
     const el = document.getElementById(key+'-sim');
     if (el) { el.textContent = lsi+'%'; el.style.color = c; el.style.textShadow = isCrit?'0 0 12px rgba(255,68,68,.6)':'none'; }
     const st = document.getElementById(key+'-sim-st');
-    if (st) { st.innerHTML = +lsi>=90?'✓ Simétrico (LSI ≥90%)':+lsi>=85?`⚠️ Asimetría leve (${asim}%)`:`<b style="color:var(--red)">🔴 ASIMETRÍA CRÍTICA: ${asim}% — SUPERA EL 15%</b>`; st.style.color=c; }
+    if (st) { st.innerHTML = +lsi>=90?'✓ Simétrico (LSI ≥90%)':+lsi>=85?`⚠️ Asimetría leve (${asim}%)`:`<b style="color:var(--red)">🔴 ASIMETRÍA CRÍTICA: ${asim}% -- SUPERA EL 15%</b>`; st.style.color=c; }
     if (isCrit) { const card = el?.closest('.card'); if (card) { card.style.borderColor='rgba(255,68,68,.4)'; card.style.boxShadow='0 0 20px rgba(255,68,68,.15)'; } }
   }
   renderSimetriasTabla();
@@ -1024,14 +1024,14 @@ function renderSimetriasTabla() {
     const iAvg = parseFloat(document.getElementById(def.key+'-i-avg')?.dataset.val||'')||0;
     if (!dAvg && !iAvg) return null;
     const mayor = Math.max(dAvg,iAvg), menor = Math.min(dAvg,iAvg);
-    const lsi = mayor?(menor/mayor*100).toFixed(1):'—';
-    const asim = mayor?((mayor-menor)/mayor*100).toFixed(1):'—';
+    const lsi = mayor?(menor/mayor*100).toFixed(1):'--';
+    const asim = mayor?((mayor-menor)/mayor*100).toFixed(1):'--';
     const c = +lsi>=90?'var(--neon)':+lsi>=85?'var(--amber)':'var(--red)';
-    const isCrit = asim!=='—'&&+asim>15;
+    const isCrit = asim!=='--'&&+asim>15;
     return `<tr>
       <td>${def.icon} ${def.label}</td>
-      <td class="mono-cell">${dAvg?dAvg.toFixed(1):'—'} cm</td>
-      <td class="mono-cell">${iAvg?iAvg.toFixed(1):'—'} cm</td>
+      <td class="mono-cell">${dAvg?dAvg.toFixed(1):'--'} cm</td>
+      <td class="mono-cell">${iAvg?iAvg.toFixed(1):'--'} cm</td>
       <td class="mono-cell" style="color:${c};font-weight:800;${isCrit?'text-shadow:0 0 8px rgba(255,68,68,.5)':''}">${lsi}%</td>
       <td class="mono-cell" style="color:${c}">${asim}%</td>
       <td><span class="tag" style="background:${c}22;color:${c}">${+lsi>=90?'✓ OK':+lsi>=85?'⚠️ Leve':'🔴 CRÍTICA'}</span></td>
@@ -1080,7 +1080,7 @@ function onMov() {
   const riHD=+document.getElementById('hom-ri-d')?.value||0, reHD=+document.getElementById('hom-re-d')?.value||0;
   const riHI=+document.getElementById('hom-ri-i')?.value||0, reHI=+document.getElementById('hom-re-i')?.value||0;
   const tromHomD=riHD+reHD, tromHomI=riHI+reHI;
-  const semL = v => !v?'':v<35?`<span style="color:var(--red)">🔴 ${v}° — déficit</span>`:v<=40?`<span style="color:var(--amber)">🟡 ${v}° — límite</span>`:`<span style="color:var(--neon)">🟢 ${v}° — normal</span>`;
+  const semL = v => !v?'':v<35?`<span style="color:var(--red)">🔴 ${v}° -- déficit</span>`:v<=40?`<span style="color:var(--amber)">🟡 ${v}° -- límite</span>`:`<span style="color:var(--neon)">🟢 ${v}° -- normal</span>`;
   let lr = `<div class="flex mt-8" style="gap:12px;flex-wrap:wrap">${ld?semL(ld):''}${li?semL(li):''}</div>`;
   if (ld&&li) { const d=Math.abs(ld-li); lr+=`<div style="font-size:11px;margin-top:6px;color:${d>5?'var(--amber)':'var(--neon)'}">Asimetría: ${d}°${d>5?' ⚠️ >5° significativo':' ✓'}</div>`; }
   document.getElementById('lunge-result').innerHTML = lr;
@@ -1112,7 +1112,7 @@ function renderMovSemaforos(ld,li,tcd,tci,thd,thi) {
     { lbl:'TROM Hom I',  val:thi, t1:100,t2:120, max:150, unit:'°', c:'var(--blue)'  }
   ];
   area.innerHTML = items.map(item => {
-    if (!item.val) return `<div class="card mb-8"><div class="card-body" style="padding:10px 14px"><div style="font-size:11px;font-weight:700;color:var(--text3)">${item.lbl}: —</div></div></div>`;
+    if (!item.val) return `<div class="card mb-8"><div class="card-body" style="padding:10px 14px"><div style="font-size:11px;font-weight:700;color:var(--text3)">${item.lbl}: --</div></div></div>`;
     const c = item.val<item.t1?'var(--red)':item.val<item.t2?'var(--amber)':'var(--neon)';
     const pct = Math.min(100, item.val/item.max*100);
     const st = item.val<item.t1?'🔴 Déficit':item.val<item.t2?'🟡 Límite':'🟢 Normal';
@@ -1205,7 +1205,7 @@ function calcSprintBench(){
   const norms=SPRINT_NORMS[deporte]?.[rd?.tipo||'general']||SPRINT_NORMS[deporte]?.general;
   if(!norms){area.innerHTML='<div class="card"><div class="card-body" style="font-size:12px;color:var(--text3)">Sin benchmarks para este deporte. Disponibles: Rugby, Fútbol, Básquet.</div></div>';return;}
   const cats=['Amateur','Competitivo','Elite'];
-  let html=`<div class="card"><div class="card-header"><h3>Benchmark — ${deporte}${puesto?' · '+puesto:''}</h3></div><div class="card-body">`;
+  let html=`<div class="card"><div class="card-header"><h3>Benchmark -- ${deporte}${puesto?' · '+puesto:''}</h3></div><div class="card-body">`;
   if(sp10&&norms.sp10){
     html+=`<div class="mb-12"><div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px;font-family:var(--mono);text-transform:uppercase">10m Sprint · ${sp10}s</div>`;
     norms.sp10.forEach((ref,i)=>{const delta=(sp10-ref).toFixed(2);const b=sp10<=ref;const c=b?'var(--neon)':i===2?'var(--red)':'var(--amber)';html+=`<div class="flex-b mb-4"><span style="font-size:11px;color:var(--text2)">${cats[i]}: ${ref}s</span><span style="font-family:var(--mono);color:${c};font-size:11px;font-weight:700">${b?'✓ ':'+'}${delta}s</span></div><div class="prog-wrap"><div class="prog-bar" style="width:${Math.min(100,ref/sp10*100).toFixed(0)}%;background:${c}"></div></div>`;});
@@ -1225,7 +1225,7 @@ function saveSprint(){
 }
 
 // ══════════════════════════════════════════════════════
-//  FMS — CALIDAD DE MOVIMIENTO
+//  FMS -- CALIDAD DE MOVIMIENTO
 // ══════════════════════════════════════════════════════
 
 function loadSlot(input,slotId){
@@ -1295,7 +1295,7 @@ function buildHooperFields(){
   c.innerHTML+=`<div style="background:var(--bg4);border:1px solid var(--border);border-radius:var(--r);padding:12px;text-align:center;margin-top:4px">
     <div class="il mb-4">Índice de Hooper</div>
     <div id="hooper-total" style="font-family:var(--mono);font-size:28px;font-weight:800;color:var(--neon)">16</div>
-    <div id="hooper-status" style="font-size:11px;color:var(--text2);margin-top:4px">—</div>
+    <div id="hooper-status" style="font-size:11px;color:var(--text2);margin-top:4px">--</div>
   </div>`;
 }
 
@@ -1312,7 +1312,7 @@ function calcFatiga(){
   if(hrv&&base&&hrvEl){const pct=((hrv-base)/base*100).toFixed(1);const c=+pct>=-5?'var(--neon)':+pct>=-10?'var(--amber)':'var(--red)';hrvEl.innerHTML=`<div style="font-size:12px;color:${c};margin-top:6px;font-family:var(--mono)">${pct}% vs basal ${+pct>=-5?'✅ Recuperado':+pct>=-10?'⚠️ Reducido':'🔴 Suprimido'}</div>`;}
   const vmax=+document.getElementById('fat-vmax')?.value||0,vfin=+document.getElementById('fat-vfin')?.value||0;
   const velEl=document.getElementById('fat-vel-result');
-  if(vmax&&vfin&&velEl){const loss=((vmax-vfin)/vmax*100).toFixed(1);const c=+loss<=20?'var(--neon)':+loss<=30?'var(--amber)':'var(--red)';velEl.innerHTML=`<div style="font-size:12px;color:${c};margin-top:6px">Pérdida: <span style="font-family:var(--mono);font-weight:700">${loss}%</span> ${+loss<=20?'✅ ≤20%':+loss<=30?'⚠️ 20–30%':'🔴 >30%'}</div>`;}
+  if(vmax&&vfin&&velEl){const loss=((vmax-vfin)/vmax*100).toFixed(1);const c=+loss<=20?'var(--neon)':+loss<=30?'var(--amber)':'var(--red)';velEl.innerHTML=`<div style="font-size:12px;color:${c};margin-top:6px">Pérdida: <span style="font-family:var(--mono);font-weight:700">${loss}%</span> ${+loss<=20?'✅ ≤20%':+loss<=30?'⚠️ 20-30%':'🔴 >30%'}</div>`;}
   let score=100;score-=(total-4)*3.5;
   if(hrv&&base){const p=(hrv-base)/base*100;if(p<-10)score-=20;else if(p<-5)score-=10;}
   if(vmax&&vfin){const l=(vmax-vfin)/vmax*100;if(l>30)score-=20;else if(l>20)score-=10;}
@@ -1322,7 +1322,7 @@ function calcFatiga(){
   if(circ){circ.style.strokeDashoffset=238.8*(1-score/100);circ.style.stroke=rc_;}
   if(sc){sc.textContent=score;sc.style.color=rc_;}
   if(lb){lb.textContent=score>=80?'✅ Listo para entrenar':score>=60?'⚠️ Precaución':'🔴 Recuperación';lb.style.color=rc_;}
-  if(rc)rc.textContent=score>=80?'Podés realizar la sesión planificada.':score>=60?'Reducí volumen un 20–30%. Priorizá técnica.':'Descanso activo. No entrenamiento intenso hoy.';
+  if(rc)rc.textContent=score>=80?'Podés realizar la sesión planificada.':score>=60?'Reducí volumen un 20-30%. Priorizá técnica.':'Descanso activo. No entrenamiento intenso hoy.';
 }
 
 function saveFatiga(){
@@ -1389,7 +1389,7 @@ function buildOrthoPanel(containerId,tests){
       </div>
       <div class="ortho-btns">
         <button class="ot-btn" id="otb-pos-${t.id}" onclick="setOrthoTest('${t.id}','pos')">+ POS</button>
-        <button class="ot-btn" id="otb-neg-${t.id}" onclick="setOrthoTest('${t.id}','neg')">– NEG</button>
+        <button class="ot-btn" id="otb-neg-${t.id}" onclick="setOrthoTest('${t.id}','neg')">- NEG</button>
       </div>
     </div>
     <div class="ortho-obs-row" id="ortho-obs-${t.id}">
@@ -1507,7 +1507,7 @@ function onBodyZoneClick(el){
 function showKinePanel(panel,label){
   document.querySelectorAll('.kine-panel').forEach(p=>p.classList.add('hidden'));
   const el=document.getElementById('tests-panel-'+panel);
-  if(el){el.classList.remove('hidden');document.getElementById('kine-zona-label').textContent=label+' — Tests activos';el.scrollIntoView({behavior:'smooth',block:'start'});}
+  if(el){el.classList.remove('hidden');document.getElementById('kine-zona-label').textContent=label+' -- Tests activos';el.scrollIntoView({behavior:'smooth',block:'start'});}
 }
 
 function renderBodyZonesList(){
@@ -1611,29 +1611,29 @@ async function regenerarInforme(){
   const ftRel=s.lastFV?.oneRM&&s.peso?(s.lastFV.oneRM/+s.peso).toFixed(2):null;
   const normKey=fv?Object.keys(STR_NORMS).find(k=>fv.ej?.toLowerCase().includes(STR_NORMS[k].name.toLowerCase().split(' ')[0].toLowerCase())):null;
   const norm=normKey?STR_NORMS[normKey]:null;
-  const frSt=ftRel&&norm?(+ftRel>=norm.amber?'🟢 ELITE':+ftRel>=norm.red?'🟡 MODERADO':'🔴 DÉFICIT'):'—';
+  const frSt=ftRel&&norm?(+ftRel>=norm.amber?'🟢 ELITE':+ftRel>=norm.red?'🟡 MODERADO':'🔴 DÉFICIT'):'--';
   // LSI Simple Hop
   const lsi=sal?.avg?.shD&&sal?.avg?.shI?((Math.min(sal.avg.shD,sal.avg.shI)/Math.max(sal.avg.shD,sal.avg.shI))*100).toFixed(1):null;
   // Kinesio compacto
   const kine=s.kinesio?{
-    zonas:Object.values(s.kinesio.bodyZones||{}).filter(z=>!z.recuperado).map(z=>`${z.label}(EVA${z.eva||0})`).join(', ')||'—',
-    positivos:Object.entries(s.kinesio.tests||{}).filter(([,v])=>v.result==='pos').map(([id])=>{const allT=[...ORTHO_TESTS.subacro,...ORTHO_TESTS.manguito,...ORTHO_TESTS.biceps,...ORTHO_TESTS.ligamentos,...ORTHO_TESTS.meniscos,...ORTHO_TESTS.funcionales,...ORTHO_TESTS.tobillo,...ORTHO_TESTS.lumbar,...ORTHO_TESTS.cadera];return allT.find(x=>x.id===id)?.name||id;}).join(', ')||'—',
-    dx:s.kinesio.form?.dx||'—',
-    eva:s.kinesio.form?.eva??'—'
+    zonas:Object.values(s.kinesio.bodyZones||{}).filter(z=>!z.recuperado).map(z=>`${z.label}(EVA${z.eva||0})`).join(', ')||'--',
+    positivos:Object.entries(s.kinesio.tests||{}).filter(([,v])=>v.result==='pos').map(([id])=>{const allT=[...ORTHO_TESTS.subacro,...ORTHO_TESTS.manguito,...ORTHO_TESTS.biceps,...ORTHO_TESTS.ligamentos,...ORTHO_TESTS.meniscos,...ORTHO_TESTS.funcionales,...ORTHO_TESTS.tobillo,...ORTHO_TESTS.lumbar,...ORTHO_TESTS.cadera];return allT.find(x=>x.id===id)?.name||id;}).join(', ')||'--',
+    dx:s.kinesio.form?.dx||'--',
+    eva:s.kinesio.form?.eva??'--'
   }:null;
 
   const prompt=`Kinesiólogo/preparador físico experto. Informe clínico deportivo conciso en español rioplatense.
 
 ATLETA: ${s.nombre}, ${s.edad||'?'}a, ${s.peso||'?'}kg, ${s.talla||'?'}cm
-DEPORTE: ${s.deporte||'—'}${s.puesto?' ('+s.puesto+')':''} | Nivel: ${s.nivel||'—'} | Enfoque: ${s.servicio==='kinesio'?'Kinesio':'Rendimiento'}
+DEPORTE: ${s.deporte||'--'}${s.puesto?' ('+s.puesto+')':''} | Nivel: ${s.nivel||'--'} | Enfoque: ${s.servicio==='kinesio'?'Kinesio':'Rendimiento'}
 ${s.lesion?'LESIÓN: '+s.lesion:''}
 
 DATOS CLAVE:
 • F-V: ${fv?`${fv.ej} | 1RM: ${fv.oneRM}kg | V0: ${fv.V0}m/s | Pmax: ${fv.Pmax}W | R²: ${fv.r2}`:'Sin datos'}
-• Fuerza relativa: ${ftRel||'—'}×PC ${frSt}${norm?` (ref: <${norm.red} déf, >${norm.amber} elite)`:''}
-• Saltos: CMJ ${sal?.avg?.cmj?.toFixed(1)||'—'}cm | BJ ${sal?.avg?.bj?.toFixed(1)||'—'}cm | LSI Hop: ${lsi||'—'}%${lsi&&+lsi<90?' ⚠️':''}
-• Movilidad: Lunge D/I ${s.lungeD||'—'}°/${s.lungeI||'—'}° | TROM Cad D/I ${s.tromCadD||'—'}°/${s.tromCadI||'—'}°
-• Sprint: 10m ${sp?.sp10||'—'}s | 30m ${sp?.sp30||'—'}s | T-Test ${sp?.ttest||'—'}s
+• Fuerza relativa: ${ftRel||'--'}×PC ${frSt}${norm?` (ref: <${norm.red} déf, >${norm.amber} elite)`:''}
+• Saltos: CMJ ${sal?.avg?.cmj?.toFixed(1)||'--'}cm | BJ ${sal?.avg?.bj?.toFixed(1)||'--'}cm | LSI Hop: ${lsi||'--'}%${lsi&&+lsi<90?' ⚠️':''}
+• Movilidad: Lunge D/I ${s.lungeD||'--'}°/${s.lungeI||'--'}° | TROM Cad D/I ${s.tromCadD||'--'}°/${s.tromCadI||'--'}°
+• Sprint: 10m ${sp?.sp10||'--'}s | 30m ${sp?.sp30||'--'}s | T-Test ${sp?.ttest||'--'}s
 ${kine?`• Kinesio: Zonas ${kine.zonas} | Tests+ ${kine.positivos} | Dx ${kine.dx} | EVA ${kine.eva}/10`:''}
 
 Generá el informe con ESTE FORMATO EXACTO (usá los emojis como encabezados, sin texto introductorio):
@@ -1705,11 +1705,11 @@ function exportarPDF(){
   doc.setDrawColor(57,255,122);doc.setLineWidth(0.3);doc.roundedRect(14,50,182,36,2,2,'S');
   doc.setTextColor(57,255,122);doc.setFontSize(15);doc.setFont('courier','bold');doc.text(s.nombre,20,61);
   doc.setTextColor(160,160,160);doc.setFontSize(8.5);doc.setFont('courier','normal');
-  doc.text(`${s.deporte||'—'}${s.puesto?' · '+s.puesto:''} · ${s.edad||'?'} años · ${s.peso||'?'}kg · ${s.talla||'?'}cm`,20,68);
-  doc.text(`Objetivo: ${s.objetivo||'—'} · Nivel: ${s.nivel||'—'} · ${s.servicio==='kinesio'?'Kinesiología':'Rendimiento'}`,20,74);
+  doc.text(`${s.deporte||'--'}${s.puesto?' · '+s.puesto:''} · ${s.edad||'?'} años · ${s.peso||'?'}kg · ${s.talla||'?'}cm`,20,68);
+  doc.text(`Objetivo: ${s.objetivo||'--'} · Nivel: ${s.nivel||'--'} · ${s.servicio==='kinesio'?'Kinesiología':'Rendimiento'}`,20,74);
   if(s.lesion){doc.setTextColor(255,176,32);doc.text(`Lesión: ${s.lesion}`,20,80);}
   // KPIs
-  const kpis=[['CMJ',s.lastCMJ?s.lastCMJ.toFixed(1)+'cm':'—'],['1RM',s.lastFV?.oneRM?s.lastFV.oneRM.toFixed(0)+'kg':'—'],['Fza.Rel.',s.lastFV&&s.peso?(s.lastFV.oneRM/+s.peso).toFixed(2)+'×PC':'—'],['R²',s.lastFV?.r2?.toFixed(4)||'—']];
+  const kpis=[['CMJ',s.lastCMJ?s.lastCMJ.toFixed(1)+'cm':'--'],['1RM',s.lastFV?.oneRM?s.lastFV.oneRM.toFixed(0)+'kg':'--'],['Fza.Rel.',s.lastFV&&s.peso?(s.lastFV.oneRM/+s.peso).toFixed(2)+'×PC':'--'],['R²',s.lastFV?.r2?.toFixed(4)||'--']];
   kpis.forEach(([lbl,val],i)=>{const x=14+i*46;doc.setFillColor(15,15,15);doc.roundedRect(x,92,42,20,1.5,1.5,'F');doc.setTextColor(50,50,50);doc.setFontSize(7);doc.setFont('courier','normal');doc.text(lbl.toUpperCase(),x+3,99);doc.setTextColor(57,255,122);doc.setFontSize(10);doc.setFont('courier','bold');doc.text(val,x+3,108);});
   // Charts
   const radarCanvas=document.getElementById('radar-chart');if(radarCanvas){try{const img=radarCanvas.toDataURL('image/png');doc.addImage(img,'PNG',14,118,86,70);}catch(e){}}
@@ -1732,10 +1732,10 @@ function exportarPDF(){
     doc.setTextColor(100,100,100);doc.setFontSize(8);doc.setFont('courier','normal');doc.text(`${s.nombre} · ${new Date().toLocaleDateString('es-AR')}`,14,26);
     let ky=44;
     const zonas=Object.entries(s.kinesio.bodyZones||{}).filter(([,v])=>!v.recuperado);
-    if(zonas.length){doc.setFillColor(20,5,5);doc.roundedRect(14,ky,182,8+zonas.length*7,2,2,'F');doc.setDrawColor(255,68,68);doc.setLineWidth(0.3);doc.roundedRect(14,ky,182,8+zonas.length*7,2,2,'S');doc.setTextColor(255,68,68);doc.setFontSize(9);doc.setFont('courier','bold');doc.text('ZONAS LESIONADAS',18,ky+7);doc.setFont('courier','normal');doc.setFontSize(8.5);doc.setTextColor(200,150,150);zonas.forEach(([,z],i)=>{doc.text(`• ${z.label}  EVA: ${z.eva||'—'}/10`,22,ky+7+7*(i+1));});ky+=14+zonas.length*7;}
+    if(zonas.length){doc.setFillColor(20,5,5);doc.roundedRect(14,ky,182,8+zonas.length*7,2,2,'F');doc.setDrawColor(255,68,68);doc.setLineWidth(0.3);doc.roundedRect(14,ky,182,8+zonas.length*7,2,2,'S');doc.setTextColor(255,68,68);doc.setFontSize(9);doc.setFont('courier','bold');doc.text('ZONAS LESIONADAS',18,ky+7);doc.setFont('courier','normal');doc.setFontSize(8.5);doc.setTextColor(200,150,150);zonas.forEach(([,z],i)=>{doc.text(`• ${z.label}  EVA: ${z.eva||'--'}/10`,22,ky+7+7*(i+1));});ky+=14+zonas.length*7;}
     const posTests=Object.entries(s.kinesio.tests||{}).filter(([,v])=>v.result==='pos');
     const allTests=[...ORTHO_TESTS.subacro,...ORTHO_TESTS.manguito,...ORTHO_TESTS.biceps,...ORTHO_TESTS.ligamentos,...ORTHO_TESTS.meniscos,...ORTHO_TESTS.funcionales,...ORTHO_TESTS.tobillo,...ORTHO_TESTS.lumbar,...ORTHO_TESTS.cadera];
-    if(posTests.length){ky+=6;doc.setFillColor(20,5,5);doc.roundedRect(14,ky,182,10+posTests.length*9,2,2,'F');doc.setDrawColor(255,68,68);doc.setLineWidth(0.3);doc.roundedRect(14,ky,182,10+posTests.length*9,2,2,'S');doc.setTextColor(255,68,68);doc.setFontSize(9);doc.setFont('courier','bold');doc.text('TESTS ORTOPÉDICOS POSITIVOS',18,ky+8);ky+=12;posTests.forEach(([id,v])=>{const t=allTests.find(x=>x.id===id);if(!t)return;doc.setFont('courier','bold');doc.setFontSize(8.5);doc.setTextColor(255,100,100);doc.text(`+ ${t.name}`,18,ky);doc.setFont('courier','normal');doc.setTextColor(150,150,150);const subt=` — ${t.sub}${v.obs?' — '+v.obs:''}`;doc.text(subt,18+doc.getTextWidth(`+ ${t.name}`),ky);ky+=7;});}
+    if(posTests.length){ky+=6;doc.setFillColor(20,5,5);doc.roundedRect(14,ky,182,10+posTests.length*9,2,2,'F');doc.setDrawColor(255,68,68);doc.setLineWidth(0.3);doc.roundedRect(14,ky,182,10+posTests.length*9,2,2,'S');doc.setTextColor(255,68,68);doc.setFontSize(9);doc.setFont('courier','bold');doc.text('TESTS ORTOPÉDICOS POSITIVOS',18,ky+8);ky+=12;posTests.forEach(([id,v])=>{const t=allTests.find(x=>x.id===id);if(!t)return;doc.setFont('courier','bold');doc.setFontSize(8.5);doc.setTextColor(255,100,100);doc.text(`+ ${t.name}`,18,ky);doc.setFont('courier','normal');doc.setTextColor(150,150,150);const subt=` -- ${t.sub}${v.obs?' -- '+v.obs:''}`;doc.text(subt,18+doc.getTextWidth(`+ ${t.name}`),ky);ky+=7;});}
   }
   // Footer
   const total=doc.getNumberOfPages();
@@ -1751,7 +1751,7 @@ function exportAllData(){
 
 
 // ══════════════════════════════════════════════════════
-//  VIDEO SALTO — Módulo de salto vertical por video
+//  VIDEO SALTO -- Módulo de salto vertical por video
 // ══════════════════════════════════════════════════════
 
 let videoState = {
@@ -1950,8 +1950,8 @@ function clearMarkers() {
   videoState.takeoffTime = null;
   videoState.landingTime = null;
   videoState.result = null;
-  ['takeoff-frame-display','takeoff-time-display'].forEach(id => { const e=document.getElementById(id); if(e) e.textContent='—'; });
-  ['landing-frame-display','landing-time-display'].forEach(id => { const e=document.getElementById(id); if(e) e.textContent='—'; });
+  ['takeoff-frame-display','takeoff-time-display'].forEach(id => { const e=document.getElementById(id); if(e) e.textContent='--'; });
+  ['landing-frame-display','landing-time-display'].forEach(id => { const e=document.getElementById(id); if(e) e.textContent='--'; });
   document.getElementById('btn-takeoff').style.cssText = '';
   document.getElementById('btn-landing').style.cssText = '';
   document.getElementById('video-result-card').style.display = 'none';
