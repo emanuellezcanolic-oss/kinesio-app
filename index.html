@@ -596,143 +596,224 @@
   </div>
 
   <!-- ══ TAB: MOVILIDAD ══ -->
-  <div id="ptab-movilidad" class="hidden">
-    <div class="flex-b mb-14">
-      <div><div style="font-size:15px;font-weight:700">Movilidad Articular</div><div style="font-size:12px;color:var(--text2)">Tobillo · Cadera · Hombro — Semáforos + Velocímetros</div></div>
-      <div class="flex" style="gap:8px">
-        <select class="inp inp-mono" id="mov-eval-num" style="width:120px;font-size:11px"><option value="0">1ra</option><option value="1">2da</option><option value="2">3ra</option><option value="3">4ta</option></select>
-        <button class="btn btn-neon btn-sm" onclick="saveMov()">💾 Guardar</button>
-      </div>
+<div id="ptab-movilidad" class="hidden">
+  <div class="flex-b mb-14">
+    <div>
+      <div style="font-size:15px;font-weight:700">Movilidad Articular</div>
+      <div style="font-size:12px;color:var(--text2)">Tobillo · Cadera · Hombro — Semáforos + Velocímetros</div>
     </div>
-    <div class="mb-16" id="mov-semaforos-wrap">
-      <div id="mov-semaforos" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px"></div>
+    <div class="flex" style="gap:8px">
+      <select class="inp inp-mono" id="mov-eval-num" style="width:120px;font-size:11px">
+        <option value="0">1ra Evaluación</option>
+        <option value="1">2da Evaluación</option>
+        <option value="2">3ra Evaluación</option>
+        <option value="3">4ta Evaluación</option>
+      </select>
+      <button class="btn btn-neon btn-sm" onclick="saveMov()">💾 Guardar</button>
     </div>
+  </div>
 
-    <!-- Tests funcionales adulto mayor -->
-    <div id="adulto-mayor-tests" class="hidden mb-16">
-      <div class="card">
-        <div class="card-header"><h3>🧓 Tests funcionales — Adulto Mayor</h3><span class="tag tag-y">Salud funcional</span></div>
-        <div class="card-body">
-          <div class="grid-2" style="gap:12px">
-            <div class="ig">
-              <label class="il">Sit-to-Stand 30s (reps)</label>
-              <input class="inp inp-mono" type="number" id="sts-reps" placeholder="12" oninput="saveFuncTests()">
-              <div style="font-size:10px;color:var(--text3);margin-top:3px">Ref: ≥12 reps = normal</div>
-            </div>
-            <div class="ig">
-              <label class="il">Apoyo Unipodal (seg)</label>
-              <input class="inp inp-mono" type="number" id="unipodal-seg" placeholder="20" oninput="saveFuncTests()">
-              <div style="font-size:10px;color:var(--text3);margin-top:3px">Ref: ≥30s = normal</div>
-            </div>
-            <div class="ig">
-              <label class="il">TUG — Timed Up and Go (seg)</label>
-              <input class="inp inp-mono" type="number" step=".1" id="tug-seg" placeholder="10.5" oninput="saveFuncTests()">
-              <div style="font-size:10px;color:var(--text3);margin-top:3px">Ref: &lt;10s = normal · &lt;12s = límite · &gt;12s = riesgo caída</div>
-            </div>
-            <div class="ig">
-              <label class="il">6MWT — Caminata 6 min (metros)</label>
-              <input class="inp inp-mono" type="number" id="dist6min-m" placeholder="450" oninput="saveFuncTests()">
-              <div style="font-size:10px;color:var(--text3);margin-top:3px">Ref: &gt;500m = bueno · &gt;400m = aceptable</div>
-            </div>
-          </div>
-        </div>
+  <div class="grid-2 mb-16" style="gap:16px">
+    <div class="card">
+      <div class="card-header"><h3>📊 Radar de Movilidad</h3></div>
+      <div class="card-body">
+        <canvas id="mov-radar" height="220"></canvas>
       </div>
     </div>
-    <div class="grid-2" style="gap:12px">
-      <div class="card">
-        <div class="card-header"><h3>Lunge Test — Dorsiflexión</h3><span class="tag tag-b">ROM</span></div>
-        <div class="card-body">
-          <p style="font-size:11px;color:var(--text2);margin-bottom:10px">🟢 &gt;40° · 🟡 35–40° · 🔴 &lt;35° · Δ &gt;5° = significativo</p>
-          <div class="grid-2" style="gap:12px">
-            <div class="ig">
-  <label class="il">Derecho (°)</label>
-  <div class="flex" style="gap: 8px;">
-    <input class="inp inp-mono" type="number" id="lunge-d" placeholder="0" oninput="onMov()" style="flex: 2;">
-    <button class="btn btn-outline btn-sm" onclick="iniciarGoniometro('tobillo-d', 'Tobillo Derecho')" style="font-size: 10px;">📐 Medir</button>
+    <div id="mov-semaforos"></div>
   </div>
-</div>
-           <div class="ig">
-  <label class="il">Izquierdo (°)</label>
-  <div class="flex" style="gap: 8px;">
-    <input class="inp inp-mono" type="number" id="lunge-i" placeholder="0" oninput="onMov()" style="flex: 2;">
-    <button class="btn btn-outline btn-sm" onclick="iniciarGoniometro('tobillo-i', 'Tobillo Izquierdo')" style="font-size: 10px;">📐 Medir</button>
-  </div>
-</div>
-          </div>
-          <div id="lunge-result"></div>
-        </div>
-      </div>
-     <div class="ig">
-  <label class="il">RI D (°)</label>
-  <div class="flex" style="gap: 8px;">
-    <input class="inp inp-mono" type="number" id="cad-ri-d" placeholder="0" oninput="onMov()" style="flex: 2;">
-    <button class="btn btn-outline btn-sm" onclick="iniciarGoniometro('cadera-ri-d', 'Cadera RI Derecha')" style="font-size: 10px;">📐 Medir</button>
-  </div>
-</div>
-      <div class="ig">
-  <label class="il">RE D (°)</label>
-  <div class="flex" style="gap: 8px;">
-    <input class="inp inp-mono" type="number" id="cad-re-d" placeholder="0" oninput="onMov()" style="flex: 2;">
-    <button class="btn btn-outline btn-sm" onclick="iniciarGoniometro('cadera-re-d', 'Cadera RE Derecha')" style="font-size: 10px;">📐 Medir</button>
-  </div>
-</div>
-      <div class="ig">
-  <label class="il">RI I (°)</label>
-  <div class="flex" style="gap: 8px;">
-    <input class="inp inp-mono" type="number" id="cad-ri-i" placeholder="0" oninput="onMov()" style="flex: 2;">
-    <button class="btn btn-outline btn-sm" onclick="iniciarGoniometro('cadera-ri-i', 'Cadera RI Izquierda')" style="font-size: 10px;">📐 Medir</button>
-  </div>
-</div>
-      <div class="ig">
-  <label class="il">RE I (°)</label>
-  <div class="flex" style="gap: 8px;">
-    <input class="inp inp-mono" type="number" id="cad-re-i" placeholder="0" oninput="onMov()" style="flex: 2;">
-    <button class="btn btn-outline btn-sm" onclick="iniciarGoniometro('cadera-re-i', 'Cadera RE Izquierda')" style="font-size: 10px;">📐 Medir</button>
-  </div>
-</div>
-      <div class="ig">
-  <label class="il">RI D (°)</label>
-  <div class="flex" style="gap: 8px;">
-    <input class="inp inp-mono" type="number" id="cad-ri-d" placeholder="0" oninput="onMov()" style="flex: 2;">
-    <button class="btn btn-outline btn-sm" onclick="iniciarGoniometro('cadera-ri-d', 'Cadera RI Derecha')" style="font-size: 10px;">📐 Medir</button>
-  </div>
-</div>
-      <div class="ig">
-  <label class="il">RE D (°)</label>
-  <div class="flex" style="gap: 8px;">
-    <input class="inp inp-mono" type="number" id="cad-re-d" placeholder="0" oninput="onMov()" style="flex: 2;">
-    <button class="btn btn-outline btn-sm" onclick="iniciarGoniometro('cadera-re-d', 'Cadera RE Derecha')" style="font-size: 10px;">📐 Medir</button>
-  </div>
-</div>
+
+  <!-- ==================== LUNGE TEST (TOBILLO) ==================== -->
+  <div class="card mb-16">
+    <div class="card-header">
+      <h3>🦶 Lunge Test — Dorsiflexión de Tobillo</h3>
+      <span class="tag tag-b">ROM</span>
+    </div>
+    <div class="card-body">
+      <p style="font-size:11px;color:var(--text2);margin-bottom:16px">🟢 &gt;40° · 🟡 35–40° · 🔴 &lt;35° · Δ &gt;5° = asimetría significativa</p>
       
-    <div class="ig">
-  <label class="il">RI I (°)</label>
-  <div class="flex" style="gap: 8px;">
-    <input class="inp inp-mono" type="number" id="cad-ri-i" placeholder="0" oninput="onMov()" style="flex: 2;">
-    <button class="btn btn-outline btn-sm" onclick="iniciarGoniometro('cadera-ri-i', 'Cadera RI Izquierda')" style="font-size: 10px;">📐 Medir</button>
-  </div>
-</div>
-      <div class="ig">
-  <label class="il">RE I (°)</label>
-  <div class="flex" style="gap: 8px;">
-    <input class="inp inp-mono" type="number" id="cad-re-i" placeholder="0" oninput="onMov()" style="flex: 2;">
-    <button class="btn btn-outline btn-sm" onclick="iniciarGoniometro('cadera-re-i', 'Cadera RE Izquierda')" style="font-size: 10px;">📐 Medir</button>
-  </div>
-</div>
-      <div class="card">
-        <div class="card-header"><h3>Velocímetros</h3></div>
-        <div class="card-body">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-            <div style="text-align:center"><div class="il mb-4">Lunge D</div><canvas id="g-ld" width="120" height="74"></canvas><div id="gv-ld" style="font-family:var(--mono);font-size:20px;font-weight:700;margin-top:2px;color:var(--text3)">—</div></div>
-            <div style="text-align:center"><div class="il mb-4">Lunge I</div><canvas id="g-li" width="120" height="74"></canvas><div id="gv-li" style="font-family:var(--mono);font-size:20px;font-weight:700;margin-top:2px;color:var(--text3)">—</div></div>
-            <div style="text-align:center"><div class="il mb-4">TROM Cad D</div><canvas id="g-tcd" width="120" height="74"></canvas><div id="gv-tcd" style="font-family:var(--mono);font-size:20px;font-weight:700;margin-top:2px;color:var(--text3)">—</div></div>
-            <div style="text-align:center"><div class="il mb-4">TROM Cad I</div><canvas id="g-tci" width="120" height="74"></canvas><div id="gv-tci" style="font-family:var(--mono);font-size:20px;font-weight:700;margin-top:2px;color:var(--text3)">—</div></div>
+      <div class="grid-2" style="gap:20px">
+        <!-- Derecha -->
+        <div style="background:var(--bg4); border-radius:var(--r); padding:16px;">
+          <div style="font-size:13px;font-weight:700;color:var(--neon);margin-bottom:12px;text-align:center;">🟢 DERECHA</div>
+          <div class="flex" style="justify-content:space-between;align-items:center;gap:12px;">
+            <input class="inp inp-mono" type="number" id="lunge-d" placeholder="0" oninput="onMov()" style="flex:1; text-align:center; font-size:20px;">
+            <button class="btn btn-outline" onclick="iniciarGoniometro('tobillo-d', 'Tobillo Derecho')" style="white-space:nowrap;">📐 Medir</button>
           </div>
+          <div id="lunge-d-status" style="font-size:10px;color:var(--text3);margin-top:8px;text-align:center;"></div>
+        </div>
+        
+        <!-- Izquierda -->
+        <div style="background:var(--bg4); border-radius:var(--r); padding:16px;">
+          <div style="font-size:13px;font-weight:700;color:var(--blue);margin-bottom:12px;text-align:center;">🔵 IZQUIERDA</div>
+          <div class="flex" style="justify-content:space-between;align-items:center;gap:12px;">
+            <input class="inp inp-mono" type="number" id="lunge-i" placeholder="0" oninput="onMov()" style="flex:1; text-align:center; font-size:20px;">
+            <button class="btn btn-outline" onclick="iniciarGoniometro('tobillo-i', 'Tobillo Izquierdo')" style="white-space:nowrap;">📐 Medir</button>
+          </div>
+          <div id="lunge-i-status" style="font-size:10px;color:var(--text3);margin-top:8px;text-align:center;"></div>
+        </div>
+      </div>
+      <div id="lunge-result" class="mt-12" style="text-align:center;"></div>
+    </div>
+  </div>
+
+  <!-- ==================== TROM CADERA ==================== -->
+  <div class="card mb-16">
+    <div class="card-header">
+      <h3>🦵 TROM Cadera (RI + RE)</h3>
+      <span class="tag tag-b">ROM · 🟢 &gt;90° · 🟡 80–90° · 🔴 &lt;80°</span>
+    </div>
+    <div class="card-body">
+      <div class="grid-2" style="gap:20px">
+        <!-- Derecha -->
+        <div style="background:var(--bg4); border-radius:var(--r); padding:16px;">
+          <div style="font-size:13px;font-weight:700;color:var(--neon);margin-bottom:12px;text-align:center;">🟢 CADERA DERECHA</div>
+          
+          <div class="grid-2" style="gap:12px; margin-bottom:12px;">
+            <div>
+              <div class="il" style="text-align:center;">RI (°)</div>
+              <div class="flex" style="gap:6px;">
+                <input class="inp inp-mono" type="number" id="cad-ri-d" placeholder="0" oninput="onMov()" style="flex:1; text-align:center;">
+                <button class="btn btn-ghost btn-sm" onclick="iniciarGoniometro('cadera-ri-d', 'Cadera RI Derecha')" style="font-size:9px;">📐</button>
+              </div>
+            </div>
+            <div>
+              <div class="il" style="text-align:center;">RE (°)</div>
+              <div class="flex" style="gap:6px;">
+                <input class="inp inp-mono" type="number" id="cad-re-d" placeholder="0" oninput="onMov()" style="flex:1; text-align:center;">
+                <button class="btn btn-ghost btn-sm" onclick="iniciarGoniometro('cadera-re-d', 'Cadera RE Derecha')" style="font-size:9px;">📐</button>
+              </div>
+            </div>
+          </div>
+          <div style="background:var(--bg3); border-radius:var(--r); padding:8px; text-align:center;">
+            <span class="il">TROM</span>
+            <div id="trom-cad-d" style="font-family:var(--mono); font-size:20px; font-weight:800; color:var(--neon);">—</div>
+          </div>
+        </div>
+        
+        <!-- Izquierda -->
+        <div style="background:var(--bg4); border-radius:var(--r); padding:16px;">
+          <div style="font-size:13px;font-weight:700;color:var(--blue);margin-bottom:12px;text-align:center;">🔵 CADERA IZQUIERDA</div>
+          
+          <div class="grid-2" style="gap:12px; margin-bottom:12px;">
+            <div>
+              <div class="il" style="text-align:center;">RI (°)</div>
+              <div class="flex" style="gap:6px;">
+                <input class="inp inp-mono" type="number" id="cad-ri-i" placeholder="0" oninput="onMov()" style="flex:1; text-align:center;">
+                <button class="btn btn-ghost btn-sm" onclick="iniciarGoniometro('cadera-ri-i', 'Cadera RI Izquierda')" style="font-size:9px;">📐</button>
+              </div>
+            </div>
+            <div>
+              <div class="il" style="text-align:center;">RE (°)</div>
+              <div class="flex" style="gap:6px;">
+                <input class="inp inp-mono" type="number" id="cad-re-i" placeholder="0" oninput="onMov()" style="flex:1; text-align:center;">
+                <button class="btn btn-ghost btn-sm" onclick="iniciarGoniometro('cadera-re-i', 'Cadera RE Izquierda')" style="font-size:9px;">📐</button>
+              </div>
+            </div>
+          </div>
+          <div style="background:var(--bg3); border-radius:var(--r); padding:8px; text-align:center;">
+            <span class="il">TROM</span>
+            <div id="trom-cad-i" style="font-family:var(--mono); font-size:20px; font-weight:800; color:var(--blue);">—</div>
+          </div>
+        </div>
+      </div>
+      <div id="cad-result" class="mt-12" style="text-align:center;"></div>
+    </div>
+  </div>
+
+  <!-- ==================== TROM HOMBRO (GIRD) ==================== -->
+  <div class="card mb-16">
+    <div class="card-header">
+      <h3>💪 TROM Hombro — GIRD</h3>
+      <span class="tag tag-b">ROM · GIRD &gt;18° = significativo</span>
+    </div>
+    <div class="card-body">
+      <div class="grid-2" style="gap:20px">
+        <!-- Derecha -->
+        <div style="background:var(--bg4); border-radius:var(--r); padding:16px;">
+          <div style="font-size:13px;font-weight:700;color:var(--neon);margin-bottom:12px;text-align:center;">🟢 HOMBRO DERECHO</div>
+          
+          <div class="grid-2" style="gap:12px; margin-bottom:12px;">
+            <div>
+              <div class="il" style="text-align:center;">RI (°)</div>
+              <div class="flex" style="gap:6px;">
+                <input class="inp inp-mono" type="number" id="hom-ri-d" placeholder="0" oninput="onMov()" style="flex:1; text-align:center;">
+                <button class="btn btn-ghost btn-sm" onclick="iniciarGoniometro('hombro-ri-d', 'Hombro RI Derecha')" style="font-size:9px;">📐</button>
+              </div>
+            </div>
+            <div>
+              <div class="il" style="text-align:center;">RE (°)</div>
+              <div class="flex" style="gap:6px;">
+                <input class="inp inp-mono" type="number" id="hom-re-d" placeholder="0" oninput="onMov()" style="flex:1; text-align:center;">
+                <button class="btn btn-ghost btn-sm" onclick="iniciarGoniometro('hombro-re-d', 'Hombro RE Derecha')" style="font-size:9px;">📐</button>
+              </div>
+            </div>
+          </div>
+          <div style="background:var(--bg3); border-radius:var(--r); padding:8px; text-align:center;">
+            <span class="il">TROM</span>
+            <div id="trom-hom-d" style="font-family:var(--mono); font-size:20px; font-weight:800; color:var(--neon);">—</div>
+          </div>
+        </div>
+        
+        <!-- Izquierda -->
+        <div style="background:var(--bg4); border-radius:var(--r); padding:16px;">
+          <div style="font-size:13px;font-weight:700;color:var(--blue);margin-bottom:12px;text-align:center;">🔵 HOMBRO IZQUIERDO</div>
+          
+          <div class="grid-2" style="gap:12px; margin-bottom:12px;">
+            <div>
+              <div class="il" style="text-align:center;">RI (°)</div>
+              <div class="flex" style="gap:6px;">
+                <input class="inp inp-mono" type="number" id="hom-ri-i" placeholder="0" oninput="onMov()" style="flex:1; text-align:center;">
+                <button class="btn btn-ghost btn-sm" onclick="iniciarGoniometro('hombro-ri-i', 'Hombro RI Izquierda')" style="font-size:9px;">📐</button>
+              </div>
+            </div>
+            <div>
+              <div class="il" style="text-align:center;">RE (°)</div>
+              <div class="flex" style="gap:6px;">
+                <input class="inp inp-mono" type="number" id="hom-re-i" placeholder="0" oninput="onMov()" style="flex:1; text-align:center;">
+                <button class="btn btn-ghost btn-sm" onclick="iniciarGoniometro('hombro-re-i', 'Hombro RE Izquierda')" style="font-size:9px;">📐</button>
+              </div>
+            </div>
+          </div>
+          <div style="background:var(--bg3); border-radius:var(--r); padding:8px; text-align:center;">
+            <span class="il">TROM</span>
+            <div id="trom-hom-i" style="font-family:var(--mono); font-size:20px; font-weight:800; color:var(--blue);">—</div>
+          </div>
+        </div>
+      </div>
+      <div id="hom-result" class="mt-12" style="text-align:center;"></div>
+    </div>
+  </div>
+
+  <!-- ==================== VELOCÍMETROS ==================== -->
+  <div class="card">
+    <div class="card-header"><h3>📊 Velocímetros visuales</h3></div>
+    <div class="card-body">
+      <div class="grid-2" style="gap:16px">
+        <div style="text-align:center">
+          <div class="il mb-4">Lunge Derecho</div>
+          <canvas id="g-ld" width="120" height="74"></canvas>
+          <div id="gv-ld" style="font-family:var(--mono);font-size:20px;font-weight:700;margin-top:4px;color:var(--text3)">—</div>
+        </div>
+        <div style="text-align:center">
+          <div class="il mb-4">Lunge Izquierdo</div>
+          <canvas id="g-li" width="120" height="74"></canvas>
+          <div id="gv-li" style="font-family:var(--mono);font-size:20px;font-weight:700;margin-top:4px;color:var(--text3)">—</div>
+        </div>
+        <div style="text-align:center">
+          <div class="il mb-4">TROM Cadera D</div>
+          <canvas id="g-tcd" width="120" height="74"></canvas>
+          <div id="gv-tcd" style="font-family:var(--mono);font-size:20px;font-weight:700;margin-top:4px;color:var(--text3)">—</div>
+        </div>
+        <div style="text-align:center">
+          <div class="il mb-4">TROM Cadera I</div>
+          <canvas id="g-tci" width="120" height="74"></canvas>
+          <div id="gv-tci" style="font-family:var(--mono);font-size:20px;font-weight:700;margin-top:4px;color:var(--text3)">—</div>
         </div>
       </div>
     </div>
   </div>
-
+</div>
   <!-- ══ TAB: VELOCIDAD ══ -->
   <div id="ptab-velocidad" class="hidden">
     <div class="flex-b mb-16">
