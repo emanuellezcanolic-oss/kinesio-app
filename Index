@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>MoveMetrics — Prof Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<!-- ════════ LAYOUT ════════ -->
+<div class="app">
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <h1>∧ MOVEMETRICS</h1>
+    <p>Plataforma deportivo-clínica</p>
+    <div class="version-badge">v12 · INVESTOR EDITION</div>
+  </div>
+
+  <nav class="nav-list">
+    <div class="nav-section-title">Principal</div>
+
+    <div class="nav-item active" onclick="showPage('atletas')" id="nav-atletas">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      Atletas
+    </div>
+
+    <div class="nav-item" onclick="showPage('tests')" id="nav-tests">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+      Tests & Módulos
+    </div>
+
+    <div class="nav-sep"></div>
+    <div class="nav-section-title">Configuración</div>
+
+    <div class="nav-item" onclick="showPage('ajustes')" id="nav-ajustes">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2M20 12h2M2 12h2M17.66 17.66l-1.41-1.41M6.34 17.66l1.41-1.41"/></svg>
+      VMP & Ajustes
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div id="sb-atleta-info" style="color:var(--neon);margin-bottom:4px">Sin atleta activo</div>
+    <div>∧ MoveMetrics <span>v12.0</span></div>
+    <div>Lic. Emanuel Lezcano</div>
+  </div>
+</aside>
+
+<!-- ── MOBILE NAV ── -->
+<nav class="mobile-nav">
+  <button class="mn-btn active" onclick="showPage('atletas')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Atletas</button>
+  <button class="mn-btn" onclick="showPage('tests')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>Tests</button>
+  <button class="mn-btn" onclick="showPage('ajustes')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41"/></svg>Más</button>
+</nav>
+
+<!-- ═══════════ MAIN ═══════════ -->
+<main class="main" id="main-content">
+
+<!-- ────────────────────────────────────────
+     PAGE: ATLETAS
+──────────────────────────────────────────── -->
+<div class="page active" id="page-atletas">
+  <div class="page-header">
+    <div>
+      <h2>Atletas</h2>
+      <p id="atletas-count">0 atletas registrados</p>
+    </div>
+    <div class="flex" style="gap:10px">
+      <input class="inp" style="width:200px" placeholder="🔍 Buscar..." oninput="filterAtletas(this.value)" id="search-atletas">
+      <button class="btn btn-neon" onclick="prepNewAtleta();openModal('modal-atleta-form')">+ Nuevo atleta</button>
+    </div>
+  </div>
+  <div id="atletas-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px"></div>
+</div>
+
+<!-- ────────────────────────────────────────
+     PAGE: TESTS → PERFIL ATLETA
+──────────────────────────────────────────── -->
+<div class="page" id="page-tests">
+
+  <!-- Indicator -->
+  <div style="background:var(--bg4);border:1px solid var(--border);border-radius:var(--r2);padding:10px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between">
+    <div class="flex" style="gap:8px">
+      <div style="font-size:11px;color:var(--text3);font-family:var(--mono)">ATLETA ACTIVO</div>
+      <div id="tests-atleta-indicator" style="font-size:13px;font-weight:700;color:var(--neon)">— Seleccioná un atleta →</div>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="showPage('atletas')">← Cambiar</button>
+  </div>
+
+  <!-- PROFILE HERO -->
+  <div class="profile-hero mb-16" id="profile-hero-area" style="display:none">
+    <div class="flex mb-12" style="align-items:flex-start;gap:14px">
+      <div class="profile-av" id="profile-av-lg" onclick="document.getElementById('photo-profile-input').click()">?
+        <div class="profile-av-edit">✏️</div>
+      </div>
+      <input type="file" id="photo-profile-input" accept="image/*" class="hidden" onchange="updateProfilePhoto(this)">
+      <div style="flex:1">
+        <div id="profile-name2" style="font-size:19px;font-weight:700;margin-bottom:4px;letter-spacing:-.3px">—</div>
+        <div id="profile-meta" style="font-size:12px;color:var(--text2);margin-bottom:6px">—</div>
+        <div id="profile-tags"></div>
+      </div>
+      <div id="fuerza-rel-kpi"></div>
+    </div>
+    <div id="profile-stats-row" class="grid-4"></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="profile-tabs" id="profile-tab-bar">
+    <button class="ptab active" onclick="showProfileTab('dashboard',this)">Dashboard</button>
+    <button class="ptab" id="tab-kinesio" onclick="showProfileTab('kinesio',this)">🏥 Kinesio</button>
+    <button class="ptab" onclick="showProfileTab('fuerza',this)">F-V</button>
+    <button class="ptab" onclick="showProfileTab('saltos',this)">Saltos</button>
+    <button class="ptab" onclick="showProfileTab('movilidad',this)">Movilidad</button>
+    <button class="ptab" onclick="showProfileTab('velocidad',this)">Sprint</button>
+    <button class="ptab" onclick="showProfileTab('fms',this)">Calidad Mov.</button>
+    <button class="ptab" onclick="showProfileTab('fatiga',this)">Fatiga</button>
+    <button class="ptab" onclick="showProfileTab('historial',this)">Historial</button>
+  </div>
+
+  <!-- ══ TAB: DASHBOARD ══ -->
+  <div id="ptab-dashboard">
+    <div class="grid-2 mb-16" style="gap:16px">
+      <div class="card card-glow">
+        <div class="card-header"><h3>Radar — Perfil de rendimiento</h3><span id="radar-obj-tag" class="tag tag-g">—</span></div>
+        <div class="card-body">
+          <canvas id="radar-chart" height="230"></canvas>
+          <div class="flex mt-8" style="justify-content:center;gap:14px;font-size:10px;color:var(--text2)">
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:rgba(57,255,122,.6);margin-right:4px;vertical-align:middle"></span>Actual</span>
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:rgba(77,158,255,.3);margin-right:4px;vertical-align:middle"></span>Objetivo</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="card card-glow">
+          <div class="card-header"><h3>💪 Fuerza relativa — Semáforos</h3></div>
+          <div class="card-body" id="dash-semaforos"><p style="font-size:12px;color:var(--text3)">Realizá un perfil F-V para ver los semáforos.</p></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>⚡ Fatiga — Último registro</h3></div>
+          <div class="card-body" id="dash-fatiga-mini"><p style="font-size:12px;color:var(--text3)">Sin registros de fatiga.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="card mb-16 card-glow">
+      <div class="card-header"><h3>📈 Perfil Carga-Velocidad</h3><button class="btn btn-outline btn-sm" onclick="showProfileTab('fuerza',document.querySelector('.ptab:nth-child(3)'))">Ver módulo →</button></div>
+      <div class="card-body"><canvas id="dash-fv-chart" height="170"></canvas><div id="dash-fv-stats" class="mt-8"></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>🕐 Historial — últimas evaluaciones</h3></div>
+      <div class="card-body" id="dash-timeline" style="max-height:280px;overflow-y:auto"></div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: KINESIO ══ -->
+  <div id="ptab-kinesio" class="hidden">
+    <div class="flex-b mb-16">
+      <div>
+        <div style="font-size:15px;font-weight:700">🏥 Kinesiología / Evaluación Osteomioarticular</div>
+        <div style="font-size:12px;color:var(--text2)">Anamnesis · Body Chart · EVA · Tests ortopédicos · ROM activo/pasivo</div>
+      </div>
+      <div class="flex" style="gap:8px">
+        <input class="inp" type="date" id="kine-fecha" style="width:150px;font-size:12px">
+        <button class="btn btn-neon btn-sm" onclick="saveKinesio()">💾 Guardar evaluación</button>
+      </div>
+    </div>
+
+    <!-- GRID: Body Chart + Anamnesis -->
+    <div class="grid-2 mb-14" style="gap:16px;align-items:start">
+
+      <!-- BODY CHART -->
+      <div class="card card-glow">
+        <div class="card-header">
+          <h3>🗺️ Body Chart — mapa del dolor</h3>
+          <div class="flex" style="gap:5px">
+            <button class="btn btn-neon btn-sm" id="btn-front" onclick="setBodyView('front')" style="font-size:10px;padding:4px 10px">Frente</button>
+            <button class="btn btn-ghost btn-sm" id="btn-back" onclick="setBodyView('back')" style="font-size:10px;padding:4px 10px">Posterior</button>
+          </div>
+        </div>
+        <div class="card-body" style="padding:10px">
+          <p style="font-size:9px;font-family:var(--mono);color:var(--text3);text-align:center;margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em">Tocá una zona para marcarla · 2° toque = Recuperado</p>
+
+          <!-- SVG FRONTAL -->
+          <div id="body-front" class="body-chart-container">
+            <svg viewBox="0 0 200 440" width="170" style="cursor:pointer">
+              <!-- Cabeza -->
+              <ellipse cx="100" cy="28" rx="22" ry="26" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+              <!-- Cuello -->
+              <rect x="92" y="52" width="16" height="15" rx="4" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+              <!-- Torso -->
+              <path d="M66 67 Q55 72 52 92 L50 162 Q53 170 100 170 Q147 170 150 162 L148 92 Q145 72 134 67 Z" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+              <!-- Brazo D -->
+              <path d="M52 70 L34 138 L50 140 L65 80 Z" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+              <!-- Brazo I -->
+              <path d="M148 70 L166 138 L150 140 L135 80 Z" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+              <!-- Antebrazo D -->
+              <path d="M34 148 L26 198 L44 200 L50 148 Z" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+              <!-- Antebrazo I -->
+              <path d="M166 148 L174 198 L156 200 L150 148 Z" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+              <!-- Muslo D -->
+              <path d="M70 188 L60 272 L84 274 L90 188 Z" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+              <!-- Muslo I -->
+              <path d="M130 188 L140 272 L116 274 L110 188 Z" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+              <!-- Pantorrilla D -->
+              <path d="M60 290 L58 374 L84 374 L82 290 Z" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+              <!-- Pantorrilla I -->
+              <path d="M140 290 L142 374 L116 374 L118 290 Z" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+              <!-- Pie D -->
+              <ellipse cx="72" cy="388" rx="15" ry="8" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+              <!-- Pie I -->
+              <ellipse cx="128" cy="388" rx="15" ry="8" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+
+              <!-- ── ZONAS INTERACTIVAS ── -->
+              <!-- Hombro D -->
+              <ellipse id="z-hombro-d" class="body-zone" data-zone="hombro-d" data-label="Hombro Derecho" data-panel="hombro"
+                cx="57" cy="82" rx="17" ry="15" fill="rgba(57,255,122,0)" stroke="#333" stroke-width="1.5"/>
+              <!-- Hombro I -->
+              <ellipse id="z-hombro-i" class="body-zone" data-zone="hombro-i" data-label="Hombro Izquierdo" data-panel="hombro"
+                cx="143" cy="82" rx="17" ry="15" fill="rgba(57,255,122,0)" stroke="#333" stroke-width="1.5"/>
+              <!-- Codo D -->
+              <ellipse id="z-codo-d" class="body-zone" data-zone="codo-d" data-label="Codo Derecho" data-panel="hombro"
+                cx="42" cy="140" rx="11" ry="9" fill="rgba(57,255,122,0)" stroke="#333" stroke-width="1.5"/>
+              <!-- Codo I -->
+              <ellipse id="z-codo-i" class="body-zone" data-zone="codo-i" data-label="Codo Izquierdo" data-panel="hombro"
+                cx="158" cy="140" rx="11" ry="9" fill="rgba(57,255,122,0)" stroke="#333" stroke-width="1.5"/>
+              <!-- Lumbar (frente = abdomen/lumbar) -->
+              <rect id="z-lumbar" class="body-zone" data-zone="lumbar" data-label="Lumbar" data-panel="lumbar"
+                x="80" y="132" width="40" height="32" rx="8" fill="rgba(57,255,122,0)" stroke="#333" stroke-width="1.5"/>
+              <!-- Cadera D -->
+              <ellipse id="z-cadera-d" class="body-zone" data-zone="cadera-d" data-label="Cadera Derecha" data-panel="cadera"
+                cx="68" cy="178" rx="22" ry="16" fill="rgba(57,255,122,0)" stroke="#333" stroke-width="1.5"/>
+              <!-- Cadera I -->
+              <ellipse id="z-cadera-i" class="body-zone" data-zone="cadera-i" data-label="Cadera Izquierda" data-panel="cadera"
+                cx="132" cy="178" rx="22" ry="16" fill="rgba(57,255,122,0)" stroke="#333" stroke-width="1.5"/>
+              <!-- Rodilla D -->
+              <ellipse id="z-rodilla-d" class="body-zone" data-zone="rodilla-d" data-label="Rodilla Derecha" data-panel="rodilla"
+                cx="70" cy="282" rx="16" ry="14" fill="rgba(57,255,122,0)" stroke="#333" stroke-width="1.5"/>
+              <!-- Rodilla I -->
+              <ellipse id="z-rodilla-i" class="body-zone" data-zone="rodilla-i" data-label="Rodilla Izquierda" data-panel="rodilla"
+                cx="130" cy="282" rx="16" ry="14" fill="rgba(57,255,122,0)" stroke="#333" stroke-width="1.5"/>
+              <!-- Tobillo D -->
+              <ellipse id="z-tobillo-d" class="body-zone" data-zone="tobillo-d" data-label="Tobillo Derecho" data-panel="tobillo"
+                cx="70" cy="378" rx="14" ry="10" fill="rgba(57,255,122,0)" stroke="#333" stroke-width="1.5"/>
+              <!-- Tobillo I -->
+              <ellipse id="z-tobillo-i" class="body-zone" data-zone="tobillo-i" data-label="Tobillo Izquierdo" data-panel="tobillo"
+                cx="130" cy="378" rx="14" ry="10" fill="rgba(57,255,122,0)" stroke="#333" stroke-width="1.5"/>
+
+              <!-- Labels -->
+              <text x="57" y="86" text-anchor="middle" font-size="5" fill="#3a3a3a" font-family="JetBrains Mono">H.D</text>
+              <text x="143" y="86" text-anchor="middle" font-size="5" fill="#3a3a3a" font-family="JetBrains Mono">H.I</text>
+              <text x="100" y="150" text-anchor="middle" font-size="5" fill="#3a3a3a" font-family="JetBrains Mono">LUMB</text>
+              <text x="68" y="182" text-anchor="middle" font-size="5" fill="#3a3a3a" font-family="JetBrains Mono">CAD.D</text>
+              <text x="132" y="182" text-anchor="middle" font-size="5" fill="#3a3a3a" font-family="JetBrains Mono">CAD.I</text>
+              <text x="70" y="286" text-anchor="middle" font-size="5" fill="#3a3a3a" font-family="JetBrains Mono">ROD.D</text>
+              <text x="130" y="286" text-anchor="middle" font-size="5" fill="#3a3a3a" font-family="JetBrains Mono">ROD.I</text>
+              <text x="70" y="382" text-anchor="middle" font-size="5" fill="#3a3a3a" font-family="JetBrains Mono">TOB.D</text>
+              <text x="130" y="382" text-anchor="middle" font-size="5" fill="#3a3a3a" font-family="JetBrains Mono">TOB.I</text>
+            </svg>
+          </div>
+
+          <!-- SVG POSTERIOR -->
+          <div id="body-back" class="body-chart-container" style="display:none">
+            <svg viewBox="0 0 200 440" width="170" style="cursor:pointer">
+              <!-- Cabeza -->
+              <ellipse cx="100" cy="28" rx="22" ry="26" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+              <rect x="92" y="52" width="16" height="15" rx="4" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+              <!-- Torso -->
+              <path d="M66 67 Q55 72 52 92 L50 162 Q53 170 100 170 Q147 170 150 162 L148 92 Q145 72 134 67 Z" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+              <!-- Brazos -->
+              <path d="M52 70 L34 138 L50 140 L65 80 Z" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+              <path d="M148 70 L166 138 L150 140 L135 80 Z" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+              <path d="M34 148 L26 198 L44 200 L50 148 Z" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+              <path d="M166 148 L174 198 L156 200 L150 148 Z" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+              <!-- Muslos -->
+              <path d="M70 188 L60 272 L84 274 L90 188 Z" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+              <path d="M130 188 L140 272 L116 274 L110 188 Z" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+              <!-- Pantorrillas -->
+              <path d="M60 290 L58 374 L84 374 L82 290 Z" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+              <path d="M140 290 L142 374 L116 374 L118 290 Z" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+              <ellipse cx="72" cy="388" rx="15" ry="8" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+              <ellipse cx="128" cy="388" rx="15" ry="8" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+
+              <!-- ZONAS POSTERIORES -->
+              <ellipse id="z-cervical" class="body-zone" data-zone="cervical" data-label="Cervical" data-panel="lumbar"
+                cx="100" cy="58" rx="14" ry="8" fill="rgba(57,255,122,0)" stroke="#333" stroke-width="1.5"/>
+              <rect id="z-dorsal" class="body-zone" data-zone="dorsal" data-label="Dorsal/Torácica" data-panel="lumbar"
+                x="82" y="82" width="36" height="40" rx="8" fill="rgba(57,255,122,0)" stroke="#333" stroke-width="1.5"/>
+              <ellipse id="z-lumbar-post" class="body-zone" data-zone="lumbar-post" data-label="Lumbar Posterior" data-panel="lumbar"
+                cx="100" cy="148" rx="24" ry="18" fill="rgba(57,255,122,0)" stroke="#333" stroke-width="1.5"/>
+              <ellipse id="z-hombro-pd" class="body-zone" data-zone="hombro-pd" data-label="Hombro Post. D" data-panel="hombro"
+                cx="57" cy="82" rx="17" ry="15" fill="rgba(57,255,122,0)" stroke="#333" stroke-width="1.5"/>
+              <ellipse id="z-hombro-pi" class="body-zone" data-zone="hombro-pi" data-label="Hombro Post. I" data-panel="hombro"
+                cx="143" cy="82" rx="17" ry="15" fill="rgba(57,255,122,0)" stroke="#333" stroke-width="1.5"/>
+              <ellipse id="z-gluteo-d" class="body-zone" data-zone="gluteo-d" data-label="Glúteo Derecho" data-panel="cadera"
+                cx="76" cy="178" rx="22" ry="18" fill="rgba(57,255,122,0)" stroke="#333" stroke-width="1.5"/>
+              <ellipse id="z-gluteo-i" class="body-zone" data-zone="gluteo-i" data-label="Glúteo Izquierdo" data-panel="cadera"
+                cx="124" cy="178" rx="22" ry="18" fill="rgba(57,255,122,0)" stroke="#333" stroke-width="1.5"/>
+              <ellipse id="z-pantorrilla-d" class="body-zone" data-zone="pantorrilla-d" data-label="Pantorrilla D" data-panel="tobillo"
+                cx="70" cy="330" rx="14" ry="24" fill="rgba(57,255,122,0)" stroke="#333" stroke-width="1.5"/>
+              <ellipse id="z-pantorrilla-i" class="body-zone" data-zone="pantorrilla-i" data-label="Pantorrilla I" data-panel="tobillo"
+                cx="130" cy="330" rx="14" ry="24" fill="rgba(57,255,122,0)" stroke="#333" stroke-width="1.5"/>
+
+              <!-- Labels post -->
+              <text x="100" y="62" text-anchor="middle" font-size="5" fill="#3a3a3a" font-family="JetBrains Mono">CERV</text>
+              <text x="100" y="104" text-anchor="middle" font-size="5" fill="#3a3a3a" font-family="JetBrains Mono">DORS</text>
+              <text x="100" y="152" text-anchor="middle" font-size="5" fill="#3a3a3a" font-family="JetBrains Mono">LUMB</text>
+              <text x="76" y="182" text-anchor="middle" font-size="5" fill="#3a3a3a" font-family="JetBrains Mono">GLUT.D</text>
+              <text x="124" y="182" text-anchor="middle" font-size="5" fill="#3a3a3a" font-family="JetBrains Mono">GLUT.I</text>
+            </svg>
+          </div>
+
+          <!-- Zones list -->
+          <div id="body-zones-list" class="mt-8" style="min-height:28px">
+            <div style="font-size:9px;color:var(--text3);font-family:var(--mono);text-align:center">Sin zonas marcadas</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANAMNESIS -->
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <!-- Motivo + mecanismo -->
+        <div class="card">
+          <div class="card-header"><h3>📋 Anamnesis — Historia clínica MOVE</h3></div>
+          <div class="card-body">
+            <div class="ig"><label class="il">Motivo de consulta</label>
+              <textarea class="inp" id="kine-motivo" rows="2" placeholder="Motivo principal de la consulta..."></textarea></div>
+            <div class="ig"><label class="il">¿Cómo fue que te lesionaste?</label>
+              <textarea class="inp" id="kine-mecanismo" rows="2" placeholder="Mecanismo de lesión..."></textarea></div>
+            <div class="grid-2" style="gap:8px">
+              <div class="ig"><label class="il">Fecha lesión / aprox.</label><input class="inp inp-mono" type="date" id="kine-fecha-lesion"></div>
+              <div class="ig"><label class="il">Fecha de cirugía</label><input class="inp inp-mono" type="date" id="kine-fecha-cx"></div>
+            </div>
+            <div class="ig"><label class="il">Médico a cargo / mail-teléfono</label><input class="inp" id="kine-medico" placeholder="Dr. / contacto..."></div>
+            <div class="ig"><label class="il">¿Cuál fue el diagnóstico médico?</label><input class="inp" id="kine-dx" placeholder="Diagnóstico oficial..."></div>
+            <div class="ig">
+              <label class="il">¿Realizaste tratamiento previo?</label>
+              <div style="display:flex;gap:6px;margin-top:4px;align-items:center">
+                <button class="fms-btn" id="kine-trat-si" onclick="setKineTrat('si')">SI</button>
+                <button class="fms-btn" id="kine-trat-no" onclick="setKineTrat('no')">NO</button>
+                <input class="inp" id="kine-trat-cual" placeholder="¿Cuál?" style="flex:1;font-size:12px">
+              </div>
+            </div>
+            <div class="ig">
+              <label class="il">Estudios complementarios (marcá con círculo)</label>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
+                <button class="fms-btn" id="est-resonancia"   onclick="toggleEstudio('resonancia')">Resonancia</button>
+                <button class="fms-btn" id="est-radiografia"  onclick="toggleEstudio('radiografia')">Radiografía</button>
+                <button class="fms-btn" id="est-ecografia"    onclick="toggleEstudio('ecografia')">Ecografía</button>
+                <button class="fms-btn" id="est-tomografia"   onclick="toggleEstudio('tomografia')">Tomografía</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- EVA -->
+        <div class="card">
+          <div class="card-header"><h3>📊 EVA — Escala Visual Analógica</h3></div>
+          <div class="card-body">
+            <p style="font-size:11px;color:var(--text2);margin-bottom:10px">Con un círculo indicá ¿cómo se encuentra actualmente?</p>
+            <input type="range" id="kine-eva" class="eva-slider" min="0" max="10" value="0" oninput="updateEVA()">
+            <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:10px">
+              <span>0 No Dolor</span><span>5 Moderado</span><span>10 Insoportable</span>
+            </div>
+            <div class="eva-display eva-0-3" id="eva-val">0</div>
+            <div id="eva-label" style="text-align:center;font-size:12px;color:var(--text2);margin-top:4px">Sin dolor</div>
+            <div class="ig mt-8"><label class="il">¿En qué movimiento se intensifica el dolor?</label>
+              <textarea class="inp" id="kine-dolor-mov" rows="2" placeholder="Al elevar el brazo, al caminar cuesta abajo..."></textarea></div>
+          </div>
+        </div>
+
+        <!-- Antecedentes patológicos -->
+        <div class="card">
+          <div class="card-header"><h3>🏥 Antecedentes personales patológicos</h3></div>
+          <div class="card-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
+              <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg4)"><input type="checkbox" class="kine-antec" value="Genitourinarias" style="accent-color:var(--neon)"> Genitourinarias</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg4)"><input type="checkbox" class="kine-antec" value="Digestivas" style="accent-color:var(--neon)"> Digestivas</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg4)"><input type="checkbox" class="kine-antec" value="Hormonales" style="accent-color:var(--neon)"> Hormonales</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg4)"><input type="checkbox" class="kine-antec" value="Sanguíneas" style="accent-color:var(--neon)"> Sanguíneas</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg4)"><input type="checkbox" class="kine-antec" value="Cardiovasculares" style="accent-color:var(--neon)"> Cardiovasculares</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg4)"><input type="checkbox" class="kine-antec" value="Neurológicas" style="accent-color:var(--neon)"> Neurológicas</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg4)"><input type="checkbox" class="kine-antec" value="Reumatológicas" style="accent-color:var(--neon)"> Reumatológicas</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:5px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg4)"><input type="checkbox" class="kine-antec" value="Psicológicas" style="accent-color:var(--neon)"> Psicológicas</label>
+            </div>
+            <div class="ig"><label class="il">Otras observaciones / Cirugías previas</label>
+              <textarea class="inp" id="kine-antec-obs" rows="2" placeholder="Otras enfermedades, cirugías..."></textarea></div>
+          </div>
+        </div>
+
+        <!-- Historia activa -->
+        <div class="card">
+          <div class="card-header"><h3>🏃 Historia activa / Deportiva</h3></div>
+          <div class="card-body">
+            <div class="ig"><label class="il">Deportes/actividades realizadas anteriormente</label><input class="inp" id="kine-deporte-prev" placeholder="Fútbol, natación, musculación..."></div>
+            <div class="ig"><label class="il">Actividad física actual (último mes)</label><input class="inp" id="kine-act-actual" placeholder="Describe la actividad actual..."></div>
+            <div class="grid-2" style="gap:8px">
+              <div class="ig"><label class="il">Frecuencia semanal</label><input class="inp inp-mono" id="kine-frec" placeholder="3 veces/sem"></div>
+              <div class="ig"><label class="il">Horas / semana</label><input class="inp inp-mono" id="kine-horas" placeholder="4 hs"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Objetivos -->
+        <div class="card">
+          <div class="card-header"><h3>🎯 Objetivos del tratamiento</h3></div>
+          <div class="card-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+              <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg4)"><input type="checkbox" class="kine-objetivo" value="Deportivo" style="accent-color:var(--neon)"> Deportivo</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg4)"><input type="checkbox" class="kine-objetivo" value="Acondicionamiento General" style="accent-color:var(--neon)"> Acond. General</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg4)"><input type="checkbox" class="kine-objetivo" value="Salud" style="accent-color:var(--neon)"> Salud</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg4)"><input type="checkbox" class="kine-objetivo" value="Calidad de Vida" style="accent-color:var(--neon)"> Calidad de Vida</label>
+            </div>
+            <div class="ig"><label class="il">Puede desarrollar objetivos</label>
+              <textarea class="inp" id="kine-obj-det" rows="2" placeholder="Objetivos específicos adicionales..."></textarea></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TESTS ORTOPÉDICOS POR ZONA -->
+    <div id="kinesio-tests-area">
+      <div class="flex-b mb-12">
+        <div style="font-family:var(--mono);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.10em;color:var(--neon)">
+          🔬 Tests ortopédicos — <span id="kine-zona-label">seleccioná una zona</span>
+        </div>
+      </div>
+
+      <!-- Panel hombro -->
+      <div id="tests-panel-hombro" class="kine-panel hidden">
+        <div class="grid-2" style="gap:12px">
+          <div class="card">
+            <div class="card-header"><h3>Espacio subacromial</h3><span class="tag tag-b">Impingement</span></div>
+            <div class="card-body" id="tp-subacro"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Manguito Rotador</h3><span class="tag tag-y">Integridad</span></div>
+            <div class="card-body" id="tp-manguito"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Bíceps e Inestabilidad</h3><span class="tag tag-r">Inestabilidad</span></div>
+            <div class="card-body" id="tp-biceps"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>ROM Hombro</h3><span class="tag tag-b">Act / Pas</span></div>
+            <div class="card-body" id="tp-rom-hombro"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel rodilla -->
+      <div id="tests-panel-rodilla" class="kine-panel hidden">
+        <div class="grid-2" style="gap:12px">
+          <div class="card">
+            <div class="card-header"><h3>Ligamentos</h3><span class="tag tag-r">Estabilidad</span></div>
+            <div class="card-body" id="tp-ligamentos"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Meniscos</h3><span class="tag tag-y">Menisco</span></div>
+            <div class="card-body" id="tp-meniscos"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Funcionales</h3><span class="tag tag-g">Función</span></div>
+            <div class="card-body" id="tp-funcionales"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>ROM Rodilla + Valgo dinámico</h3><span class="tag tag-b">Act / Pas</span></div>
+            <div class="card-body" id="tp-rom-rodilla"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel tobillo -->
+      <div id="tests-panel-tobillo" class="kine-panel hidden">
+        <div class="grid-2" style="gap:12px">
+          <div class="card">
+            <div class="card-header"><h3>Ligamentos tobillo</h3><span class="tag tag-r">Estabilidad</span></div>
+            <div class="card-body" id="tp-tobillo"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>ROM Tobillo</h3><span class="tag tag-b">Act / Pas</span></div>
+            <div class="card-body" id="tp-rom-tobillo"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel lumbar -->
+      <div id="tests-panel-lumbar" class="kine-panel hidden">
+        <div class="grid-2" style="gap:12px">
+          <div class="card">
+            <div class="card-header"><h3>Tests neurales / columna</h3><span class="tag tag-r">Neural</span></div>
+            <div class="card-body" id="tp-lumbar"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>ROM Columna</h3><span class="tag tag-b">Goniometría</span></div>
+            <div class="card-body" id="tp-rom-columna"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel cadera -->
+      <div id="tests-panel-cadera" class="kine-panel hidden">
+        <div class="grid-2" style="gap:12px">
+          <div class="card">
+            <div class="card-header"><h3>Tests cadera</h3><span class="tag tag-y">Cadera / SIJ</span></div>
+            <div class="card-body" id="tp-cadera"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>ROM Cadera</h3><span class="tag tag-b">Act / Pas</span></div>
+            <div class="card-body" id="tp-rom-cadera"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tests positivos summary -->
+      <div class="card card-danger mt-16" id="kine-positivos-card" style="display:none">
+        <div class="card-header"><h3 style="color:var(--red)">🔴 Tests positivos activos</h3><span style="font-size:10px;color:var(--text2);font-family:var(--mono)">Incluidos en el informe PDF</span></div>
+        <div class="card-body" id="kine-positivos-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: FUERZA F-V ══ -->
+  <div id="ptab-fuerza" class="hidden">
+    <div class="card mb-14">
+      <div class="card-header">
+        <h3>Perfil Carga-Velocidad — Regresión lineal (R²)</h3>
+        <div class="flex" style="gap:8px">
+          <select class="inp inp-mono" id="fv-ej" style="width:180px;font-size:11px" onchange="onFvEjChange()">
+            <option value="sentadilla">Sentadilla / Back Squat</option>
+            <option value="press-banca">Press de Banca</option>
+            <option value="peso-muerto">Peso Muerto / Deadlift</option>
+            <option value="bench-pull">Bench Pull / Remo</option>
+            <option value="hip-thrust">Hip Thrust</option>
+            <option value="media-sent">Media Sentadilla</option>
+            <option value="military-press">Military Press</option>
+            <option value="dominadas">Dominadas / Pull Up</option>
+          </select>
+          <select class="inp inp-mono" id="fv-eval-num" style="width:80px;font-size:11px"><option value="0">1ra</option><option value="1">2da</option><option value="2">3ra</option><option value="3">4ta</option></select>
+          <input class="inp" type="date" id="fv-fecha" style="width:150px;font-size:12px">
+        </div>
+      </div>
+      <div class="card-body">
+        <div style="background:var(--bg4);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:12px">
+          <div class="flex-b mb-8"><span class="il" style="margin:0">Pares Carga (kg) / VMP (m/s)</span><button class="btn btn-ghost btn-sm" onclick="addFVRow()">+ Fila</button></div>
+          <div style="display:grid;grid-template-columns:60px 1fr 1fr 24px;gap:6px;margin-bottom:6px">
+            <span class="il" style="margin:0">N°</span><span class="il" style="margin:0">Carga kg</span><span class="il" style="margin:0">VMP m/s</span><span></span>
+          </div>
+          <div id="fv-rows-wrap"></div>
+        </div>
+        <button class="btn btn-neon btn-full" onclick="calcFV()">📊 Calcular y Guardar Perfil F-V</button>
+      </div>
+    </div>
+    <div class="card mb-14">
+      <div class="card-header"><h3>Historial F-V — <span id="fv-hist-title" class="text-neon">Sentadilla</span></h3></div>
+      <div class="card-body" id="fv-hist-table" style="overflow-x:auto"></div>
+    </div>
+    <div id="fv-output" class="hidden">
+      <div class="card mb-12 card-glow">
+        <div class="card-header"><h3>Curva Carga-Velocidad</h3><span id="fv-r2-badge" class="tag"></span></div>
+        <div class="card-body"><canvas id="fv-chart" height="220"></canvas></div>
+      </div>
+      <div class="grid-2 mb-12" style="gap:12px">
+        <div class="card"><div class="card-header"><h3>Resultados F-V</h3></div><div class="card-body" id="fv-res-table"></div></div>
+        <div class="card"><div class="card-header"><h3>% RM → Carga → VMP</h3></div><div class="card-body" style="overflow-x:auto"><table class="data-table"><thead><tr><th>%RM</th><th>Carga kg</th><th>VMP m/s</th></tr></thead><tbody id="fv-pct-table"></tbody></table></div></div>
+      </div>
+      <div class="card card-glow">
+        <div class="card-header"><h3>Semáforo Fuerza Relativa — 1RM / Peso corporal</h3></div>
+        <div class="card-body" id="fv-fuerza-rel"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: SALTOS ══ -->
+  <div id="ptab-saltos" class="hidden">
+    <div class="flex-b mb-16">
+      <div><div style="font-size:15px;font-weight:700">Saltos — Protocolo My Jump</div><div style="font-size:12px;color:var(--text2)">Rep1 + Rep2 · Promedio · LSI · % Mejora vs eval anterior</div></div>
+      <div class="flex" style="gap:8px">
+        <select class="inp inp-mono" id="saltos-eval-num" style="width:120px;font-size:11px">
+          <option value="0">1ra Eval</option><option value="1">2da Eval</option><option value="2">3ra Eval</option><option value="3">4ta Eval</option>
+        </select>
+        <input class="inp" type="date" id="saltos-fecha" style="width:150px;font-size:12px">
+        <button class="btn btn-neon btn-sm" onclick="saveSaltos()">💾 Guardar</button>
+      </div>
+    </div>
+    <div id="saltos-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px"></div>
+    <div class="card mt-16">
+      <div class="card-header"><h3>Tabla de Simetrías — todos los tests</h3><span style="font-size:10px;color:var(--text2);font-family:var(--mono)">🔴 &gt;15% · 🟡 5–15% · 🟢 &lt;5%</span></div>
+      <div class="card-body" id="simetrias-tabla" style="overflow-x:auto"></div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: MOVILIDAD ══ -->
+  <div id="ptab-movilidad" class="hidden">
+    <div class="flex-b mb-14">
+      <div><div style="font-size:15px;font-weight:700">Movilidad Articular</div><div style="font-size:12px;color:var(--text2)">Tobillo · Cadera · Hombro — Semáforos + Velocímetros</div></div>
+      <div class="flex" style="gap:8px">
+        <select class="inp inp-mono" id="mov-eval-num" style="width:120px;font-size:11px"><option value="0">1ra</option><option value="1">2da</option><option value="2">3ra</option><option value="3">4ta</option></select>
+        <button class="btn btn-neon btn-sm" onclick="saveMov()">💾 Guardar</button>
+      </div>
+    </div>
+    <div class="grid-2 mb-16" style="gap:16px">
+      <div class="card"><div class="card-header"><h3>Radar movilidad</h3></div><div class="card-body"><canvas id="mov-radar" height="220"></canvas></div></div>
+      <div id="mov-semaforos"></div>
+    </div>
+    <div class="grid-2" style="gap:12px">
+      <div class="card">
+        <div class="card-header"><h3>Lunge Test — Dorsiflexión</h3><span class="tag tag-b">ROM</span></div>
+        <div class="card-body">
+          <p style="font-size:11px;color:var(--text2);margin-bottom:10px">🟢 &gt;40° · 🟡 35–40° · 🔴 &lt;35° · Δ &gt;5° = significativo</p>
+          <div class="grid-2" style="gap:12px">
+            <div class="ig"><label class="il">Derecho (°)</label><input class="inp inp-mono" type="number" id="lunge-d" placeholder="0" oninput="onMov()"></div>
+            <div class="ig"><label class="il">Izquierdo (°)</label><input class="inp inp-mono" type="number" id="lunge-i" placeholder="0" oninput="onMov()"></div>
+          </div>
+          <div id="lunge-result"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>TROM Cadera</h3><span class="tag tag-b">ROM</span></div>
+        <div class="card-body">
+          <p style="font-size:11px;color:var(--text2);margin-bottom:10px">TROM = RI + RE · 🟢 &gt;90° · 🟡 80–90° · 🔴 &lt;80°</p>
+          <div class="grid-2" style="gap:12px">
+            <div><div style="font-size:10px;color:var(--neon);font-weight:700;margin-bottom:6px;font-family:var(--mono)">DERECHA</div>
+              <div class="ig"><label class="il">RI D (°)</label><input class="inp inp-mono" type="number" id="cad-ri-d" placeholder="0" oninput="onMov()"></div>
+              <div class="ig"><label class="il">RE D (°)</label><input class="inp inp-mono" type="number" id="cad-re-d" placeholder="0" oninput="onMov()"></div>
+            </div>
+            <div><div style="font-size:10px;color:var(--blue);font-weight:700;margin-bottom:6px;font-family:var(--mono)">IZQUIERDA</div>
+              <div class="ig"><label class="il">RI I (°)</label><input class="inp inp-mono" type="number" id="cad-ri-i" placeholder="0" oninput="onMov()"></div>
+              <div class="ig"><label class="il">RE I (°)</label><input class="inp inp-mono" type="number" id="cad-re-i" placeholder="0" oninput="onMov()"></div>
+            </div>
+          </div>
+          <div id="cad-result"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>TROM Hombro — GIRD</h3><span class="tag tag-b">ROM</span></div>
+        <div class="card-body">
+          <p style="font-size:11px;color:var(--text2);margin-bottom:10px">GIRD significativo: Δ TROM &gt;18°</p>
+          <div class="grid-2" style="gap:12px">
+            <div><div style="font-size:10px;color:var(--neon);font-weight:700;margin-bottom:6px;font-family:var(--mono)">DERECHA</div>
+              <div class="ig"><label class="il">RI D (°)</label><input class="inp inp-mono" type="number" id="hom-ri-d" placeholder="0" oninput="onMov()"></div>
+              <div class="ig"><label class="il">RE D (°)</label><input class="inp inp-mono" type="number" id="hom-re-d" placeholder="0" oninput="onMov()"></div>
+            </div>
+            <div><div style="font-size:10px;color:var(--blue);font-weight:700;margin-bottom:6px;font-family:var(--mono)">IZQUIERDA</div>
+              <div class="ig"><label class="il">RI I (°)</label><input class="inp inp-mono" type="number" id="hom-ri-i" placeholder="0" oninput="onMov()"></div>
+              <div class="ig"><label class="il">RE I (°)</label><input class="inp inp-mono" type="number" id="hom-re-i" placeholder="0" oninput="onMov()"></div>
+            </div>
+          </div>
+          <div id="hom-result"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>Velocímetros</h3></div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div style="text-align:center"><div class="il mb-4">Lunge D</div><canvas id="g-ld" width="120" height="74"></canvas><div id="gv-ld" style="font-family:var(--mono);font-size:20px;font-weight:700;margin-top:2px;color:var(--text3)">—</div></div>
+            <div style="text-align:center"><div class="il mb-4">Lunge I</div><canvas id="g-li" width="120" height="74"></canvas><div id="gv-li" style="font-family:var(--mono);font-size:20px;font-weight:700;margin-top:2px;color:var(--text3)">—</div></div>
+            <div style="text-align:center"><div class="il mb-4">TROM Cad D</div><canvas id="g-tcd" width="120" height="74"></canvas><div id="gv-tcd" style="font-family:var(--mono);font-size:20px;font-weight:700;margin-top:2px;color:var(--text3)">—</div></div>
+            <div style="text-align:center"><div class="il mb-4">TROM Cad I</div><canvas id="g-tci" width="120" height="74"></canvas><div id="gv-tci" style="font-family:var(--mono);font-size:20px;font-weight:700;margin-top:2px;color:var(--text3)">—</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: VELOCIDAD ══ -->
+  <div id="ptab-velocidad" class="hidden">
+    <div class="flex-b mb-16">
+      <div><div style="font-size:15px;font-weight:700">Sprint & COD</div><div style="font-size:12px;color:var(--text2)">10m · 30m · T-Test · 505 + Benchmark normativo</div></div>
+      <div class="flex" style="gap:8px">
+        <select class="inp inp-mono" id="sprint-eval-num" style="width:120px;font-size:11px"><option value="0">1ra</option><option value="1">2da</option><option value="2">3ra</option><option value="3">4ta</option></select>
+        <input class="inp" type="date" id="sprint-fecha" style="width:150px;font-size:12px">
+        <button class="btn btn-neon btn-sm" onclick="saveSprint()">💾 Guardar</button>
+      </div>
+    </div>
+    <div class="grid-2 mb-16" style="gap:12px">
+      <div class="card">
+        <div class="card-header"><h3>Tiempos de sprint</h3></div>
+        <div class="card-body">
+          <div class="grid-2" style="gap:12px">
+            <div class="ig"><label class="il">10m (seg)</label><input class="inp inp-mono" type="number" step=".01" id="sp-10" placeholder="1.70" oninput="calcSprintBench()"></div>
+            <div class="ig"><label class="il">20m (seg)</label><input class="inp inp-mono" type="number" step=".01" id="sp-20" placeholder="2.90" oninput="calcSprintBench()"></div>
+            <div class="ig"><label class="il">30m (seg)</label><input class="inp inp-mono" type="number" step=".01" id="sp-30" placeholder="4.10" oninput="calcSprintBench()"></div>
+            <div class="ig"><label class="il">Vel. máx (km/h)</label><input class="inp inp-mono" type="number" step=".1" id="sp-vmax" placeholder="28"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>COD — Cambio de dirección</h3></div>
+        <div class="card-body">
+          <div class="ig"><label class="il">T-Test (seg)</label><input class="inp inp-mono" type="number" step=".01" id="sp-ttest" placeholder="9.5" oninput="calcSprintBench()"></div>
+          <div class="grid-2" style="gap:8px">
+            <div class="ig"><label class="il">505 Derecho (seg)</label><input class="inp inp-mono" type="number" step=".01" id="sp-505d" placeholder="2.4" oninput="calcSprintBench()"></div>
+            <div class="ig"><label class="il">505 Izquierdo (seg)</label><input class="inp inp-mono" type="number" step=".01" id="sp-505i" placeholder="2.4" oninput="calcSprintBench()"></div>
+          </div>
+          <div id="sp-505-asim"></div>
+        </div>
+      </div>
+    </div>
+    <div id="sprint-bench-area"></div>
+  </div>
+
+  <!-- ══ TAB: FMS ══ -->
+  <div id="ptab-fms" class="hidden">
+    <div class="flex-b mb-16">
+      <div><div style="font-size:15px;font-weight:700">Calidad de Movimiento</div><div style="font-size:12px;color:var(--text2)">OHS (2 fotos) · Step-Down (4 fotos) · Criterios SÍ/NO</div></div>
+      <button class="btn btn-neon btn-sm" onclick="saveFMS()">💾 Guardar FMS</button>
+    </div>
+    <div class="grid-2" style="gap:14px">
+      <div class="card">
+        <div class="card-header"><h3>Overhead Squat</h3><span class="tag tag-y">2 slots</span></div>
+        <div class="card-body">
+          <div class="grid-2 mb-12" style="gap:10px">
+            <div>
+              <div class="il mb-4">Frente</div>
+              <div class="img-slot" id="slot-ohs-frente" onclick="document.getElementById('ohs-frente-inp').click()"><div style="font-size:22px">📷</div></div>
+              <input type="file" id="ohs-frente-inp" accept="image/*" class="hidden" onchange="loadSlot(this,'slot-ohs-frente')">
+            </div>
+            <div>
+              <div class="il mb-4">Perfil</div>
+              <div class="img-slot" id="slot-ohs-perfil" onclick="document.getElementById('ohs-perfil-inp').click()"><div style="font-size:22px">📷</div></div>
+              <input type="file" id="ohs-perfil-inp" accept="image/*" class="hidden" onchange="loadSlot(this,'slot-ohs-perfil')">
+            </div>
+          </div>
+          <div class="il mb-8">Criterios — punto de máx. flexión</div>
+          <div id="ohs-checks">
+            <div class="fms-check"><span style="font-size:12px">Rodillas alineadas con los pies</span><div class="fms-btns"><button class="fms-btn" onclick="setFMS(this,'yes')">SÍ</button><button class="fms-btn" onclick="setFMS(this,'no')">NO</button></div></div>
+            <div class="fms-check"><span style="font-size:12px">Fémur debajo de la horizontal</span><div class="fms-btns"><button class="fms-btn" onclick="setFMS(this,'yes')">SÍ</button><button class="fms-btn" onclick="setFMS(this,'no')">NO</button></div></div>
+            <div class="fms-check"><span style="font-size:12px">Torso paralelo a la tibia</span><div class="fms-btns"><button class="fms-btn" onclick="setFMS(this,'yes')">SÍ</button><button class="fms-btn" onclick="setFMS(this,'no')">NO</button></div></div>
+            <div class="fms-check"><span style="font-size:12px">Barra alineada sobre los pies</span><div class="fms-btns"><button class="fms-btn" onclick="setFMS(this,'yes')">SÍ</button><button class="fms-btn" onclick="setFMS(this,'no')">NO</button></div></div>
+          </div>
+          <div id="ohs-score" class="mt-8"></div>
+          <div class="ig mt-8"><label class="il">Observaciones</label><textarea class="inp" id="ohs-obs" rows="2" placeholder="Compensaciones, hallazgos..."></textarea></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>Step-Down</h3><span class="tag tag-y">4 slots</span></div>
+        <div class="card-body">
+          <div class="grid-2 mb-12" style="gap:8px">
+            <div><div class="il" style="color:var(--neon)" >Frente D</div><div class="img-slot" id="slot-sd-fd" onclick="document.getElementById('sd-fd-inp').click()"><div style="font-size:18px">📷</div></div><input type="file" id="sd-fd-inp" accept="image/*" class="hidden" onchange="loadSlot(this,'slot-sd-fd')"></div>
+            <div><div class="il" style="color:var(--neon)">Perfil D</div><div class="img-slot" id="slot-sd-pd" onclick="document.getElementById('sd-pd-inp').click()"><div style="font-size:18px">📷</div></div><input type="file" id="sd-pd-inp" accept="image/*" class="hidden" onchange="loadSlot(this,'slot-sd-pd')"></div>
+            <div><div class="il" style="color:var(--blue)">Frente I</div><div class="img-slot" id="slot-sd-fi" onclick="document.getElementById('sd-fi-inp').click()"><div style="font-size:18px">📷</div></div><input type="file" id="sd-fi-inp" accept="image/*" class="hidden" onchange="loadSlot(this,'slot-sd-fi')"></div>
+            <div><div class="il" style="color:var(--blue)">Perfil I</div><div class="img-slot" id="slot-sd-pi" onclick="document.getElementById('sd-pi-inp').click()"><div style="font-size:18px">📷</div></div><input type="file" id="sd-pi-inp" accept="image/*" class="hidden" onchange="loadSlot(this,'slot-sd-pi')"></div>
+          </div>
+          <div id="sd-checks">
+            <div class="fms-check"><span style="font-size:12px">Rodilla alineada (sin valgo)</span><div class="fms-btns"><button class="fms-btn" onclick="setFMS(this,'yes')">SÍ</button><button class="fms-btn" onclick="setFMS(this,'no')">NO</button></div></div>
+            <div class="fms-check"><span style="font-size:12px">Cadera estable (sin Trendelenburg)</span><div class="fms-btns"><button class="fms-btn" onclick="setFMS(this,'yes')">SÍ</button><button class="fms-btn" onclick="setFMS(this,'no')">NO</button></div></div>
+            <div class="fms-check"><span style="font-size:12px">Tronco erecto</span><div class="fms-btns"><button class="fms-btn" onclick="setFMS(this,'yes')">SÍ</button><button class="fms-btn" onclick="setFMS(this,'no')">NO</button></div></div>
+          </div>
+          <div id="sd-score" class="mt-8"></div>
+          <div class="grid-2 mt-8" style="gap:8px">
+            <div class="ig"><label class="il">Valgo D (°)</label><input class="inp inp-mono" type="number" id="valgo-d" placeholder="0" oninput="calcValgo()"></div>
+            <div class="ig"><label class="il">Valgo I (°)</label><input class="inp inp-mono" type="number" id="valgo-i" placeholder="0" oninput="calcValgo()"></div>
+          </div>
+          <div id="valgo-result"></div>
+          <div class="ig mt-8"><label class="il">Observaciones</label><textarea class="inp" id="sd-obs" rows="2" placeholder="Diferencias D/I, compensaciones..."></textarea></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: FATIGA ══ -->
+  <div id="ptab-fatiga" class="hidden">
+    <div class="flex-b mb-14">
+      <div><div style="font-size:15px;font-weight:700">Control de Fatiga Diaria</div><div style="font-size:12px;color:var(--text2)">Hooper Index · HRV · Pérdida de velocidad</div></div>
+      <div class="flex" style="gap:8px">
+        <input class="inp" type="date" id="fat-fecha" style="width:150px;font-size:12px">
+        <button class="btn btn-neon btn-sm" onclick="saveFatiga()">💾 Guardar</button>
+      </div>
+    </div>
+    <div class="grid-2" style="gap:14px">
+      <div class="card">
+        <div class="card-header"><h3>Índice de Hooper</h3><span style="font-size:10px;color:var(--text2);font-family:var(--mono)">1=Muy bueno · 7=Muy malo</span></div>
+        <div class="card-body" id="hooper-fields"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="card"><div class="card-header"><h3>HRV</h3></div><div class="card-body">
+          <div class="grid-2" style="gap:8px">
+            <div class="ig"><label class="il">HRV hoy (ms)</label><input class="inp inp-mono" type="number" id="fat-hrv" placeholder="65" oninput="calcFatiga()"></div>
+            <div class="ig"><label class="il">HRV basal (ms)</label><input class="inp inp-mono" type="number" id="fat-hrv-base" placeholder="70" oninput="calcFatiga()"></div>
+          </div>
+          <div id="hrv-result"></div>
+        </div></div>
+        <div class="card"><div class="card-header"><h3>Pérdida de velocidad</h3></div><div class="card-body">
+          <div class="grid-2" style="gap:8px">
+            <div class="ig"><label class="il">Vel. máx (m/s)</label><input class="inp inp-mono" type="number" step=".001" id="fat-vmax" placeholder="0.85" oninput="calcFatiga()"></div>
+            <div class="ig"><label class="il">Vel. final (m/s)</label><input class="inp inp-mono" type="number" step=".001" id="fat-vfin" placeholder="0.65" oninput="calcFatiga()"></div>
+          </div>
+          <div id="fat-vel-result"></div>
+        </div></div>
+        <div class="card card-glow"><div class="card-header"><h3>Score general de recuperación</h3></div><div class="card-body" style="text-align:center">
+          <div style="position:relative;display:inline-flex;align-items:center;justify-content:center;width:90px;height:90px;margin:0 auto 10px">
+            <svg width="90" height="90" viewBox="0 0 90 90" style="transform:rotate(-90deg)">
+              <circle cx="45" cy="45" r="38" fill="none" stroke="var(--bg5)" stroke-width="7"/>
+              <circle id="fat-ring-circle" cx="45" cy="45" r="38" fill="none" stroke="var(--neon)" stroke-width="7" stroke-dasharray="238.8" stroke-dashoffset="238.8" stroke-linecap="round" style="transition:stroke-dashoffset .8s,stroke .4s"/>
+            </svg>
+            <div style="position:absolute;font-family:var(--mono);font-size:20px;font-weight:800;color:var(--neon)" id="fat-score">—</div>
+          </div>
+          <div id="fat-label" style="font-size:13px;font-weight:700;margin-bottom:5px"></div>
+          <div id="fat-rec" style="font-size:11px;color:var(--text2);line-height:1.5"></div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: HISTORIAL ══ -->
+  <div id="ptab-historial" class="hidden">
+    <div class="flex-b mb-16">
+      <div>
+        <div style="font-size:15px;font-weight:700">Historial — Timeline visual</div>
+        <div style="font-size:12px;color:var(--text2)">🔴 Déficit → 🟡 Límite → 🟢 Óptimo — Evolución del atleta</div>
+      </div>
+      <div class="flex" style="gap:8px">
+        <button class="btn btn-ai" onclick="openInformeIA()">🤖 Generar Informe IA</button>
+        <button class="btn btn-outline" onclick="exportAllData()">📤 Exportar JSON</button>
+      </div>
+    </div>
+    <div style="padding:12px 14px;background:linear-gradient(135deg,rgba(57,255,122,.04),rgba(77,158,255,.04));border:1px solid var(--border2);border-radius:var(--r2);margin-bottom:16px;font-size:12px;color:var(--text2)">
+      <b style="color:var(--neon)">📈 Evolución visual del atleta.</b> Los puntos de color muestran el estado en cada fecha registrada.
+    </div>
+    <div class="card">
+      <div class="card-body" id="historial-timeline" style="max-height:600px;overflow-y:auto"></div>
+    </div>
+  </div>
+
+</div><!-- /page-tests -->
+
+<!-- ────────────────────────────────────────
+     PAGE: AJUSTES (VMP + REFERENCIAS)
+──────────────────────────────────────────── -->
+<div class="page" id="page-ajustes">
+  <div class="page-header"><div><h2>Ajustes & Referencias técnicas</h2><p>Tablas VMP, normativos, configuración del sistema</p></div></div>
+  <div class="card mb-14">
+    <div class="card-header"><h3>VMP al 1RM — Referencia científica</h3></div>
+    <div class="card-body" style="overflow-x:auto">
+      <table class="data-table" style="min-width:600px">
+        <thead><tr><th>Ejercicio</th><th>VMP @ 1RM</th><th>Zona potencia</th><th>Fuente</th></tr></thead>
+        <tbody>
+          <tr><td>Back Squat</td><td class="mono-cell text-neon">0.32 m/s</td><td class="mono-cell">0.68–0.84</td><td style="font-size:10px;color:var(--text3)">González-Badillo & Sánchez-Medina (2010)</td></tr>
+          <tr><td>Press de Banca</td><td class="mono-cell text-neon">0.18 m/s</td><td class="mono-cell">0.47–0.62</td><td style="font-size:10px;color:var(--text3)">González-Badillo & Sánchez-Medina (2010)</td></tr>
+          <tr><td>Peso Muerto</td><td class="mono-cell text-neon">0.14 m/s</td><td class="mono-cell">0.37–0.46</td><td style="font-size:10px;color:var(--text3)">Helms et al. (2017)</td></tr>
+          <tr><td>Bench Pull / Remo</td><td class="mono-cell text-neon">0.53 m/s</td><td class="mono-cell">0.78–0.99</td><td style="font-size:10px;color:var(--text3)">Sánchez-Medina et al. (2014)</td></tr>
+          <tr><td>Hip Thrust</td><td class="mono-cell text-neon">0.24 m/s</td><td class="mono-cell">0.48–0.60</td><td style="font-size:10px;color:var(--text3)">Hoyo, Núñez et al. (2017)</td></tr>
+          <tr><td>Media Sentadilla</td><td class="mono-cell text-neon">0.33 m/s</td><td class="mono-cell">0.59–0.76</td><td style="font-size:10px;color:var(--text3)">Sánchez-Medina et al. (2014)</td></tr>
+          <tr><td>Military Press</td><td class="mono-cell text-neon">0.20 m/s</td><td class="mono-cell">0.41–0.55</td><td style="font-size:10px;color:var(--text3)">Muñoz et al. (2014)</td></tr>
+          <tr><td>Dominadas / Pull Up</td><td class="mono-cell text-neon">0.22 m/s</td><td class="mono-cell">0.39–0.57</td><td style="font-size:10px;color:var(--text3)">Sánchez-Moreno et al. (2017)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card mb-14">
+    <div class="card-header"><h3>Tabla completa % RM → VMP</h3><span style="font-size:10px;color:var(--text2)">Vitruve / González-Badillo lab</span></div>
+    <div class="card-body" style="overflow-x:auto">
+      <table class="data-table" style="min-width:700px">
+        <thead><tr><th>Ejercicio</th><th>40%</th><th>50%</th><th>60%</th><th>70%</th><th>80%</th><th>85%</th><th>90%</th><th>95%</th><th>100%</th></tr></thead>
+        <tbody>
+          <tr><td>Back Squat</td><td class="mono-cell">1.28</td><td class="mono-cell">1.07</td><td class="mono-cell">0.92</td><td class="mono-cell">0.76</td><td class="mono-cell">0.59</td><td class="mono-cell">0.51</td><td class="mono-cell">0.42</td><td class="mono-cell">0.36</td><td class="mono-cell text-neon">0.32</td></tr>
+          <tr><td>Press Banca</td><td class="mono-cell">1.13</td><td class="mono-cell">0.95</td><td class="mono-cell">0.70</td><td class="mono-cell">0.55</td><td class="mono-cell">0.39</td><td class="mono-cell">0.32</td><td class="mono-cell">0.25</td><td class="mono-cell">0.20</td><td class="mono-cell text-neon">0.18</td></tr>
+          <tr><td>Bench Pull</td><td class="mono-cell">1.36</td><td class="mono-cell">1.21</td><td class="mono-cell">0.99</td><td class="mono-cell">0.85</td><td class="mono-cell">0.72</td><td class="mono-cell">0.65</td><td class="mono-cell">0.59</td><td class="mono-cell">0.56</td><td class="mono-cell text-neon">0.53</td></tr>
+          <tr><td>Pull Up</td><td class="mono-cell">—</td><td class="mono-cell">1.09</td><td class="mono-cell">0.83</td><td class="mono-cell">0.65</td><td class="mono-cell">0.50</td><td class="mono-cell">0.43</td><td class="mono-cell">0.31</td><td class="mono-cell">0.25</td><td class="mono-cell text-neon">0.22</td></tr>
+          <tr><td>Deadlift</td><td class="mono-cell">—</td><td class="mono-cell">—</td><td class="mono-cell">—</td><td class="mono-cell">0.37</td><td class="mono-cell">0.29</td><td class="mono-cell">0.25</td><td class="mono-cell">0.21</td><td class="mono-cell">0.17</td><td class="mono-cell text-neon">0.14</td></tr>
+          <tr><td>Hip Thrust</td><td class="mono-cell">—</td><td class="mono-cell">—</td><td class="mono-cell">0.60</td><td class="mono-cell">0.48</td><td class="mono-cell">—</td><td class="mono-cell">0.36</td><td class="mono-cell">—</td><td class="mono-cell">—</td><td class="mono-cell text-neon">0.24</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card mb-14">
+    <div class="card-header"><h3>Fuerza relativa — Normativos</h3></div>
+    <div class="card-body">
+      <table class="data-table">
+        <thead><tr><th>Ejercicio</th><th>🔴 Déficit</th><th>🟡 Moderado</th><th>🟢 Elite</th><th>Referencia</th></tr></thead>
+        <tbody>
+          <tr><td>Sentadilla</td><td class="mono-cell text-red">&lt;1.0×PC</td><td class="mono-cell text-amber">1.0–1.5×PC</td><td class="mono-cell text-neon">&gt;1.5×PC</td><td style="font-size:10px;color:var(--text3)">Haff & Triplett (2016)</td></tr>
+          <tr><td>Press Banca</td><td class="mono-cell text-red">&lt;0.75×PC</td><td class="mono-cell text-amber">0.75–1.25×PC</td><td class="mono-cell text-neon">&gt;1.25×PC</td><td style="font-size:10px;color:var(--text3)">Haff & Triplett (2016)</td></tr>
+          <tr><td>Peso Muerto</td><td class="mono-cell text-red">&lt;1.25×PC</td><td class="mono-cell text-amber">1.25–2.0×PC</td><td class="mono-cell text-neon">&gt;2.0×PC</td><td style="font-size:10px;color:var(--text3)">Cronin & Sleivert (2005)</td></tr>
+          <tr><td>Hip Thrust</td><td class="mono-cell text-red">&lt;1.0×PC</td><td class="mono-cell text-amber">1.0–2.0×PC</td><td class="mono-cell text-neon">&gt;2.0×PC</td><td style="font-size:10px;color:var(--text3)">Contreras et al. (2017)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><h3>Sistema & Datos</h3></div>
+    <div class="card-body" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+      <button class="btn btn-ghost btn-sm" onclick="exportAllData()">📤 Exportar JSON</button>
+      <button class="btn btn-red btn-sm" onclick="if(confirm('¿Eliminar TODOS los datos locales?')){localStorage.clear();location.reload()}">🗑️ Limpiar datos</button>
+      <span style="font-size:10px;color:var(--text3);font-family:var(--mono)">MoveMetrics v12 · Investor Edition · Lic. Lezcano</span>
+    </div>
+  </div>
+</div>
+
+</main>
+</div><!-- /app -->
+
+<!-- ════════ TOAST ════════ -->
+<div id="save-toast">✓ Guardado</div>
+
+<!-- ════════ MODALES ════════ -->
+
+<!-- Modal: Form Atleta -->
+<div class="modal" id="modal-atleta-form">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="form-title">Nuevo atleta</div>
+    <div class="modal-sub">Completá el perfil del atleta / paciente</div>
+    <input type="hidden" id="edit-id">
+
+    <!-- Foto -->
+    <div class="ig">
+      <label class="il">Foto de perfil (opcional)</label>
+      <div class="flex" style="gap:14px">
+        <div id="form-photo-prev" style="width:58px;height:58px;border-radius:12px;background:var(--bg4);border:1px dashed var(--border2);display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden;flex-shrink:0">👤</div>
+        <div>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('photo-form-inp').click()">📷 Cargar foto</button>
+          <input type="file" id="photo-form-inp" accept="image/*" class="hidden" onchange="previewFormPhoto(this)">
+          <div style="font-size:10px;color:var(--text3);margin-top:4px">JPG/PNG · Se guarda en el perfil</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Servicio -->
+    <div class="ig">
+      <label class="il">Enfoque</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button id="svc-rend" class="btn btn-neon btn-full" onclick="setSvc('rendimiento')" style="font-size:12px">⚡ Rendimiento</button>
+        <button id="svc-kine" class="btn btn-ghost btn-full" onclick="setSvc('kinesio')" style="font-size:12px">🏥 Kinesiología</button>
+      </div>
+      <input type="hidden" id="s-servicio" value="rendimiento">
+    </div>
+
+    <div class="ig"><label class="il">Nombre completo</label><input class="inp" id="s-nombre" placeholder="Juan Pérez"></div>
+    <div class="grid-2" style="gap:12px">
+      <div class="ig"><label class="il">Edad</label><input class="inp inp-mono" id="s-edad" type="number" placeholder="25"></div>
+      <div class="ig"><label class="il">Sexo</label><select class="inp" id="s-sexo"><option value="M">Masculino</option><option value="F">Femenino</option><option value="X">Otro</option></select></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <div class="ig"><label class="il">Peso (kg)</label><input class="inp inp-mono" id="s-peso" type="number" placeholder="75"></div>
+      <div class="ig"><label class="il">Talla (cm)</label><input class="inp inp-mono" id="s-talla" type="number" placeholder="178"></div>
+      <div class="ig"><label class="il">L.Pierna (cm)</label><input class="inp inp-mono" id="s-pierna" type="number" placeholder="92"></div>
+    </div>
+    <div class="ig"><label class="il">Deporte</label>
+      <select class="inp" id="s-deporte" onchange="checkRugby()">
+        <option value="">Seleccioná...</option>
+        <optgroup label="🏉 Deportes de Contacto / Equipo">
+          <option value="Rugby">🏉 Rugby</option>
+          <option value="Fútbol">⚽ Fútbol</option>
+          <option value="Básquet">🏀 Básquet</option>
+          <option value="Vóley">🏐 Vóley</option>
+          <option value="Hockey">🏑 Hockey sobre césped</option>
+          <option value="Hockey Patín">🏒 Hockey sobre patines</option>
+          <option value="Handball">🤾 Handball</option>
+          <option value="Waterpolo">🤽 Waterpolo</option>
+          <option value="Boxeo">🥊 Boxeo / MMA / Kickboxing</option>
+          <option value="Judo">🥋 Judo / Lucha</option>
+        </optgroup>
+        <optgroup label="🏃 Atletismo / Carrera">
+          <option value="Running">🏃 Running / Trail Running</option>
+          <option value="Maratón">🏅 Maratón / Media Maratón</option>
+          <option value="Atletismo">🏅 Atletismo (pista y campo)</option>
+          <option value="Marcha Atlética">🚶 Marcha Atlética</option>
+        </optgroup>
+        <optgroup label="🚴 Ciclismo">
+          <option value="Ciclismo">🚴 Ciclismo de Ruta</option>
+          <option value="MTB">🚵 MTB / Ciclismo de montaña</option>
+          <option value="Ciclismo Indoor">🚴 Ciclismo Indoor / Zwift</option>
+          <option value="BMX">🚲 BMX / Ciclismo urbano</option>
+          <option value="Gravel">🚴 Gravel / Cicloturismo</option>
+        </optgroup>
+        <optgroup label="🏊 Acuáticos">
+          <option value="Natación">🏊 Natación (piscina)</option>
+          <option value="Natación Aguas Abiertas">🌊 Natación en aguas abiertas</option>
+          <option value="Surf">🏄 Surf / Kitesurf / Windsurf</option>
+          <option value="Remo">🚣 Remo / Kayak / Canotaje</option>
+          <option value="Triatlón">🏊 Triatlón / Duatlón</option>
+        </optgroup>
+        <optgroup label="🎾 Raqueta / Precisión">
+          <option value="Tenis">🎾 Tenis</option>
+          <option value="Pádel">🏓 Pádel</option>
+          <option value="Squash">🎾 Squash / Racquetball</option>
+          <option value="Tenis de Mesa">🏓 Tenis de Mesa</option>
+          <option value="Golf">⛳ Golf</option>
+          <option value="Tiro">🎯 Tiro / Arco</option>
+        </optgroup>
+        <optgroup label="🏋️ Fuerza / Funcional">
+          <option value="CrossFit">🏋️ CrossFit / HYROX</option>
+          <option value="Powerlifting">🏋️ Powerlifting / Halterofilia</option>
+          <option value="Fuerza General">💪 Entrenamiento de fuerza general</option>
+          <option value="Calistenia">🤸 Calistenia / Street Workout</option>
+          <option value="Escalada">🧗 Escalada deportiva / Boulder</option>
+        </optgroup>
+        <optgroup label="🧘 Mente-Cuerpo / Flexibilidad">
+          <option value="Yoga">🧘 Yoga</option>
+          <option value="Pilates">🤸 Pilates</option>
+          <option value="Danza">💃 Danza / Baile deportivo</option>
+          <option value="Gimnasia Artística">🤸 Gimnasia Artística / Rítmica</option>
+        </optgroup>
+        <optgroup label="⛷️ Deportes de Nieve / Extremos">
+          <option value="Esquí Alpino">⛷️ Esquí Alpino / Snowboard</option>
+          <option value="Esquí Fondo">🎿 Esquí de Fondo / Travesía</option>
+          <option value="Paracaidismo">🪂 Paracaidismo / Deportes aéreos</option>
+        </optgroup>
+        <optgroup label="🏥 Salud / Poblaciones especiales">
+          <option value="Adulto Mayor">👴 Adulto Mayor (60+)</option>
+          <option value="Embarazo">🤱 Embarazo / Post-parto</option>
+          <option value="Rehabilitación">🏥 Rehabilitación / Readaptación</option>
+          <option value="Salud General">❤️ Salud general / Sedentario activo</option>
+          <option value="General">💪 Fitness / Acondicionamiento general</option>
+        </optgroup>
+      </select>
+    </div>
+    <div id="rugby-sec" class="hidden">
+      <div class="ig"><label class="il">🏉 Puesto en Rugby</label>
+        <select class="inp" id="s-puesto">
+          <option value="">—</option>
+          <option value="pilares">1/3 — Pilares (Forward)</option>
+          <option value="hooker">2 — Hooker (Forward)</option>
+          <option value="2da-linea">4/5 — 2da Línea (Forward)</option>
+          <option value="3ras-lineas">6/7/8 — 3ras Líneas (Forward)</option>
+          <option value="medio-scrum">9 — Medio Scrum (Back)</option>
+          <option value="apertura">10 — Apertura (Back)</option>
+          <option value="centros">12/13 — Centros (Back)</option>
+          <option value="wing-fb">11/14/15 — Wings / FB (Back)</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid-2" style="gap:12px">
+      <div class="ig"><label class="il">Nivel</label>
+        <select class="inp" id="s-nivel"><option value="recreativo">Recreativo</option><option value="amateur">Amateur</option><option value="federado">Federado</option><option value="semi-pro">Semi-pro</option><option value="elite">Elite</option></select>
+      </div>
+      <div class="ig"><label class="il">Objetivo</label>
+        <select class="inp" id="s-objetivo"><option value="rendimiento">Rendimiento</option><option value="fuerza">Fuerza máxima</option><option value="hipertrofia">Hipertrofia</option><option value="salud">Salud</option><option value="readaptacion">Readaptación</option></select>
+      </div>
+    </div>
+    <div class="ig"><label class="il">Lesión / Motivo de consulta</label><input class="inp" id="s-lesion" placeholder="LCA, hombro, lumbar..."></div>
+    <div class="ig"><label class="il">Email</label><input class="inp" id="s-email" type="email" placeholder="atleta@mail.com"></div>
+    <button class="btn btn-neon btn-full" onclick="saveAtleta()">Guardar atleta</button>
+    <button class="btn btn-ghost btn-full mt-8" onclick="closeModal('modal-atleta-form')">Cancelar</button>
+  </div>
+</div>
+
+<!-- Modal: Informe IA + PDF -->
+<div class="modal" id="modal-informe">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🤖 Informe Analítico con IA</div>
+    <div class="modal-sub" id="informe-sub">Generando análisis...</div>
+    <div id="informe-loading" class="hidden" style="display:flex;align-items:center;gap:8px;background:var(--bg4);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:16px">
+      <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      <span style="font-size:12px;color:var(--neon)">Analizando datos completos del atleta...</span>
+    </div>
+    <div id="informe-editor-wrap" class="hidden">
+      <div style="font-size:10px;color:var(--text3);margin-bottom:8px;font-family:var(--mono)">Editá el texto antes de exportar</div>
+      <textarea class="pdf-editor" id="informe-text" rows="16"></textarea>
+      <div class="grid-2 mt-12" style="gap:12px">
+        <div class="ig"><label class="il">Profesional</label><input class="inp" id="prof-nombre" placeholder="Lic. Emanuel Lezcano"></div>
+        <div class="ig"><label class="il">Institución</label><input class="inp" id="prof-inst" placeholder="MOVE Centro de Evaluación"></div>
+      </div>
+      <div class="flex mt-12" style="gap:12px">
+        <button class="btn btn-pdf btn-full" onclick="exportarPDF()">📄 Descargar PDF</button>
+        <button class="btn btn-ai btn-full" onclick="regenerarInforme()">🔄 Regenerar</button>
+      </div>
+    </div>
+    <button class="btn btn-ghost btn-full mt-12" onclick="closeModal('modal-informe')">Cerrar</button>
+  </div>
+</div>
+
+<!-- ════════ SCRIPT ════════ -->
+<script src="assets/script.js"></script>
+
+</body>
+</html>
