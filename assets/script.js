@@ -2015,3 +2015,311 @@ document.addEventListener('DOMContentLoaded', () => {
     if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); if (cur) saveData(); }
   });
 });
+// ================================================
+// GONIÓMETRO DIGITAL - Movilidad Articular
+// ================================================
+
+let goniometroActivo = false;
+let goniometroCongelado = false;
+let anguloActual = 0;
+let anguloCongelado = 0;
+let goniometroCanvas = null;
+let goniometroCtx = null;
+let goniometroAnimationId = null;
+let testEnCurso = null; // 'tobillo-d', 'tobillo-i', 'rodilla-d', etc.
+
+// Iniciar medición
+function iniciarGoniometro(testId, testNombre) {
+  if (!cur) {
+    alert('Seleccioná un atleta primero');
+    return;
+  }
+  
+  testEnCurso = testId;
+  document.getElementById('goniometro-title').textContent = `📐 ${testNombre}`;
+  document.getElementById('goniometro-sub').textContent = 'Incliná el dispositivo para medir';
+  
+  goniometroActivo = true;
+  goniometroCongelado = false;
+  anguloActual = 0;
+  anguloCongelado = 0;
+  
+  // Reiniciar UI
+  document.getElementById('lectura-actual').textContent = '0.0°';
+  document.getElementById('lectura-estado').innerHTML = '🔓 En vivo';
+  document.getElementById('goniometro-angulo').textContent = '0.0';
+  
+  const btnCongelar = document.getElementById('btn-congelar');
+  if (btnCongelar) {
+    btnCongelar.textContent = '🔒 Congelar ángulo';
+    btnCongelar.className = 'btn btn-neon btn-full';
+  }
+  
+  // Inicializar canvas
+  if (!goniometroCanvas) {
+    goniometroCanvas = document.getElementById('goniometro-canvas');
+    if (goniometroCanvas) {
+      goniometroCtx = goniometroCanvas.getContext('2d');
+      dibujarGoniometro(0);
+    }
+  }
+  
+  // Solicitar permiso para DeviceOrientation (iOS requiere permiso)
+  solicitarPermisoSensor();
+  
+  openModal('modal-goniometro');
+}
+
+// Solicitar permiso para sensores (especialmente iOS)
+function solicitarPermisoSensor() {
+  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+    // iOS: requiere permiso explícito
+    document.getElementById('goniometro-estado').innerHTML = '⚠️ Toca para activar sensor';
+    document.getElementById('goniometro-estado').style.color = 'var(--amber)';
+    
+    const modalSheet = document.querySelector('#modal-goniometro .modal-sheet');
+    const handler = () => {
+      DeviceOrientationEvent.requestPermission()
+        .then(permissionState => {
+          if (permissionState === 'granted') {
+            window.addEventListener('deviceorientation', manejarOrientacion);
+            document.getElementById('goniometro-estado').innerHTML = '🟢 Sensor activo';
+            document.getElementById('goniometro-estado').style.color = 'var(--neon)';
+          }
+        })
+        .catch(console.error);
+      modalSheet.removeEventListener('click', handler);
+    };
+    modalSheet.addEventListener('click', handler);
+  } else {
+    // Android / otros: directo
+    window.addEventListener('deviceorientation', manejarOrientacion);
+    document.getElementById('goniometro-estado').innerHTML = '🟢 Sensor activo';
+  }
+}
+
+// Manejar orientación del dispositivo
+function manejarOrientacion(event) {
+  if (!goniometroActivo) return;
+  
+  // Usamos beta (inclinación front-back) para medir dorsiflexión
+  // Rango típico: -90 a 90 grados
+  let angulo = event.beta || 0;
+  
+  // Ajustar para que 0° sea horizontal
+  // y valores positivos sean flexión hacia arriba
+  angulo = Math.round(angulo * 10) / 10;
+  
+  // Limitar rango a -30° a 60° (rango útil para movilidad)
+  angulo = Math.max(-30, Math.min(60, angulo));
+  
+  if (!goniometroCongelado) {
+    anguloActual = angulo;
+    document.getElementById('goniometro-angulo').textContent = angulo.toFixed(1);
+    document.getElementById('lectura-actual').textContent = angulo.toFixed(1) + '°';
+    dibujarGoniometro(angulo);
+    actualizarFlecha(angulo);
+  }
+}
+
+// Dibujar círculo graduado
+function dibujarGoniometro(angulo) {
+  if (!goniometroCtx) return;
+  
+  const canvas = goniometroCanvas;
+  const ctx = goniometroCtx;
+  const w = canvas.width;
+  const h = canvas.height;
+  const cx = w / 2;
+  const cy = h / 2;
+  const radio = w * 0.42;
+  
+  ctx.clearRect(0, 0, w, h);
+  
+  // Círculo exterior
+  ctx.beginPath();
+  ctx.arc(cx, cy, radio + 8, 0, 2 * Math.PI);
+  ctx.strokeStyle = 'rgba(57,255,122,.2)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  
+  // Círculo interior
+  ctx.beginPath();
+  ctx.arc(cx, cy, radio, 0, 2 * Math.PI);
+  ctx.strokeStyle = 'rgba(57,255,122,.4)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  
+  // Graduaciones (cada 10 grados)
+  for (let i = -30; i <= 60; i += 5) {
+    const rad = (i * Math.PI) / 180;
+    const esPrincipal = i % 10 === 0;
+    const largo = esPrincipal ? 12 : 6;
+    const x1 = cx + (radio - largo) * Math.sin(rad);
+    const y1 = cy + (radio - largo) * Math.cos(rad);
+    const x2 = cx + radio * Math.sin(rad);
+    const y2 = cy + radio * Math.cos(rad);
+    
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.strokeStyle = esPrincipal ? 'rgba(57,255,122,.7)' : 'rgba(57,255,122,.3)';
+    ctx.lineWidth = esPrincipal ? 1.5 : 1;
+    ctx.stroke();
+    
+    // Números cada 10 grados
+    if (esPrincipal && i !== 0) {
+      ctx.font = 'bold 9px "JetBrains Mono"';
+      ctx.fillStyle = 'rgba(57,255,122,.6)';
+      ctx.shadowBlur = 0;
+      const tx = cx + (radio + 15) * Math.sin(rad);
+      const ty = cy + (radio + 12) * Math.cos(rad);
+      ctx.fillText(i + '°', tx - 4, ty + 3);
+    }
+  }
+  
+  // Línea horizontal (referencia 0°)
+  ctx.beginPath();
+  ctx.moveTo(cx - radio - 10, cy);
+  ctx.lineTo(cx + radio + 10, cy);
+  ctx.strokeStyle = 'rgba(255,255,255,.1)';
+  ctx.lineWidth = 0.5;
+  ctx.stroke();
+  
+  // Marca de 0°
+  ctx.fillStyle = 'rgba(255,255,255,.3)';
+  ctx.font = 'bold 10px "JetBrains Mono"';
+  ctx.fillText('0°', cx + 5, cy - 3);
+  
+  // Rango útil marcado
+  ctx.beginPath();
+  ctx.arc(cx, cy, radio - 5, (-30 * Math.PI) / 180, (60 * Math.PI) / 180);
+  ctx.strokeStyle = 'rgba(57,255,122,.15)';
+  ctx.lineWidth = 4;
+  ctx.stroke();
+}
+
+// Actualizar flecha indicadora
+function actualizarFlecha(angulo) {
+  const flecha = document.getElementById('goniometro-flecha');
+  if (flecha) {
+    flecha.style.transform = `translateX(-50%) rotate(${-angulo}deg)`;
+  }
+}
+
+// Congelar/Descongelar ángulo
+function toggleCongelar() {
+  if (!goniometroActivo) return;
+  
+  const btn = document.getElementById('btn-congelar');
+  const estadoSpan = document.getElementById('lectura-estado');
+  
+  if (goniometroCongelado) {
+    // Descongelar
+    goniometroCongelado = false;
+    btn.textContent = '🔒 Congelar ángulo';
+    btn.className = 'btn btn-neon btn-full';
+    estadoSpan.innerHTML = '🔓 En vivo';
+    document.getElementById('lectura-actual').style.color = 'var(--neon)';
+  } else {
+    // Congelar
+    goniometroCongelado = true;
+    anguloCongelado = anguloActual;
+    btn.textContent = '🔓 Descongelar';
+    btn.className = 'btn btn-outline btn-full';
+    estadoSpan.innerHTML = '🔒 Congelado';
+    document.getElementById('lectura-actual').style.color = 'var(--amber)';
+  }
+}
+
+// Reiniciar medición
+function reiniciarGoniometro() {
+  if (!goniometroActivo) return;
+  
+  goniometroCongelado = false;
+  anguloActual = 0;
+  anguloCongelado = 0;
+  
+  document.getElementById('btn-congelar').textContent = '🔒 Congelar ángulo';
+  document.getElementById('btn-congelar').className = 'btn btn-neon btn-full';
+  document.getElementById('lectura-estado').innerHTML = '🔓 En vivo';
+  document.getElementById('lectura-actual').style.color = 'var(--neon)';
+  document.getElementById('goniometro-angulo').textContent = '0.0';
+  document.getElementById('lectura-actual').textContent = '0.0°';
+  dibujarGoniometro(0);
+  actualizarFlecha(0);
+}
+
+// Confirmar y guardar ángulo en el perfil del atleta
+function confirmarGoniometro() {
+  if (!cur || !testEnCurso) {
+    alert('Error: No hay atleta seleccionado');
+    return;
+  }
+  
+  const anguloFinal = goniometroCongelado ? anguloCongelado : anguloActual;
+  
+  // Mapear tests a campos del perfil
+  const mapeo = {
+    'tobillo-d': { campo: 'lungeD', nombre: 'Tobillo Derecho' },
+    'tobillo-i': { campo: 'lungeI', nombre: 'Tobillo Izquierdo' },
+    'rodilla-d': { campo: 'rodillaD', nombre: 'Rodilla Derecha' },
+    'rodilla-i': { campo: 'rodillaI', nombre: 'Rodilla Izquierda' },
+    'cadera-d': { campo: 'caderaD', nombre: 'Cadera Derecha' },
+    'cadera-i': { campo: 'caderaI', nombre: 'Cadera Izquierda' }
+  };
+  
+  const testInfo = mapeo[testEnCurso];
+  if (testInfo) {
+    cur[testInfo.campo] = anguloFinal;
+    
+    // Actualizar UI si estamos en la pestaña de movilidad
+    const inputField = document.getElementById('lunge-d');
+    if (inputField && testEnCurso === 'tobillo-d') inputField.value = anguloFinal;
+    const inputFieldI = document.getElementById('lunge-i');
+    if (inputFieldI && testEnCurso === 'tobillo-i') inputFieldI.value = anguloFinal;
+    
+    // Guardar en localStorage
+    atletas = atletas.map(a => a.id === cur.id ? cur : a);
+    saveData();
+    
+    showToast(`✓ ${testInfo.nombre}: ${anguloFinal.toFixed(1)}° guardado`);
+  }
+  
+  // Cerrar modal y limpiar
+  detenerGoniometro();
+  closeModal('modal-goniometro');
+  
+  // Actualizar dashboard si es necesario
+  if (document.getElementById('ptab-movilidad') && !document.getElementById('ptab-movilidad').classList.contains('hidden')) {
+    if (typeof onMov === 'function') onMov();
+  }
+}
+
+// Detener sensor al cerrar
+function detenerGoniometro() {
+  goniometroActivo = false;
+  goniometroCongelado = false;
+  window.removeEventListener('deviceorientation', manejarOrientacion);
+}
+
+// Eventos del modal
+document.addEventListener('DOMContentLoaded', () => {
+  const modalGoniometro = document.getElementById('modal-goniometro');
+  if (modalGoniometro) {
+    modalGoniometro.addEventListener('click', (e) => {
+      if (e.target === modalGoniometro) {
+        detenerGoniometro();
+      }
+    });
+  }
+  
+  const btnCongelar = document.getElementById('btn-congelar');
+  if (btnCongelar) btnCongelar.onclick = toggleCongelar;
+  
+  const btnReiniciar = document.getElementById('btn-reiniciar');
+  if (btnReiniciar) btnReiniciar.onclick = reiniciarGoniometro;
+  
+  const btnConfirmar = document.getElementById('btn-confirmar-goniometro');
+  if (btnConfirmar) btnConfirmar.onclick = confirmarGoniometro;
+});
