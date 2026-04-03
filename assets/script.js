@@ -355,7 +355,7 @@ function renderAtletas() {
   document.getElementById('atletas-count').textContent =
     atletas.length + ' atleta' + (atletas.length !== 1 ? 's' : '') + ' registrado' + (atletas.length !== 1 ? 's' : '');
   if (!atletas.length) {
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:100px 20px"><div style="width:80px;height:80px;border-radius:20px;background:rgba(57,255,122,.06);border:1px solid rgba(57,255,122,.12);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 24px">👤</div><div style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:.08em;color:#fff;margin-bottom:10px">SIN ATLETAS</div><p style="font-size:13px;color:rgba(255,255,255,.3);line-height:1.8;font-family:'JetBrains Mono',monospace">Creá tu primer atleta para comenzar<br>a registrar evaluaciones.</p></div>';
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:100px 20px"><div style="width:80px;height:80px;border-radius:20px;background:rgba(57,255,122,.06);border:1px solid rgba(57,255,122,.12);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 24px">👤</div><div style="font-family:Bebas Neue,sans-serif;font-size:36px;letter-spacing:.08em;color:#fff;margin-bottom:10px">SIN ATLETAS</div><p style="font-size:13px;color:rgba(255,255,255,.3);line-height:1.8;font-family:JetBrains Mono,monospace">Creá tu primer atleta para comenzar<br>a registrar evaluaciones.</p></div>';
     return;
   }
   grid.innerHTML = atletas.map(s => {
