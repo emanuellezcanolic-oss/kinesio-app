@@ -1100,6 +1100,13 @@ function onMov() {
   if (cur) { cur.lungeD=ld;cur.lungeI=li;cur.tromCadD=tromCadD;cur.tromCadI=tromCadI;cur.tromHomD=tromHomD;cur.tromHomI=tromHomI; }
   renderMovSemaforos(ld,li,tromCadD,tromCadI,tromHomD,tromHomI);
 }
+<div class="ig">
+  <label class="il">RI D (°)</label>
+  <div class="flex" style="gap: 8px;">
+    <input class="inp inp-mono" type="number" id="hom-ri-d" placeholder="0" oninput="onMov()" style="flex: 2;">
+    <button class="btn btn-outline btn-sm" onclick="iniciarGoniometro('hombro-ri-d', 'Hombro RI Derecha')" style="font-size: 10px;">📐 Medir</button>
+  </div>
+</div>
 
 function renderMovSemaforos(ld,li,tcd,tci,thd,thi) {
   const area = document.getElementById('mov-semaforos'); if (!area) return;
@@ -1111,6 +1118,20 @@ function renderMovSemaforos(ld,li,tcd,tci,thd,thi) {
     { lbl:'TROM Hom D',  val:thd, t1:100,t2:120, max:150, unit:'°', c:'var(--neon)' },
     { lbl:'TROM Hom I',  val:thi, t1:100,t2:120, max:150, unit:'°', c:'var(--blue)'  }
   ];
+  <div class="ig">
+  <label class="il">RI D (°)</label>
+  <div class="flex" style="gap: 8px;">
+    <input class="inp inp-mono" type="number" id="cad-ri-d" placeholder="0" oninput="onMov()" style="flex: 2;">
+    <button class="btn btn-outline btn-sm" onclick="iniciarGoniometro('cadera-ri-d', 'Cadera RI Derecha')" style="font-size: 10px;">📐 Medir</button>
+  </div>
+</div>
+<div class="ig">
+  <label class="il">RE D (°)</label>
+  <div class="flex" style="gap: 8px;">
+    <input class="inp inp-mono" type="number" id="cad-re-d" placeholder="0" oninput="onMov()" style="flex: 2;">
+    <button class="btn btn-outline btn-sm" onclick="iniciarGoniometro('cadera-re-d', 'Cadera RE Derecha')" style="font-size: 10px;">📐 Medir</button>
+  </div>
+</div>
   area.innerHTML = items.map(item => {
     if (!item.val) return `<div class="card mb-8"><div class="card-body" style="padding:10px 14px"><div style="font-size:11px;font-weight:700;color:var(--text3)">${item.lbl}: --</div></div></div>`;
     const c = item.val<item.t1?'var(--red)':item.val<item.t2?'var(--amber)':'var(--neon)';
@@ -2048,7 +2069,7 @@ function iniciarGoniometro(testId, testNombre) {
   document.getElementById('lectura-actual').textContent = '0.0°';
   document.getElementById('lectura-estado').innerHTML = '🔓 En vivo';
   document.getElementById('goniometro-angulo').textContent = '0.0';
-  
+  <button class="btn btn-ghost btn-sm" onclick="calibrarGoniometro()" style="font-size: 10px;">🎯 Calibrar</button>
   const btnCongelar = document.getElementById('btn-congelar');
   if (btnCongelar) {
     btnCongelar.textContent = '🔒 Congelar ángulo';
