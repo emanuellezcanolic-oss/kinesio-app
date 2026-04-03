@@ -2308,6 +2308,18 @@ function confirmarGoniometro() {
     'cadera-d': { campo: 'caderaD', nombre: 'Cadera Derecha' },
     'cadera-i': { campo: 'caderaI', nombre: 'Cadera Izquierda' }
   };
+  const mapeo = {
+  'tobillo-d': { campo: 'lungeD', nombre: 'Tobillo Derecho' },
+  'tobillo-i': { campo: 'lungeI', nombre: 'Tobillo Izquierdo' },
+  'cadera-ri-d': { campo: 'cadRiD', nombre: 'Cadera RI Derecha' },
+  'cadera-re-d': { campo: 'cadReD', nombre: 'Cadera RE Derecha' },
+  'cadera-ri-i': { campo: 'cadRiI', nombre: 'Cadera RI Izquierda' },
+  'cadera-re-i': { campo: 'cadReI', nombre: 'Cadera RE Izquierda' },
+  'hombro-ri-d': { campo: 'homRiD', nombre: 'Hombro RI Derecha' },
+  'hombro-re-d': { campo: 'homReD', nombre: 'Hombro RE Derecha' },
+  'hombro-ri-i': { campo: 'homRiI', nombre: 'Hombro RI Izquierda' },
+  'hombro-re-i': { campo: 'homReI', nombre: 'Hombro RE Izquierda' }
+};
   
   const testInfo = mapeo[testEnCurso];
   if (testInfo) {
