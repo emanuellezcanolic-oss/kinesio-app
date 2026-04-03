@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <title>MoveMetrics — Prof Platform</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link rel="stylesheet" href="assets/styles.css">
@@ -17,7 +17,7 @@
 <!-- ── SIDEBAR ── -->
 <aside class="sidebar">
   <div class="sidebar-logo">
-    <h1><span style="color:var(--neon)">∧</span> MOVEMETRICS</h1>
+    <h1><span class="accent">∧</span> MOVEMETRICS</h1>
     <p>Plataforma deportivo-clínica</p>
     <div class="version-badge">v12 · INVESTOR EDITION</div>
   </div>
