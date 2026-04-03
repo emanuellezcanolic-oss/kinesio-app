@@ -37,7 +37,7 @@ function showApiKeyModal() {
         style="width:100%;background:#141414;border:1px solid rgba(57,255,122,.2);border-radius:8px;color:#f0f0f0;padding:10px 14px;font-size:13px;font-family:'JetBrains Mono',monospace;outline:none;margin-bottom:8px;box-sizing:border-box"
       >
       <div style="font-size:11px;color:#3a3a3a;margin-bottom:16px;font-family:'JetBrains Mono',monospace">
-        Obtené tu key en console.anthropic.com → API Keys
+        Obtené tu key gratis en console.groq.com → API Keys
       </div>
       <div style="display:flex;gap:10px">
         <button onclick="
@@ -1590,14 +1590,14 @@ Incluir: 1RM/PC, CMJ, LSI, Lunge, TROM. Usá | para separar columnas]
       showApiKeyModal();
       return;
     }
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
+    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
       method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':API_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:800,messages:[{role:'user',content:prompt}]})
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+API_KEY},
+      body:JSON.stringify({model:'llama-3.1-8b-instant',max_tokens:800,messages:[{role:'system',content:'Sos un kinesiólogo deportivo argentino. Respondé en español rioplatense, técnico y conciso.'},{role:'user',content:prompt}]})
     });
     const data=await res.json();
     if(data.error){throw new Error(data.error.message);}
-    const txt=data.content?.[0]?.text||'Error al generar el informe.';
+    const txt=data.choices?.[0]?.message?.content||data.error?.message||'Error al generar el informe.';
     document.getElementById('informe-text').value=txt;
     document.getElementById('informe-loading').classList.add('hidden');
     document.getElementById('informe-editor-wrap').classList.remove('hidden');
