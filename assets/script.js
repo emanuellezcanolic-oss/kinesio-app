@@ -2098,28 +2098,47 @@ function solicitarPermisoSensor() {
   }
 }
 
-// Manejar orientación del dispositivo
+// Manejar orientación del dispositivo (CORREGIDO)
+let anguloOffset = 0;
+let calibrado = false;
+
 function manejarOrientacion(event) {
   if (!goniometroActivo) return;
   
-  // Usamos beta (inclinación front-back) para medir dorsiflexión
-  // Rango típico: -90 a 90 grados
+  // Usamos beta (inclinación front-back)
   let angulo = event.beta || 0;
   
-  // Ajustar para que 0° sea horizontal
-  // y valores positivos sean flexión hacia arriba
-  angulo = Math.round(angulo * 10) / 10;
+  // Calibrar a 0° cuando el usuario toca "calibrar"
+  if (!calibrado) {
+    anguloOffset = angulo;
+    calibrado = true;
+  }
   
-  // Limitar rango a -30° a 60° (rango útil para movilidad)
+  // Aplicar offset para que 0° sea la posición actual
+  angulo = angulo - anguloOffset;
+  
+  // Limitar rango visible (-30° a 60°)
   angulo = Math.max(-30, Math.min(60, angulo));
   
   if (!goniometroCongelado) {
-    anguloActual = angulo;
-    document.getElementById('goniometro-angulo').textContent = angulo.toFixed(1);
-    document.getElementById('lectura-actual').textContent = angulo.toFixed(1) + '°';
-    dibujarGoniometro(angulo);
-    actualizarFlecha(angulo);
+    anguloActual = Math.round(angulo * 10) / 10;
+    document.getElementById('goniometro-angulo').textContent = anguloActual.toFixed(1);
+    document.getElementById('lectura-actual').textContent = anguloActual.toFixed(1) + '°';
+    dibujarGoniometro(anguloActual);
+    actualizarFlecha(anguloActual);
   }
+}
+
+// Función para calibrar el goniómetro a 0°
+function calibrarGoniometro() {
+  calibrado = false;
+  anguloOffset = 0;
+  anguloActual = 0;
+  document.getElementById('goniometro-angulo').textContent = '0.0';
+  document.getElementById('lectura-actual').textContent = '0.0°';
+  dibujarGoniometro(0);
+  actualizarFlecha(0);
+  showToast('📐 Goniómetro calibrado a 0°');
 }
 
 // Dibujar círculo graduado
