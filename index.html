@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>MoveMetrics - The Move Club</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #000; --bg2: #080808; --bg3: #0f0f0f; --bg4: #141414; --bg5: #1c1c1c;
+    --border: rgba(57,255,122,.10); --border2: rgba(57,255,122,.22);
+    --text: #f0f0f0; --text2: #888; --text3: #3a3a3a;
+    --neon: #39FF7A; --neondim: rgba(57,255,122,.12);
+    --red: #FF4444; --rdim: rgba(255,68,68,.10);
+    --amber: #FFB020; --blue: #4D9EFF;
+    --font: 'Space Grotesk', sans-serif; --mono: 'JetBrains Mono', monospace;
+    --r: 8px; --r2: 12px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; }
+  .app { display: grid; grid-template-columns: 220px 1fr; height: 100vh; overflow: hidden; }
+  .main { overflow-y: auto; background: var(--bg); }
+  .sidebar { background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+  .sidebar-logo { padding: 24px 20px 18px; border-bottom: 1px solid var(--border); }
+  .sidebar-logo h1 { font-family: var(--mono); font-size: 15px; font-weight: 700; color: var(--neon); }
+  .nav-list { padding: 12px 8px; flex: 1; }
+  .nav-section-title { font-family: var(--mono); font-size: 8px; color: var(--text3); text-transform: uppercase; padding: 10px 8px 4px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--r); cursor: pointer; color: var(--text3); font-size: 12px; font-weight: 600; transition: all .15s; }
+  .nav-item:hover { color: var(--text); background: var(--bg3); }
+  .nav-item.active { color: var(--neon); background: var(--neondim); border: 1px solid var(--border2); }
+  .nav-item svg { width: 15px; height: 15px; stroke: currentColor; }
+  .sidebar-footer { padding: 14px 16px; border-top: 1px solid var(--border); font-size: 9px; color: var(--text3); }
+  .page { display: none; padding: 28px; }
+  .page.active { display: block; }
+  .card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r2); overflow: hidden; margin-bottom: 16px; }
+  .card-header { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .card-header h3 { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text2); font-family: var(--mono); }
+  .card-body { padding: 16px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 9px 18px; border-radius: var(--r); cursor: pointer; font-size: 12px; font-weight: 700; transition: all .15s; border: none; }
+  .btn-neon { background: var(--neon); color: #000; }
+  .btn-outline { background: transparent; color: var(--neon); border: 1px solid var(--border2); }
+  .btn-ghost { background: var(--bg4); color: var(--text2); border: 1px solid var(--border); }
+  .btn-red { background: var(--rdim); color: var(--red); border: 1px solid rgba(255,68,68,.25); }
+  .btn-full { width: 100%; }
+  .btn-sm { padding: 6px 12px; font-size: 11px; }
+  .inp { width: 100%; background: var(--bg4); border: 1px solid var(--border); border-radius: var(--r); color: var(--text); padding: 9px 12px; font-size: 13px; outline: none; }
+  .il { font-family: var(--mono); font-size: 9px; font-weight: 700; color: var(--text3); margin-bottom: 5px; display: block; }
+  .hidden { display: none !important; }
+  .flex { display: flex; align-items: center; gap: 8px; }
+  .flex-b { display: flex; align-items: center; justify-content: space-between; }
+  .mt-8 { margin-top: 8px; } .mt-12 { margin-top: 12px; } .mb-12 { margin-bottom: 12px; } .mb-16 { margin-bottom: 16px; }
+  .tag { font-family: var(--mono); font-size: 9px; font-weight: 700; padding: 2px 8px; border-radius: 20px; display: inline-block; }
+  .tag-g { background: rgba(57,255,122,.12); color: var(--neon); }
+  .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.88); z-index: 500; backdrop-filter: blur(8px); }
+  .modal.open { display: flex; align-items: flex-end; justify-content: center; }
+  .modal-sheet { background: var(--bg2); border-radius: 18px 18px 0 0; width: 100%; max-width: 500px; max-height: 93vh; overflow-y: auto; padding: 24px 20px 48px; border: 1px solid var(--border); }
+  .modal-handle { width: 32px; height: 3px; background: var(--bg5); border-radius: 2px; margin: 0 auto 22px; }
+  .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .profile-hero { background: linear-gradient(135deg, var(--bg3), var(--bg4)); border: 1px solid var(--border2); border-radius: var(--r2); padding: 20px; margin-bottom: 20px; }
+  .profile-av { width: 52px; height: 52px; border-radius: 12px; background: var(--neondim); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; color: var(--neon); font-family: var(--mono); flex-shrink: 0; overflow: hidden; cursor: pointer; position: relative; }
+  .profile-av img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
+  .profile-av-edit { position: absolute; bottom: 0; right: 0; width: 18px; height: 18px; background: var(--neon); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; }
+  .athlete-card { background: linear-gradient(135deg, var(--bg3), var(--bg4)); border: 1px solid var(--border); border-radius: var(--r2); padding: 16px; cursor: pointer; margin-bottom: 8px; }
+  .athlete-av-sm { width: 40px; height: 40px; border-radius: 10px; background: var(--neondim); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; color: var(--neon); }
+  #save-toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(57,255,122,.12); border: 1px solid rgba(57,255,122,.35); color: var(--neon); padding: 8px 20px; border-radius: 20px; z-index: 9999; opacity: 0; transition: opacity .3s; }
+  .img-slot { aspect-ratio: 3/4; background: var(--bg4); border: 1px dashed var(--border2); border-radius: var(--r); display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; position: relative; }
+  .img-slot img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+  .fms-check { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .fms-btn { padding: 4px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg4); color: var(--text3); font-size: 10px; font-weight: 700; cursor: pointer; font-family: var(--mono); }
+  .fms-btn.yes { background: rgba(57,255,122,.15); color: var(--neon); border-color: rgba(57,255,122,.3); }
+  .fms-btn.no { background: var(--rdim); color: var(--red); border-color: rgba(255,68,68,.3); }
+  @media (max-width: 768px) { .app { grid-template-columns: 1fr; } .sidebar { display: none; } .page { padding: 16px; } .grid-2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidebar-logo"><h1>∧ MOVEMETRICS</h1></div>
+    <nav class="nav-list">
+      <div class="nav-section-title">Principal</div>
+      <div class="nav-item active" onclick="showPage('atletas')" id="nav-atletas"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Atletas</div>
+      <div class="nav-item" onclick="showPage('tests')" id="nav-tests"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>Tests</div>
+    </nav>
+    <div class="sidebar-footer"><div id="sb-atleta-info">Sin atleta activo</div></div>
+  </aside>
+
+  <main class="main">
+    <!-- Página Atletas -->
+    <div class="page active" id="page-atletas">
+      <div class="flex-b mb-16"><h2>Atletas</h2><button class="btn btn-neon" onclick="prepNewAtleta()">+ Nuevo atleta</button></div>
+      <div id="atletas-grid"></div>
+    </div>
+
+    <!-- Página Tests -->
+    <div class="page" id="page-tests">
+      <div class="profile-hero mb-16" id="profile-hero-area" style="display:none">
+        <div class="flex" style="gap:14px">
+          <div class="profile-av" id="profile-av-lg">?<div class="profile-av-edit">✏️</div></div>
+          <div><div id="profile-name2" style="font-size:19px;font-weight:700">—</div><div id="profile-meta" style="font-size:12px;color:var(--text2)">—</div></div>
+        </div>
+      </div>
+
+      <!-- Pestañas -->
+      <div class="flex" style="gap:8px; flex-wrap:wrap; margin-bottom:16px; border-bottom:1px solid var(--border); padding-bottom:12px;">
+        <button class="ptab active" onclick="showProfileTab('dashboard')">Dashboard</button>
+        <button class="ptab" onclick="showProfileTab('movilidad')">Movilidad</button>
+        <button class="ptab" onclick="showProfileTab('video')">Video Salto</button>
+        <button class="ptab" onclick="showProfileTab('fms')">FMS</button>
+      </div>
+
+      <!-- Dashboard -->
+      <div id="ptab-dashboard" class="ptab-content">
+        <div class="card"><div class="card-header"><h3>Dashboard</h3></div><div class="card-body"><p>Seleccioná un atleta para ver sus datos</p></div></div>
+      </div>
+
+      <!-- Movilidad -->
+      <div id="ptab-movilidad" class="ptab-content hidden">
+        <div class="card">
+          <div class="card-header"><h3>🦶 Lunge Test (Tobillo)</h3></div>
+          <div class="card-body">
+            <div class="grid-2" style="gap:16px">
+              <div><label class="il">Derecho (°)</label><div class="flex" style="gap:8px"><input class="inp inp-mono" type="number" id="lunge-d" placeholder="0" oninput="onMov()" style="flex:2"><button class="btn btn-outline btn-sm" onclick="iniciarGoniometro('tobillo-d', 'Tobillo Derecho', 60)">📐 Medir</button></div></div>
+              <div><label class="il">Izquierdo (°)</label><div class="flex" style="gap:8px"><input class="inp inp-mono" type="number" id="lunge-i" placeholder="0" oninput="onMov()" style="flex:2"><button class="btn btn-outline btn-sm" onclick="iniciarGoniometro('tobillo-i', 'Tobillo Izquierdo', 60)">📐 Medir</button></div></div>
+            </div>
+            <div id="lunge-result" class="mt-8"></div>
+            <button class="btn btn-neon btn-full mt-12" onclick="saveMovilidad()">💾 Guardar</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><h3>🦵 TROM Cadera</h3></div>
+          <div class="card-body">
+            <div class="grid-2" style="gap:16px">
+              <div><div style="color:var(--neon); margin-bottom:8px;">DERECHA</div>
+                <div class="flex" style="gap:8px; margin-bottom:8px;"><input class="inp inp-mono" type="number" id="cad-ri-d" placeholder="RI" oninput="onMov()" style="flex:1"><button class="btn btn-ghost btn-sm" onclick="iniciarGoniometro('cadera-ri-d', 'Cadera RI Derecha', 120)">📐</button></div>
+                <div class="flex" style="gap:8px;"><input class="inp inp-mono" type="number" id="cad-re-d" placeholder="RE" oninput="onMov()" style="flex:1"><button class="btn btn-ghost btn-sm" onclick="iniciarGoniometro('cadera-re-d', 'Cadera RE Derecha', 120)">📐</button></div>
+              </div>
+              <div><div style="color:var(--blue); margin-bottom:8px;">IZQUIERDA</div>
+                <div class="flex" style="gap:8px; margin-bottom:8px;"><input class="inp inp-mono" type="number" id="cad-ri-i" placeholder="RI" oninput="onMov()" style="flex:1"><button class="btn btn-ghost btn-sm" onclick="iniciarGoniometro('cadera-ri-i', 'Cadera RI Izquierda', 120)">📐</button></div>
+                <div class="flex" style="gap:8px;"><input class="inp inp-mono" type="number" id="cad-re-i" placeholder="RE" oninput="onMov()" style="flex:1"><button class="btn btn-ghost btn-sm" onclick="iniciarGoniometro('cadera-re-i', 'Cadera RE Izquierda', 120)">📐</button></div>
+              </div>
+            </div>
+            <div id="cad-result" class="mt-8"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Video Salto -->
+      <div id="ptab-video" class="ptab-content hidden">
+        <div class="card">
+          <div class="card-header"><h3>🎬 Salto Vertical por Video</h3></div>
+          <div class="card-body">
+            <div id="video-upload-area" style="border:2px dashed var(--border2); border-radius:12px; padding:32px; text-align:center; cursor:pointer; margin-bottom:16px;" onclick="document.getElementById('video-file-inp').click()">
+              <div style="font-size:32px;">🎬</div>
+              <div style="color:var(--neon);">Cargar video</div>
+            </div>
+            <input type="file" id="video-file-inp" accept="video/*" class="hidden" onchange="loadVideo(this)">
+            <div id="video-player-wrap" style="display:none;">
+              <video id="video-player" style="width:100%; border-radius:8px;" controls></video>
+              <div class="flex" style="justify-content:center; gap:8px; margin-top:12px;">
+                <button class="btn btn-ghost btn-sm" onclick="jumpFrames(-5)">-5</button>
+                <button class="btn btn-ghost btn-sm" onclick="jumpFrames(-1)">-1</button>
+                <button class="btn btn-ghost btn-sm" onclick="markTakeoff()" id="btn-takeoff">🟢 Despegue</button>
+                <button class="btn btn-ghost btn-sm" onclick="markLanding()" id="btn-landing">🔴 Aterrizaje</button>
+                <button class="btn btn-ghost btn-sm" onclick="jumpFrames(1)">+1</button>
+                <button class="btn btn-ghost btn-sm" onclick="jumpFrames(5)">+5</button>
+              </div>
+              <div class="flex-b mt-8"><span>Despegue: <span id="takeoff-time-display">--</span></span><span>Aterrizaje: <span id="landing-time-display">--</span></span></div>
+              <div id="video-result-card" style="display:none; margin-top:16px; padding:16px; background:var(--bg4); border-radius:12px; text-align:center;">
+                <div style="font-size:48px; font-weight:800; color:var(--neon);" id="video-height-display">0</div>
+                <div>cm de salto</div>
+                <button class="btn btn-neon btn-full mt-8" onclick="saveVideoSalto()">💾 Guardar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FMS -->
+      <div id="ptab-fms" class="ptab-content hidden">
+        <div class="card">
+          <div class="card-header"><h3>Overhead Squat</h3></div>
+          <div class="card-body">
+            <div class="grid-2" style="gap:12px;">
+              <div><div class="il">Frente</div><div class="img-slot" id="ohs-frente" onclick="document.getElementById('ohs-frente-inp').click()">📷</div><input type="file" id="ohs-frente-inp" class="hidden" accept="image/*" onchange="cargarImagen(this, 'ohs-frente')"></div>
+              <div><div class="il">Perfil</div><div class="img-slot" id="ohs-perfil" onclick="document.getElementById('ohs-perfil-inp').click()">📷</div><input type="file" id="ohs-perfil-inp" class="hidden" accept="image/*" onchange="cargarImagen(this, 'ohs-perfil')"></div>
+            </div>
+            <div id="ohs-checks" class="mt-8">
+              <div class="fms-check"><span>Rodillas alineadas</span><div class="flex"><button class="fms-btn" onclick="marcarFMS(this,'yes')">SÍ</button><button class="fms-btn" onclick="marcarFMS(this,'no')">NO</button></div></div>
+              <div class="fms-check"><span>Fémur horizontal</span><div class="flex"><button class="fms-btn" onclick="marcarFMS(this,'yes')">SÍ</button><button class="fms-btn" onclick="marcarFMS(this,'no')">NO</button></div></div>
+              <div class="fms-check"><span>Torso paralelo a tibia</span><div class="flex"><button class="fms-btn" onclick="marcarFMS(this,'yes')">SÍ</button><button class="fms-btn" onclick="marcarFMS(this,'no')">NO</button></div></div>
+              <div class="fms-check"><span>Barra alineada</span><div class="flex"><button class="fms-btn" onclick="marcarFMS(this,'yes')">SÍ</button><button class="fms-btn" onclick="marcarFMS(this,'no')">NO</button></div></div>
+            </div>
+            <button class="btn btn-neon btn-full mt-12" onclick="guardarFMS()">💾 Guardar FMS</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="save-toast">✓ Guardado</div>
+
+<!-- Modal Goniómetro -->
+<div class="modal" id="modal-goniometro">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="goniometro-title">📐 Goniómetro</div>
+    <div style="text-align:center; padding:20px;">
+      <div style="position:relative; width:200px; height:200px; margin:0 auto;">
+        <canvas id="goniometro-canvas" width="200" height="200"></canvas>
+        <div id="goniometro-flecha" style="position:absolute; top:50%; left:50%; width:3px; height:80px; background:var(--neon); transform-origin:50% 0%; transform:translateX(-50%) rotate(0deg);"></div>
+      </div>
+      <div style="font-size:48px; font-weight:800; color:var(--neon); margin-top:12px;" id="goniometro-angulo">0.0</div>
+      <div id="goniometro-estado" style="font-size:10px; margin-top:8px;">🟢 Sensor activo</div>
+    </div>
+    <div class="flex" style="gap:12px; margin-bottom:16px;">
+      <button class="btn btn-neon" id="btn-congelar" style="flex:2">🔒 Congelar</button>
+      <button class="btn btn-outline" id="btn-reiniciar" style="flex:1">🔄</button>
+    </div>
+    <div class="card"><div class="card-body"><div class="flex-b"><span>Lectura:</span><span id="lectura-actual" style="font-size:24px; font-weight:800; color:var(--neon);">0.0°</span></div><div id="lectura-estado">🔓 En vivo</div></div></div>
+    <div class="grid-2 mt-12" style="gap:12px">
+      <button class="btn btn-ghost" onclick="closeModal('modal-goniometro')">Cancelar</button>
+      <button class="btn btn-neon" id="btn-confirmar-goniometro">✓ Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================
+// MOVE METRICS v12 - COMPLETO
+// ============================================
+
+let atletas = JSON.parse(localStorage.getItem('mm_atletas') || '[]');
+let cur = null;
+let goniometroActivo = false, goniometroCongelado = false, anguloActual = 0, anguloCongelado = 0, goniometroCtx = null, testEnCurso = null, anguloMax = 60, anguloOffset = 0, calibrado = false;
+let videoState = { takeoffTime: null, landingTime: null, fps: 30 };
+
+// Navegación
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id)?.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('nav-' + id)?.classList.add('active');
+  if (id === 'atletas') renderAtletas();
+}
+
+function showProfileTab(tab) {
+  document.querySelectorAll('.ptab-content').forEach(c => c.classList.add('hidden'));
+  document.getElementById('ptab-' + tab)?.classList.remove('hidden');
+  document.querySelectorAll('.ptab').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function showToast(msg) { const t = document.getElementById('save-toast'); t.textContent = msg; t.style.opacity = '1'; setTimeout(() => t.style.opacity = '0', 2000); }
+function saveData() { localStorage.setItem('mm_atletas', JSON.stringify(atletas)); showToast('✓ Guardado'); }
+
+// Atletas
+function renderAtletas() {
+  const grid = document.getElementById('atletas-grid');
+  if (!atletas.length) { grid.innerHTML = '<div style="text-align:center;padding:40px;">👤 No hay atletas</div>'; return; }
+  grid.innerHTML = atletas.map(a => `<div class="athlete-card" onclick="selectAtleta(${a.id})"><div class="flex" style="gap:12px"><div class="athlete-av-sm">${a.nombre.charAt(0)}</div><div><div style="font-weight:700">${a.nombre}</div><div style="font-size:11px;color:var(--text2)">${a.deporte || 'Sin deporte'} · ${a.edad || '?'} años</div></div></div></div>`).join('');
+}
+
+function prepNewAtleta() {
+  const nombre = prompt('Nombre del atleta:');
+  if (!nombre) return;
+  const edad = prompt('Edad:');
+  const deporte = prompt('Deporte:');
+  atletas.push({ id: Date.now(), nombre, edad, deporte, lungeD: null, lungeI: null, fmsOHS: [], evals: {} });
+  saveData();
+  renderAtletas();
+}
+
+function selectAtleta(id) {
+  cur = atletas.find(a => a.id === id);
+  document.getElementById('sb-atleta-info').textContent = cur.nombre;
+  document.getElementById('profile-name2').textContent = cur.nombre;
+  document.getElementById('profile-meta').textContent = `${cur.deporte || '—'} · ${cur.edad || '?'} años`;
+  document.getElementById('profile-hero-area').style.display = 'block';
+  document.getElementById('lunge-d').value = cur.lungeD || '';
+  document.getElementById('lunge-i').value = cur.lungeI || '';
+  onMov();
+  showPage('tests');
+}
+
+// Goniómetro
+function iniciarGoniometro(testId, testNombre, maxAngulo) {
+  if (!cur) { alert('Seleccioná un atleta'); return; }
+  testEnCurso = testId;
+  anguloMax = maxAngulo;
+  document.getElementById('goniometro-title').textContent = `📐 ${testNombre}`;
+  goniometroActivo = true; goniometroCongelado = false; anguloActual = 0; calibrado = false; anguloOffset = 0;
+  document.getElementById('lectura-actual').textContent = '0.0°';
+  document.getElementById('lectura-estado').innerHTML = '🔓 En vivo';
+  document.getElementById('goniometro-angulo').textContent = '0.0';
+  const canvas = document.getElementById('goniometro-canvas');
+  if (canvas) goniometroCtx = canvas.getContext('2d');
+  dibujarGoniometro(0);
+  actualizarFlecha(0);
+  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+    document.getElementById('goniometro-estado').innerHTML = '⚠️ Toca para activar';
+    const handler = () => {
+      DeviceOrientationEvent.requestPermission().then(state => {
+        if (state === 'granted') { window.addEventListener('deviceorientation', manejarOrientacion); document.getElementById('goniometro-estado').innerHTML = '🟢 Sensor activo'; }
+      }).catch(console.error);
+      document.querySelector('#modal-goniometro .modal-sheet').removeEventListener('click', handler);
+    };
+    document.querySelector('#modal-goniometro .modal-sheet').addEventListener('click', handler);
+  } else {
+    window.addEventListener('deviceorientation', manejarOrientacion);
+    document.getElementById('goniometro-estado').innerHTML = '🟢 Sensor activo';
+  }
+  openModal('modal-goniometro');
+}
+
+function manejarOrientacion(event) {
+  if (!goniometroActivo) return;
+  let angulo = event.beta || 0;
+  if (!calibrado) { anguloOffset = angulo; calibrado = true; }
+  angulo = angulo - anguloOffset;
+  angulo = Math.max(-10, Math.min(anguloMax, angulo));
+  if (!goniometroCongelado) {
+    anguloActual = Math.round(angulo * 10) / 10;
+    document.getElementById('goniometro-angulo').textContent = anguloActual.toFixed(1);
+    document.getElementById('lectura-actual').textContent = anguloActual.toFixed(1) + '°';
+    dibujarGoniometro(anguloActual);
+    actualizarFlecha(anguloActual);
+  }
+}
+
+function dibujarGoniometro(angulo) {
+  if (!goniometroCtx) return;
+  const canvas = document.getElementById('goniometro-canvas');
+  const ctx = goniometroCtx;
+  const w = canvas.width, h = canvas.height, cx = w/2, cy = h/2, radio = w * 0.4;
+  ctx.clearRect(0, 0, w, h);
+  ctx.beginPath(); ctx.arc(cx, cy, radio, 0, 2 * Math.PI); ctx.strokeStyle = '#39FF7A'; ctx.lineWidth = 2; ctx.stroke();
+  for (let i = 0; i <= anguloMax; i += 15) {
+    const rad = (i * Math.PI) / 180;
+    const x1 = cx + (radio - 8) * Math.sin(rad), y1 = cy + (radio - 8) * Math.cos(rad);
+    const x2 = cx + radio * Math.sin(rad), y2 = cy + radio * Math.cos(rad);
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+    if (i !== 0) { ctx.font = 'bold 8px monospace'; ctx.fillStyle = '#39FF7A'; const tx = cx + (radio + 10) * Math.sin(rad), ty = cy + (radio + 8) * Math.cos(rad); ctx.fillText(i + '°', tx - 3, ty + 2); }
+  }
+}
+
+function actualizarFlecha(angulo) { const f = document.getElementById('goniometro-flecha'); if (f) f.style.transform = `translateX(-50%) rotate(${-angulo}deg)`; }
+function calibrarGoniometro() { calibrado = false; anguloOffset = 0; anguloActual = 0; document.getElementById('goniometro-angulo').textContent = '0.0'; document.getElementById('lectura-actual').textContent = '0.0°'; dibujarGoniometro(0); actualizarFlecha(0); }
+function toggleCongelar() { const btn = document.getElementById('btn-congelar'); if (goniometroCongelado) { goniometroCongelado = false; btn.textContent = '🔒 Congelar'; btn.className = 'btn btn-neon'; document.getElementById('lectura-estado').innerHTML = '🔓 En vivo'; } else { goniometroCongelado = true; anguloCongelado = anguloActual; btn.textContent = '🔓 Descongelar'; btn.className = 'btn btn-outline'; document.getElementById('lectura-estado').innerHTML = '🔒 Congelado'; } }
+function reiniciarGoniometro() { goniometroCongelado = false; anguloActual = 0; calibrado = false; document.getElementById('btn-congelar').textContent = '🔒 Congelar'; document.getElementById('btn-congelar').className = 'btn btn-neon'; document.getElementById('lectura-estado').innerHTML = '🔓 En vivo'; document.getElementById('goniometro-angulo').textContent = '0.0'; document.getElementById('lectura-actual').textContent = '0.0°'; dibujarGoniometro(0); actualizarFlecha(0); }
+function confirmarGoniometro() { if (!cur || !testEnCurso) { alert('Error'); return; } const anguloFinal = goniometroCongelado ? anguloCongelado : anguloActual; if (testEnCurso === 'tobillo-d') { cur.lungeD = anguloFinal; document.getElementById('lunge-d').value = anguloFinal; } if (testEnCurso === 'tobillo-i') { cur.lungeI = anguloFinal; document.getElementById('lunge-i').value = anguloFinal; } if (testEnCurso.includes('cadera')) { const partes = testEnCurso.split('-'); if (partes[1] === 'ri' && partes[2] === 'd') cur.cadRiD = anguloFinal; if (partes[1] === 're' && partes[2] === 'd') cur.cadReD = anguloFinal; if (partes[1] === 'ri' && partes[2] === 'i') cur.cadRiI = anguloFinal; if (partes[1] === 're' && partes[2] === 'i') cur.cadReI = anguloFinal; } atletas = atletas.map(a => a.id === cur.id ? cur : a); saveData(); onMov(); detenerGoniometro(); closeModal('modal-goniometro'); showToast('✓ Ángulo guardado'); }
+function detenerGoniometro() { goniometroActivo = false; window.removeEventListener('deviceorientation', manejarOrientacion); }
+
+// Movilidad
+function onMov() {
+  const ld = +document.getElementById('lunge-d')?.value || 0, li = +document.getElementById('lunge-i')?.value || 0;
+  const semL = v => !v ? '' : v < 35 ? `🔴 ${v}°` : v <= 40 ? `🟡 ${v}°` : `🟢 ${v}°`;
+  document.getElementById('lunge-result').innerHTML = `<div class="flex" style="gap:12px; justify-content:center">${ld ? semL(ld) : ''}${li ? semL(li) : ''}</div>`;
+  const riD = +document.getElementById('cad-ri-d')?.value || 0, reD = +document.getElementById('cad-re-d')?.value || 0, riI = +document.getElementById('cad-ri-i')?.value || 0, reI = +document.getElementById('cad-re-i')?.value || 0;
+  const tromD = riD + reD, tromI = riI + reI;
+  const semC = v => v > 90 ? `🟢 ${v}°` : v >= 80 ? `🟡 ${v}°` : `🔴 ${v}°`;
+  document.getElementById('cad-result').innerHTML = `<div class="flex" style="gap:12px; justify-content:center">D: ${semC(tromD)} I: ${semC(tromI)}</div>`;
+  if (cur) { cur.lungeD = ld; cur.lungeI = li; cur.cadRiD = riD; cur.cadReD = reD; cur.cadRiI = riI; cur.cadReI = reI; }
+}
+
+function saveMovilidad() { if (!cur) { alert('Seleccioná un atleta'); return; } atletas = atletas.map(a => a.id === cur.id ? cur : a); saveData(); alert('Movilidad guardada'); }
+
+// Video Salto
+function loadVideo(input) {
+  if (!input.files.length) return;
+  const file = input.files[0];
+  const url = URL.createObjectURL(file);
+  const video = document.getElementById('video-player');
+  video.src = url;
+  video.load();
+  document.getElementById('video-player-wrap').style.display = 'block';
+  document.getElementById('video-upload-area').style.display = 'none';
+}
+
+function jumpFrames(n) {
+  const video = document.getElementById('video-player');
+  if (!video) return;
+  video.pause();
+  const fps = 30;
+  const frameDuration = 1 / fps;
+  video.currentTime = Math.max(0, Math.min(video.duration, video.currentTime + n * frameDuration));
+}
+
+function markTakeoff() {
+  const video = document.getElementById('video-player');
+  if (!video) { alert('Cargá un video'); return; }
+  videoState.takeoffTime = video.currentTime;
+  document.getElementById('takeoff-time-display').textContent = video.currentTime.toFixed(3) + 's';
+  document.getElementById('btn-takeoff').style.background = 'rgba(57,255,122,.2)';
+  if (videoState.landingTime) calcVideoJump();
+}
+
+function markLanding() {
+  const video = document.getElementById('video-player');
+  if (!video) { alert('Cargá un video'); return; }
+  if (videoState.takeoffTime === null) { alert('Marcá primero el despegue'); return; }
+  if (video.currentTime <= videoState.takeoffTime) { alert('El aterrizaje debe ser después del despegue'); return; }
+  videoState.landingTime = video.currentTime;
+  document.getElementById('landing-time-display').textContent = video.currentTime.toFixed(3) + 's';
+  document.getElementById('btn-landing').style.background = 'rgba(255,68,68,.2)';
+  calcVideoJump();
+}
+
+function calcVideoJump() {
+  if (videoState.takeoffTime === null || videoState.landingTime === null) return;
+  const t = videoState.landingTime - videoState.takeoffTime;
+  const g = 9.81;
+  const hCm = ((g * t * t) / 8) * 100;
+  document.getElementById('video-result-card').style.display = 'block';
+  document.getElementById('video-height-display').textContent = hCm.toFixed(1);
+  videoState.result = { hCm: hCm.toFixed(1), t, takeoff: videoState.takeoffTime, landing: videoState.landingTime };
+}
+
+function saveVideoSalto() {
+  if (!cur) { alert('Seleccioná un atleta'); return; }
+  if (!videoState.result) { alert('Calculá un salto primero'); return; }
+  cur.lastCMJ = videoState.result.hCm;
+  atletas = atletas.map(a => a.id === cur.id ? cur : a);
+  saveData();
+  alert('Salto guardado: ' + videoState.result.hCm + ' cm');
+}
+
+// FMS
+function cargarImagen(input, slotId) {
+  if (!input.files.length) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const slot = document.getElementById(slotId);
+    slot.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function marcarFMS(btn, tipo) {
+  const parent = btn.closest('.fms-check');
+  parent.querySelectorAll('.fms-btn').forEach(b => b.classList.remove('yes', 'no'));
+  btn.classList.add(tipo);
+}
+
+function guardarFMS() {
+  if (!cur) { alert('Seleccioná un atleta'); return; }
+  const checks = document.querySelectorAll('#ohs-checks .fms-check');
+  const resultados = [];
+  checks.forEach(check => {
+    const btnYes = check.querySelector('.fms-btn.yes');
+    const btnNo = check.querySelector('.fms-btn.no');
+    if (btnYes) resultados.push('si');
+    else if (btnNo) resultados.push('no');
+    else resultados.push(null);
+  });
+  cur.fmsOHS = resultados;
+  atletas = atletas.map(a => a.id === cur.id ? cur : a);
+  saveData();
+  alert('FMS guardado');
+}
+
+// Inicialización
+document.addEventListener('DOMContentLoaded', () => {
+  renderAtletas();
+  document.getElementById('btn-congelar')?.addEventListener('click', toggleCongelar);
+  document.getElementById('btn-reiniciar')?.addEventListener('click', reiniciarGoniometro);
+  document.getElementById('btn-confirmar-goniometro')?.addEventListener('click', confirmarGoniometro);
+});
+</script>
+</body>
+</html>
