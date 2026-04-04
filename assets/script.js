@@ -161,6 +161,97 @@ const ORTHO_TESTS = {
     { id:'trendelenburg', name:'Trendelenburg', sub:'Glúteo medio',       ref:'Sn 0.73 / Sp 0.77' },
     { id:'ober',          name:'Ober',          sub:'Banda iliotibial',   ref:'Tensión IT band' },
     { id:'thomas',        name:'Thomas',        sub:'Acortamiento psoas', ref:'Sn 0.89 / Sp 0.91' }
+  ],
+  dohaAductores: [
+    { id:'doha-squeeze-0',    name:'Squeeze test 0 deg',         sub:'Aductores -- ingle atletica',         ref:'Sn 0.78 / Sp 0.50 -- cadera 0 grados' },
+    { id:'doha-squeeze-45',   name:'Squeeze test 45 deg',        sub:'Aductores -- mas especifico',         ref:'Sn 0.56 / Sp 0.73 -- cadera 45 grados' },
+    { id:'doha-squeeze-90',   name:'Squeeze test 90 deg',        sub:'Aductores / gracilis',                ref:'Complementario -- 90 grados rodilla' },
+    { id:'doha-aduct-dolor',  name:'Palpacion aductor largo',    sub:'Proximal -- Criterio Doha obligatorio',ref:'Sn 0.90 -- punto de mayor dolor' },
+    { id:'doha-aduct-resist', name:'Resistencia aductores',      sub:'Contraccion isometrica 0-45 deg',     ref:'Criterio Doha -- dolor reproducible' },
+    { id:'doha-aduct-estir',  name:'Estiramiento aductor',       sub:'Abduccion pasiva maxima',             ref:'Criterio complementario Doha' }
+  ],
+  dohaPsoas: [
+    { id:'doha-psoas-dolor',  name:'Palpacion iliopsoas',        sub:'Tendon distal / vientre -- Doha',     ref:'Criterio obligatorio ingle anterior' },
+    { id:'doha-psoas-resist', name:'Resistencia flexion cadera', sub:'Isometrica supino 90 deg -- Doha',    ref:'Dolor reproducible = positivo Doha' },
+    { id:'doha-psoas-estir',  name:'Estiramiento psoas',         sub:'Thomas modificado -- extension pasiva',ref:'Criterio complementario Doha' },
+    { id:'doha-stork',        name:'Stork test (Flamingo)',      sub:'SIJ / Psoas bajo carga',              ref:'Sn 0.17 / Sp 0.79 -- SIJ loading' },
+    { id:'doha-flex-activa',  name:'Flexion activa cadera',      sub:'Hip flexion pain provocation',        ref:'Criterio Doha -- ingle anterior' }
+  ],
+  dohaInguinal: [
+    { id:'doha-ing-dolor',    name:'Palpacion canal inguinal',   sub:'Anillo inguinal superficial -- Doha', ref:'Criterio obligatorio hernia deportiva' },
+    { id:'doha-ing-resist',   name:'Resistencia abd + flex',     sub:'Contraccion combinada -- Doha',       ref:'Criterio Doha inguinal' },
+    { id:'doha-valsalva',     name:'Valsalva / tos provocada',   sub:'Aumento presion intraabdominal',      ref:'Hernia inguinal / deportiva' },
+    { id:'doha-gibbon',       name:'Gibbon (inguinal sling)',     sub:'Canal inguinal bajo carga',           ref:'Sn 0.99 / Sp 0.99 -- hernia deportiva' }
+  ],
+  dohaComplementarios: [
+    { id:'doha-pubis',        name:'Palpacion pubis',            sub:'Symphysis pubis -- osteitis pubis',   ref:'Criterio complementario Doha' },
+    { id:'doha-rectus',       name:'Palpacion recto abdominal',  sub:'Insercion pubica -- Doha',            ref:'Criterio complementario abdomen bajo' },
+    { id:'doha-cadera-rom',   name:'Dolor ROM cadera activo',    sub:'RI / RE bajo carga -- FAI asociado',  ref:'Descartar FAI concomitante' },
+    { id:'doha-posterior',    name:'Dolor posterior cadera',     sub:'Gluteo / isquion -- diferencial',     ref:'Descartar tendinopatia isquiosural' }
+  ],
+  cervicalNeural: [
+    { id:'spurling',          name:'Spurling',                   sub:'Compresion raiz nerviosa cervical',   ref:'Sn 0.50 / Sp 0.86 -- LR+ 3.5' },
+    { id:'distraccion-cx',    name:'Distraccion cervical',       sub:'Alivio = compresion discal / facet',  ref:'Sn 0.44 / Sp 0.90 -- complementa Spurling' },
+    { id:'valsalva-cx',       name:'Valsalva cervical',          sub:'Hernia discal / lesion ocupante',     ref:'Aumento presion intradiscal' },
+    { id:'ultt1',             name:'ULTT1 (brachial tension)',   sub:'Tension neural miembro superior',     ref:'Sn 0.97 / Sp 0.22 -- descartar compresion' },
+    { id:'ultt2',             name:'ULTT2 (mediano / radial)',   sub:'Tension nervio mediano / radial',     ref:'Diferencia > 10 deg = positivo' },
+    { id:'roos',              name:'Roos (EAST)',                 sub:'Desfiladero toracico',                ref:'3 min -- parestesias = positivo' }
+  ],
+  cervicalArticular: [
+    { id:'flexion-rot',       name:'Flexion-Rotation test',      sub:'C1-C2 -- cervicogenico',              ref:'Sn 0.91 / Sp 0.90 -- cefalea cervicogenica' },
+    { id:'alar-lig',          name:'Alar ligament test',         sub:'Estabilidad alar -- trauma',          ref:'Sn 0.27 / Sp 0.64 -- post whiplash' },
+    { id:'sharp-purser',      name:'Sharp-Purser',                sub:'Inestabilidad C0-C2',                 ref:'Sn 0.69 / Sp 0.96 -- AR / trauma' },
+    { id:'ppivm-cx',          name:'PPIVM cervical',              sub:'Movilidad intervertebral pasiva',     ref:'Hipomovil / hipermovil por segmento' }
+  ],
+  cervicalMuscular: [
+    { id:'deep-flex-cx',      name:'Deep Neck Flexor test',      sub:'Resistencia flexores profundos',      ref:'< 38 mmHg = deficit -- Stabilizer' },
+    { id:'cranio-cx',         name:'Craniocervical flexion test', sub:'Longus colli activation',             ref:'5 niveles: 10-22-26-30 mmHg' },
+    { id:'fuerza-cx-lat',     name:'Fuerza lateral cervical',    sub:'HHD o escala manual',                 ref:'Asimetria > 10% = significativa' }
+  ],
+  codoLateral: [
+    { id:'cozen',             name:'Cozen',                      sub:'Epicondilalgia lateral',              ref:'Sn 0.84 / Sp 0.75 -- extension muneca resist.' },
+    { id:'mill',              name:'Mill',                       sub:'Epicondilalgia lateral',              ref:'Sn 0.53 / Sp 0.69 -- estiramiento extensores' },
+    { id:'maudsley',          name:'Maudsley (dedo medio)',      sub:'ECRB -- epicondilo lateral',          ref:'Extension dedo medio con resistencia' },
+    { id:'chair-test',        name:'Chair lifting test',         sub:'Epicondilalgia lateral funcional',    ref:'Dolor al levantar silla con carga' }
+  ],
+  codoMedial: [
+    { id:'golfer-elbow',      name:'Golfer elbow test',          sub:'Epicondilalgia medial',               ref:'Sn 0.64 / Sp 0.69 -- flexion muneca resist.' },
+    { id:'valgus-codo',       name:'Stress valgo codo',          sub:'LCU (cubital colateral)',             ref:'Valgus en 20-30 deg flexion -- lanzadores' },
+    { id:'milking',           name:'Milking maneuver',            sub:'LCU -- atletas overhead',             ref:'Sn 0.76 -- lanzadores / overhead' }
+  ],
+  codoLigamentos: [
+    { id:'tinel-cubital',     name:'Tinel cubital tunnel',       sub:'Nervio cubital',                      ref:'Parestesias 4-5 dedo = positivo' },
+    { id:'elbow-flex-test',   name:'Elbow flexion test',         sub:'Nervio cubital -- compresion',        ref:'Sn 0.75 / Sp 0.99 -- flexion max 3 min' },
+    { id:'lateral-pivot-codo',name:'Lateral pivot shift codo',   sub:'LUCL -- inestabilidad lateral',       ref:'Sn 0.38 / Sp 1.0' }
+  ],
+  patelo: [
+    { id:'clarke',            name:'Clarke (Grind test)',        sub:'Articulacion patelofemoral',          ref:'Baja especificidad -- usar en contexto' },
+    { id:'zohlen',            name:'Zohlen test',                sub:'Compresion patelar activa',           ref:'Dolor al contraer cuad con compresion' },
+    { id:'patela-tilt',       name:'Patellar tilt test',         sub:'Retinaculopatia lateral',             ref:'< 0 deg tilt = tension retinacular' },
+    { id:'jsign',             name:'J-sign (patellar glide)',    sub:'Tracking patelar -- VMO',             ref:'J-sign = disfuncion VMO / PFPS' },
+    { id:'apprehension-pat',  name:'Patella apprehension',       sub:'Inestabilidad / luxacion patelar',    ref:'Sn 0.39 / Sp 0.93 -- luxacion recurrente' }
+  ],
+  tendonesRodilla: [
+    { id:'single-decline',    name:'Single Leg Decline Squat',   sub:'Carga excentrica tendon patelar',    ref:'Gold standard funcional tendinopatia' },
+    { id:'royal-london',      name:'Royal London Hop test',       sub:'Tendinopatia patelar funcional',     ref:'VAS > 3/10 = positivo' },
+    { id:'arc-patelar',       name:'Arc test patelar',            sub:'Tendinopatia -- palpacion en ext.',  ref:'Sn 0.78 -- extension completa' },
+    { id:'quad-tendon',       name:'Tendon cuadricipital',        sub:'Insercion proximal patelar',         ref:'Polo superior -- adultos > 40' }
+  ],
+  pie: [
+    { id:'thompson-aq',       name:'Thompson (Aquiles)',          sub:'Ruptura tendon de Aquiles',          ref:'Sn 0.96 / Sp 0.93 -- squeeze pantorrilla' },
+    { id:'arc-aquiles',       name:'Arc sign Aquiles',            sub:'Insercion vs midportion',            ref:'Desaparece en dorsiflexion = insercion' },
+    { id:'windlass',          name:'Windlass test',               sub:'Fascia plantar',                     ref:'Sn 0.32 / Sp 1.0 -- fasciitis plantar' },
+    { id:'too-many-toes',     name:'Too many toes sign',          sub:'PTTD -- tibial posterior',           ref:'Valgo pie / colapso arco medial' },
+    { id:'single-heel-rise',  name:'Single heel rise',            sub:'Tibial posterior / Aquiles fuerza',  ref:'< 25 reps o asimetria = deficit' },
+    { id:'mulder',            name:'Mulder click (Morton)',       sub:'Neuroma de Morton',                  ref:'Click + dolor = neuroma interdigital' }
+  ],
+  muneca: [
+    { id:'finkelstein',       name:'Finkelstein',                 sub:'De Quervain -- 1er compartimento',   ref:'Sn 0.89 / Sp 0.14 -- muy sensible' },
+    { id:'phalen',            name:'Phalen',                      sub:'Tunel carpiano -- mediano',          ref:'Sn 0.68 / Sp 0.73 -- 60 seg flexion max' },
+    { id:'tinel-carpo',       name:'Tinel carpo',                 sub:'Nervio mediano -- tunel carpiano',   ref:'Sn 0.50 / Sp 0.77 -- percusion' },
+    { id:'durkan',            name:'Durkan (compresion directa)', sub:'Tunel carpiano -- mas especifico',   ref:'Sn 0.87 / Sp 0.90' },
+    { id:'tfcc-grind',        name:'TFCC grind test',             sub:'Complejo triangular fibrocartilago', ref:'Dolor ulnar en rotacion + carga' },
+    { id:'watson',            name:'Watson (scaphoid shift)',      sub:'Inestabilidad escafoides / SL',      ref:'Sn 0.69 / Sp 0.64 -- clunk = positivo' }
   ]
 };
 
@@ -1361,15 +1452,29 @@ function initKinesio(){
 }
 
 function buildOrthoPanels(){
-  buildOrthoPanel('tp-subacro',   ORTHO_TESTS.subacro);
-  buildOrthoPanel('tp-manguito',  ORTHO_TESTS.manguito);
-  buildOrthoPanel('tp-biceps',    ORTHO_TESTS.biceps);
-  buildOrthoPanel('tp-ligamentos',ORTHO_TESTS.ligamentos);
-  buildOrthoPanel('tp-meniscos',  ORTHO_TESTS.meniscos);
-  buildOrthoPanel('tp-funcionales',ORTHO_TESTS.funcionales);
-  buildOrthoPanel('tp-tobillo',   ORTHO_TESTS.tobillo);
-  buildOrthoPanel('tp-lumbar',    ORTHO_TESTS.lumbar);
-  buildOrthoPanel('tp-cadera',    ORTHO_TESTS.cadera);
+  buildOrthoPanel('tp-subacro',           ORTHO_TESTS.subacro);
+  buildOrthoPanel('tp-manguito',          ORTHO_TESTS.manguito);
+  buildOrthoPanel('tp-biceps',            ORTHO_TESTS.biceps);
+  buildOrthoPanel('tp-ligamentos',        ORTHO_TESTS.ligamentos);
+  buildOrthoPanel('tp-meniscos',          ORTHO_TESTS.meniscos);
+  buildOrthoPanel('tp-funcionales',       ORTHO_TESTS.funcionales);
+  buildOrthoPanel('tp-tobillo',           ORTHO_TESTS.tobillo);
+  buildOrthoPanel('tp-lumbar',            ORTHO_TESTS.lumbar);
+  buildOrthoPanel('tp-cadera',            ORTHO_TESTS.cadera);
+  buildOrthoPanel('tp-doha-aductores',    ORTHO_TESTS.dohaAductores);
+  buildOrthoPanel('tp-doha-psoas',        ORTHO_TESTS.dohaPsoas);
+  buildOrthoPanel('tp-doha-inguinal',     ORTHO_TESTS.dohaInguinal);
+  buildOrthoPanel('tp-doha-complementarios', ORTHO_TESTS.dohaComplementarios);
+  buildOrthoPanel('tp-cervical-neural',   ORTHO_TESTS.cervicalNeural);
+  buildOrthoPanel('tp-cervical-articular',ORTHO_TESTS.cervicalArticular);
+  buildOrthoPanel('tp-cervical-muscular', ORTHO_TESTS.cervicalMuscular);
+  buildOrthoPanel('tp-codo-lateral',      ORTHO_TESTS.codoLateral);
+  buildOrthoPanel('tp-codo-medial',       ORTHO_TESTS.codoMedial);
+  buildOrthoPanel('tp-codo-ligamentos',   ORTHO_TESTS.codoLigamentos);
+  buildOrthoPanel('tp-patelo',            ORTHO_TESTS.patelo);
+  buildOrthoPanel('tp-tendones-rodilla',  ORTHO_TESTS.tendonesRodilla);
+  buildOrthoPanel('tp-pie',               ORTHO_TESTS.pie);
+  buildOrthoPanel('tp-muneca',            ORTHO_TESTS.muneca);
   // ROM panels
   buildROMPanel('tp-rom-hombro',  [['Flexión','flex-hb'],['Extensión','ext-hb'],['Abducción','abd-hb'],['RI','ri-hb'],['RE','re-hb'],['Aducción H.','aducc-hb']]);
   buildROMPanel('tp-rom-rodilla', [['Flexión','flex-rod'],['Extensión','ext-rod']],true);
@@ -1471,7 +1576,7 @@ function setOrthoTest(id,result){
 }
 
 function updateKinePositivos(){
-  const allTests=[...ORTHO_TESTS.subacro,...ORTHO_TESTS.manguito,...ORTHO_TESTS.biceps,...ORTHO_TESTS.ligamentos,...ORTHO_TESTS.meniscos,...ORTHO_TESTS.funcionales,...ORTHO_TESTS.tobillo,...ORTHO_TESTS.lumbar,...ORTHO_TESTS.cadera];
+  const allTests=[...ORTHO_TESTS.subacro,...ORTHO_TESTS.manguito,...ORTHO_TESTS.biceps,...ORTHO_TESTS.ligamentos,...ORTHO_TESTS.meniscos,...ORTHO_TESTS.funcionales,...ORTHO_TESTS.tobillo,...ORTHO_TESTS.lumbar,...ORTHO_TESTS.cadera,...ORTHO_TESTS.dohaAductores,...ORTHO_TESTS.dohaPsoas,...ORTHO_TESTS.dohaInguinal,...ORTHO_TESTS.dohaComplementarios,...ORTHO_TESTS.cervicalNeural,...ORTHO_TESTS.cervicalArticular,...ORTHO_TESTS.cervicalMuscular,...ORTHO_TESTS.codoLateral,...ORTHO_TESTS.codoMedial,...ORTHO_TESTS.codoLigamentos,...ORTHO_TESTS.patelo,...ORTHO_TESTS.tendonesRodilla,...ORTHO_TESTS.pie,...ORTHO_TESTS.muneca];
   const positivos=Object.entries(kineState.tests).filter(([,v])=>v.result==='pos').map(([id,v])=>{
     const t=allTests.find(x=>x.id===id);return t?{name:t.name,sub:t.sub,obs:v.obs}:null;
   }).filter(Boolean);
@@ -1578,7 +1683,7 @@ function saveKinesio(){
   form.fecha=document.getElementById('kine-fecha')?.value;
   kineState.form=form;
   cur.kinesio=JSON.parse(JSON.stringify(kineState));
-  const allTests=[...ORTHO_TESTS.subacro,...ORTHO_TESTS.manguito,...ORTHO_TESTS.biceps,...ORTHO_TESTS.ligamentos,...ORTHO_TESTS.meniscos,...ORTHO_TESTS.funcionales,...ORTHO_TESTS.tobillo,...ORTHO_TESTS.lumbar,...ORTHO_TESTS.cadera];
+  const allTests=[...ORTHO_TESTS.subacro,...ORTHO_TESTS.manguito,...ORTHO_TESTS.biceps,...ORTHO_TESTS.ligamentos,...ORTHO_TESTS.meniscos,...ORTHO_TESTS.funcionales,...ORTHO_TESTS.tobillo,...ORTHO_TESTS.lumbar,...ORTHO_TESTS.cadera,...ORTHO_TESTS.dohaAductores,...ORTHO_TESTS.dohaPsoas,...ORTHO_TESTS.dohaInguinal,...ORTHO_TESTS.dohaComplementarios,...ORTHO_TESTS.cervicalNeural,...ORTHO_TESTS.cervicalArticular,...ORTHO_TESTS.cervicalMuscular,...ORTHO_TESTS.codoLateral,...ORTHO_TESTS.codoMedial,...ORTHO_TESTS.codoLigamentos,...ORTHO_TESTS.patelo,...ORTHO_TESTS.tendonesRodilla,...ORTHO_TESTS.pie,...ORTHO_TESTS.muneca];
   if(!cur.evals)cur.evals={};
   cur.evals['kinesio_'+(form.fecha||Date.now())]={fecha:form.fecha,motivo:form.motivo,eva:form.eva,zonas:Object.fromEntries(Object.entries(kineState.bodyZones).filter(([,v])=>!v.recuperado)),testsPositivos:Object.entries(kineState.tests).filter(([,v])=>v.result==='pos').map(([id])=>{const t=allTests.find(x=>x.id===id);return t?t.name:id;}),dx:form.dx};
   cur.lesionesActivas=Object.entries(kineState.bodyZones).filter(([,v])=>!v.recuperado).map(([,v])=>v.label);
@@ -1617,7 +1722,7 @@ async function regenerarInforme(){
   // Kinesio compacto
   const kine=s.kinesio?{
     zonas:Object.values(s.kinesio.bodyZones||{}).filter(z=>!z.recuperado).map(z=>`${z.label}(EVA${z.eva||0})`).join(', ')||'--',
-    positivos:Object.entries(s.kinesio.tests||{}).filter(([,v])=>v.result==='pos').map(([id])=>{const allT=[...ORTHO_TESTS.subacro,...ORTHO_TESTS.manguito,...ORTHO_TESTS.biceps,...ORTHO_TESTS.ligamentos,...ORTHO_TESTS.meniscos,...ORTHO_TESTS.funcionales,...ORTHO_TESTS.tobillo,...ORTHO_TESTS.lumbar,...ORTHO_TESTS.cadera];return allT.find(x=>x.id===id)?.name||id;}).join(', ')||'--',
+    positivos:Object.entries(s.kinesio.tests||{}).filter(([,v])=>v.result==='pos').map(([id])=>{const allT=[...ORTHO_TESTS.subacro,...ORTHO_TESTS.manguito,...ORTHO_TESTS.biceps,...ORTHO_TESTS.ligamentos,...ORTHO_TESTS.meniscos,...ORTHO_TESTS.funcionales,...ORTHO_TESTS.tobillo,...ORTHO_TESTS.lumbar,...ORTHO_TESTS.cadera,...ORTHO_TESTS.dohaAductores,...ORTHO_TESTS.dohaPsoas,...ORTHO_TESTS.dohaInguinal,...ORTHO_TESTS.dohaComplementarios,...ORTHO_TESTS.cervicalNeural,...ORTHO_TESTS.cervicalArticular,...ORTHO_TESTS.cervicalMuscular,...ORTHO_TESTS.codoLateral,...ORTHO_TESTS.codoMedial,...ORTHO_TESTS.codoLigamentos,...ORTHO_TESTS.patelo,...ORTHO_TESTS.tendonesRodilla,...ORTHO_TESTS.pie,...ORTHO_TESTS.muneca];return allT.find(x=>x.id===id)?.name||id;}).join(', ')||'--',
     dx:s.kinesio.form?.dx||'--',
     eva:s.kinesio.form?.eva??'--'
   }:null;
@@ -1734,7 +1839,7 @@ function exportarPDF(){
     const zonas=Object.entries(s.kinesio.bodyZones||{}).filter(([,v])=>!v.recuperado);
     if(zonas.length){doc.setFillColor(20,5,5);doc.roundedRect(14,ky,182,8+zonas.length*7,2,2,'F');doc.setDrawColor(255,68,68);doc.setLineWidth(0.3);doc.roundedRect(14,ky,182,8+zonas.length*7,2,2,'S');doc.setTextColor(255,68,68);doc.setFontSize(9);doc.setFont('courier','bold');doc.text('ZONAS LESIONADAS',18,ky+7);doc.setFont('courier','normal');doc.setFontSize(8.5);doc.setTextColor(200,150,150);zonas.forEach(([,z],i)=>{doc.text(`• ${z.label}  EVA: ${z.eva||'--'}/10`,22,ky+7+7*(i+1));});ky+=14+zonas.length*7;}
     const posTests=Object.entries(s.kinesio.tests||{}).filter(([,v])=>v.result==='pos');
-    const allTests=[...ORTHO_TESTS.subacro,...ORTHO_TESTS.manguito,...ORTHO_TESTS.biceps,...ORTHO_TESTS.ligamentos,...ORTHO_TESTS.meniscos,...ORTHO_TESTS.funcionales,...ORTHO_TESTS.tobillo,...ORTHO_TESTS.lumbar,...ORTHO_TESTS.cadera];
+    const allTests=[...ORTHO_TESTS.subacro,...ORTHO_TESTS.manguito,...ORTHO_TESTS.biceps,...ORTHO_TESTS.ligamentos,...ORTHO_TESTS.meniscos,...ORTHO_TESTS.funcionales,...ORTHO_TESTS.tobillo,...ORTHO_TESTS.lumbar,...ORTHO_TESTS.cadera,...ORTHO_TESTS.dohaAductores,...ORTHO_TESTS.dohaPsoas,...ORTHO_TESTS.dohaInguinal,...ORTHO_TESTS.dohaComplementarios,...ORTHO_TESTS.cervicalNeural,...ORTHO_TESTS.cervicalArticular,...ORTHO_TESTS.cervicalMuscular,...ORTHO_TESTS.codoLateral,...ORTHO_TESTS.codoMedial,...ORTHO_TESTS.codoLigamentos,...ORTHO_TESTS.patelo,...ORTHO_TESTS.tendonesRodilla,...ORTHO_TESTS.pie,...ORTHO_TESTS.muneca];
     if(posTests.length){ky+=6;doc.setFillColor(20,5,5);doc.roundedRect(14,ky,182,10+posTests.length*9,2,2,'F');doc.setDrawColor(255,68,68);doc.setLineWidth(0.3);doc.roundedRect(14,ky,182,10+posTests.length*9,2,2,'S');doc.setTextColor(255,68,68);doc.setFontSize(9);doc.setFont('courier','bold');doc.text('TESTS ORTOPÉDICOS POSITIVOS',18,ky+8);ky+=12;posTests.forEach(([id,v])=>{const t=allTests.find(x=>x.id===id);if(!t)return;doc.setFont('courier','bold');doc.setFontSize(8.5);doc.setTextColor(255,100,100);doc.text(`+ ${t.name}`,18,ky);doc.setFont('courier','normal');doc.setTextColor(150,150,150);const subt=` -- ${t.sub}${v.obs?' -- '+v.obs:''}`;doc.text(subt,18+doc.getTextWidth(`+ ${t.name}`),ky);ky+=7;});}
   }
   // Footer
