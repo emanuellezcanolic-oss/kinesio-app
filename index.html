@@ -1457,5 +1457,229 @@
     </div>
   </div>
 </div>
+  <script>
+// ============================================
+// SISTEMA COMPLETO - Movilidad y Goniómetro
+// ============================================
+
+let atletas = JSON.parse(localStorage.getItem('mm_v12_atletas') || '[]');
+let cur = null;
+
+// Navegación
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id)?.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('nav-' + id)?.classList.add('active');
+  if (id === 'atletas') renderAtletas();
+}
+
+function showProfileTab(tab, btn) {
+  const tabs = ['dashboard','kinesio','fuerza','saltos','movilidad','velocidad','fms','fatiga','video','historial'];
+  tabs.forEach(t => document.getElementById('ptab-' + t)?.classList.toggle('hidden', t !== tab));
+  document.querySelectorAll('#profile-tab-bar .ptab').forEach(b => b.classList.remove('active'));
+  btn?.classList.add('active');
+  if (tab === 'movilidad') setTimeout(() => { redrawGauges(); onMov(); }, 60);
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow = 'hidden'; }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow = ''; }
+
+function saveData() { localStorage.setItem('mm_v12_atletas', JSON.stringify(atletas)); showToast(); }
+function showToast() { const t = document.getElementById('save-toast'); t.style.opacity = '1'; setTimeout(() => t.style.opacity = '0', 2000); }
+
+// ATLETAS
+function renderAtletas() {
+  const grid = document.getElementById('atletas-grid');
+  if (!grid) return;
+  if (!atletas.length) { grid.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3)">👤 No hay atletas</div>'; return; }
+  grid.innerHTML = atletas.map(a => `<div class="athlete-card" onclick="selectAtleta(${a.id})"><div class="flex" style="gap:12px"><div class="athlete-av-sm">${a.nombre.charAt(0)}</div><div><div style="font-weight:700">${a.nombre}</div><div style="font-size:11px;color:var(--text2)">${a.deporte || 'Sin deporte'} · ${a.edad || '?'} años</div></div></div></div>`).join('');
+}
+
+function prepNewAtleta() {
+  document.getElementById('edit-id').value = '';
+  document.getElementById('s-nombre').value = '';
+  document.getElementById('s-edad').value = '';
+  document.getElementById('s-deporte').value = '';
+  document.getElementById('s-peso').value = '';
+  openModal('modal-atleta-form');
+}
+
+function saveAtleta() {
+  const nombre = document.getElementById('s-nombre').value.trim();
+  if (!nombre) { alert('Ingresá el nombre'); return; }
+  const atleta = { id: Date.now(), nombre, edad: document.getElementById('s-edad').value, deporte: document.getElementById('s-deporte').value, peso: document.getElementById('s-peso').value, evals: {} };
+  atletas.push(atleta);
+  saveData();
+  closeModal('modal-atleta-form');
+  renderAtletas();
+}
+
+function selectAtleta(id) {
+  cur = atletas.find(a => a.id === id);
+  document.getElementById('sb-atleta-info').textContent = cur.nombre;
+  document.getElementById('profile-name2').textContent = cur.nombre;
+  document.getElementById('profile-meta').textContent = `${cur.deporte || '—'} · ${cur.edad || '?'} años · ${cur.peso || '?'} kg`;
+  document.getElementById('profile-hero-area').style.display = 'block';
+  showPage('tests');
+}
+
+function setSvc(v) {
+  document.getElementById('s-servicio').value = v;
+  document.getElementById('svc-rend').className = 'btn btn-full ' + (v === 'rendimiento' ? 'btn-neon' : 'btn-ghost');
+  document.getElementById('svc-kine').className = 'btn btn-full ' + (v === 'kinesio' ? 'btn-neon' : 'btn-ghost');
+}
+
+function checkRugby() { const d = document.getElementById('s-deporte').value; document.getElementById('rugby-sec').classList.toggle('hidden', d !== 'Rugby'); }
+function previewFormPhoto(input) { if (input.files && input.files[0]) { const r = new FileReader(); r.onload = e => { const p = document.getElementById('form-photo-prev'); if (p) p.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:12px">`; }; r.readAsDataURL(input.files[0]); } }
+function updateProfilePhoto(input) { if (input.files && input.files[0] && cur) { const r = new FileReader(); r.onload = e => { cur.foto = e.target.result; atletas = atletas.map(a => a.id === cur.id ? cur : a); saveData(); }; r.readAsDataURL(input.files[0]); } }
+function editAtletaById(id) { alert('Función en desarrollo'); }
+function deleteAtleta(id, ev) { ev?.stopPropagation(); if (confirm('¿Eliminar?')) { atletas = atletas.filter(a => a.id !== id); if (cur?.id === id) cur = null; saveData(); renderAtletas(); } }
+function filterAtletas(q) { const f = atletas.filter(s => s.nombre.toLowerCase().includes(q.toLowerCase())); document.getElementById('atletas-grid').innerHTML = f.map(s => `<div class="athlete-card" onclick="selectAtleta(${s.id})"><div class="flex"><div class="athlete-av-sm">${s.nombre.charAt(0)}</div><div>${s.nombre}</div></div></div>`).join(''); }
+
+// GONIÓMETRO
+let goniometroActivo = false, goniometroCongelado = false, anguloActual = 0, anguloCongelado = 0, goniometroCtx = null, testEnCurso = null, anguloOffset = 0, calibrado = false;
+
+function iniciarGoniometro(testId, testNombre) {
+  if (!cur) { alert('Seleccioná un atleta'); return; }
+  testEnCurso = testId;
+  document.getElementById('goniometro-title').textContent = `📐 ${testNombre}`;
+  goniometroActivo = true; goniometroCongelado = false; anguloActual = 0; calibrado = false; anguloOffset = 0;
+  document.getElementById('lectura-actual').textContent = '0.0°';
+  document.getElementById('lectura-estado').innerHTML = '🔓 En vivo';
+  document.getElementById('goniometro-angulo').textContent = '0.0';
+  const canvas = document.getElementById('goniometro-canvas');
+  if (canvas) goniometroCtx = canvas.getContext('2d');
+  dibujarGoniometro(0);
+  actualizarFlecha(0);
+  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+    document.getElementById('goniometro-estado').innerHTML = '⚠️ Toca para activar';
+    const handler = () => { DeviceOrientationEvent.requestPermission().then(s => { if (s === 'granted') { window.addEventListener('deviceorientation', manejarOrientacion); document.getElementById('goniometro-estado').innerHTML = '🟢 Sensor activo'; } }).catch(console.error); document.querySelector('#modal-goniometro .modal-sheet').removeEventListener('click', handler); };
+    document.querySelector('#modal-goniometro .modal-sheet').addEventListener('click', handler);
+  } else { window.addEventListener('deviceorientation', manejarOrientacion); document.getElementById('goniometro-estado').innerHTML = '🟢 Sensor activo'; }
+  openModal('modal-goniometro');
+}
+
+function manejarOrientacion(event) {
+  if (!goniometroActivo) return;
+  let angulo = event.beta || 0;
+  if (!calibrado) { anguloOffset = angulo; calibrado = true; }
+  angulo = angulo - anguloOffset;
+  angulo = Math.max(-30, Math.min(60, angulo));
+  if (!goniometroCongelado) {
+    anguloActual = Math.round(angulo * 10) / 10;
+    document.getElementById('goniometro-angulo').textContent = anguloActual.toFixed(1);
+    document.getElementById('lectura-actual').textContent = anguloActual.toFixed(1) + '°';
+    dibujarGoniometro(anguloActual);
+    actualizarFlecha(anguloActual);
+  }
+}
+
+function dibujarGoniometro(angulo) {
+  if (!goniometroCtx) return;
+  const canvas = document.getElementById('goniometro-canvas');
+  const ctx = goniometroCtx;
+  const w = canvas.width, h = canvas.height, cx = w/2, cy = h/2, radio = w * 0.4;
+  ctx.clearRect(0, 0, w, h);
+  ctx.beginPath(); ctx.arc(cx, cy, radio, 0, 2 * Math.PI); ctx.strokeStyle = '#39FF7A'; ctx.lineWidth = 2; ctx.stroke();
+  for (let i = -30; i <= 60; i += 10) {
+    const rad = (i * Math.PI) / 180;
+    const x1 = cx + (radio - 8) * Math.sin(rad), y1 = cy + (radio - 8) * Math.cos(rad);
+    const x2 = cx + radio * Math.sin(rad), y2 = cy + radio * Math.cos(rad);
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+    if (i !== 0) { ctx.font = 'bold 8px monospace'; ctx.fillStyle = '#39FF7A'; const tx = cx + (radio + 10) * Math.sin(rad), ty = cy + (radio + 8) * Math.cos(rad); ctx.fillText(i + '°', tx - 3, ty + 2); }
+  }
+}
+
+function actualizarFlecha(angulo) { const f = document.getElementById('goniometro-flecha'); if (f) f.style.transform = `translateX(-50%) rotate(${-angulo}deg)`; }
+function calibrarGoniometro() { calibrado = false; anguloOffset = 0; anguloActual = 0; document.getElementById('goniometro-angulo').textContent = '0.0'; document.getElementById('lectura-actual').textContent = '0.0°'; dibujarGoniometro(0); actualizarFlecha(0); showToast(); }
+function toggleCongelar() { const btn = document.getElementById('btn-congelar'); if (goniometroCongelado) { goniometroCongelado = false; btn.textContent = '🔒 Congelar'; btn.className = 'btn btn-neon btn-full'; document.getElementById('lectura-estado').innerHTML = '🔓 En vivo'; } else { goniometroCongelado = true; anguloCongelado = anguloActual; btn.textContent = '🔓 Descongelar'; btn.className = 'btn btn-outline btn-full'; document.getElementById('lectura-estado').innerHTML = '🔒 Congelado'; } }
+function reiniciarGoniometro() { goniometroCongelado = false; anguloActual = 0; calibrado = false; document.getElementById('btn-congelar').textContent = '🔒 Congelar'; document.getElementById('btn-congelar').className = 'btn btn-neon btn-full'; document.getElementById('lectura-estado').innerHTML = '🔓 En vivo'; document.getElementById('goniometro-angulo').textContent = '0.0'; document.getElementById('lectura-actual').textContent = '0.0°'; dibujarGoniometro(0); actualizarFlecha(0); }
+function confirmarGoniometro() { if (!cur || !testEnCurso) { alert('Error'); return; } const anguloFinal = goniometroCongelado ? anguloCongelado : anguloActual; if (testEnCurso === 'tobillo-d') { cur.lungeD = anguloFinal; document.getElementById('lunge-d').value = anguloFinal; } if (testEnCurso === 'tobillo-i') { cur.lungeI = anguloFinal; document.getElementById('lunge-i').value = anguloFinal; } atletas = atletas.map(a => a.id === cur.id ? cur : a); saveData(); onMov(); detenerGoniometro(); closeModal('modal-goniometro'); }
+function detenerGoniometro() { goniometroActivo = false; window.removeEventListener('deviceorientation', manejarOrientacion); }
+
+// MOVILIDAD
+function onMov() {
+  const ld = +document.getElementById('lunge-d')?.value || 0, li = +document.getElementById('lunge-i')?.value || 0;
+  const riD = +document.getElementById('cad-ri-d')?.value || 0, reD = +document.getElementById('cad-re-d')?.value || 0, riI = +document.getElementById('cad-ri-i')?.value || 0, reI = +document.getElementById('cad-re-i')?.value || 0;
+  const tromCadD = riD + reD, tromCadI = riI + reI;
+  const riHD = +document.getElementById('hom-ri-d')?.value || 0, reHD = +document.getElementById('hom-re-d')?.value || 0, riHI = +document.getElementById('hom-ri-i')?.value || 0, reHI = +document.getElementById('hom-re-i')?.value || 0;
+  const tromHomD = riHD + reHD, tromHomI = riHI + reHI;
+  document.getElementById('trom-cad-d') && (document.getElementById('trom-cad-d').textContent = tromCadD || '—');
+  document.getElementById('trom-cad-i') && (document.getElementById('trom-cad-i').textContent = tromCadI || '—');
+  document.getElementById('trom-hom-d') && (document.getElementById('trom-hom-d').textContent = tromHomD || '—');
+  document.getElementById('trom-hom-i') && (document.getElementById('trom-hom-i').textContent = tromHomI || '—');
+  const semL = v => !v ? '' : v < 35 ? `🔴 ${v}°` : v <= 40 ? `🟡 ${v}°` : `🟢 ${v}°`;
+  document.getElementById('lunge-result').innerHTML = `<div class="flex" style="gap:12px;justify-content:center">${ld ? semL(ld) : ''}${li ? semL(li) : ''}</div>`;
+  const semC = v => v > 90 ? `🟢 ${v}°` : v >= 80 ? `🟡 ${v}°` : `🔴 ${v}°`;
+  document.getElementById('cad-result').innerHTML = (tromCadD || tromCadI) ? `<div class="flex" style="gap:12px;justify-content:center">D: ${semC(tromCadD)} I: ${semC(tromCadI)}</div>` : '';
+  const semH = v => v > 120 ? `🟢 ${v}°` : v >= 100 ? `🟡 ${v}°` : `🔴 ${v}°`;
+  document.getElementById('hom-result').innerHTML = (tromHomD || tromHomI) ? `<div class="flex" style="gap:12px;justify-content:center">D: ${semH(tromHomD)} I: ${semH(tromHomI)}</div>` : '';
+  drawGauge('g-ld', ld, 60); drawGauge('g-li', li, 60);
+  drawGauge('g-tcd', tromCadD, 120); drawGauge('g-tci', tromCadI, 120);
+  if (cur) { cur.lungeD = ld; cur.lungeI = li; cur.tromCadD = tromCadD; cur.tromCadI = tromCadI; cur.tromHomD = tromHomD; cur.tromHomI = tromHomI; }
+}
+
+function drawGauge(id, value, max) {
+  const c = document.getElementById(id); if (!c) return;
+  const ctx = c.getContext('2d'); const w = c.width, h = c.height;
+  ctx.clearRect(0, 0, w, h); const cx = w/2, cy = h-4, r = Math.min(w*0.4, h*0.7);
+  const start = Math.PI, end = 2 * Math.PI, pct = Math.min(1, value / max), angle = start + pct * (end - start);
+  ctx.beginPath(); ctx.arc(cx, cy, r, start, end); ctx.strokeStyle = '#333'; ctx.lineWidth = 6; ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx, cy, r, start, angle); ctx.strokeStyle = value < 35 ? '#FF4444' : value <= 40 ? '#FFB020' : '#39FF7A'; ctx.stroke();
+  const valEl = document.getElementById(id === 'g-ld' ? 'gv-ld' : id === 'g-li' ? 'gv-li' : id === 'g-tcd' ? 'gv-tcd' : 'gv-tci');
+  if (valEl) { valEl.textContent = value; valEl.style.color = value < 35 ? '#FF4444' : value <= 40 ? '#FFB020' : '#39FF7A'; }
+}
+
+function redrawGauges() { drawGauge('g-ld', +document.getElementById('lunge-d')?.value || 0, 60); drawGauge('g-li', +document.getElementById('lunge-i')?.value || 0, 60); }
+
+function saveMov() { if (!cur) { alert('Seleccioná un atleta'); return; } atletas = atletas.map(a => a.id === cur.id ? cur : a); saveData(); alert('Movilidad guardada'); }
+
+// Funciones placeholder para que no haya errores
+function renderDashboard() {}
+function renderHistorial() {}
+function renderSimetriasTabla() {}
+function renderFVHist() {}
+function buildSaltosGrid() {}
+function buildHooperFields() {}
+function addFVRow() {}
+function calcFV() {}
+function onFvEjChange() {}
+function initKinesio() {}
+function saveKinesio() {}
+function saveFMS() {}
+function saveSaltos() {}
+function saveSprint() {}
+function saveFatiga() {}
+function openInformeIA() { alert('Informe IA en desarrollo'); }
+function exportAllData() { alert('Exportar datos'); }
+function loadSlot() {}
+function setFMS() {}
+function calcValgo() {}
+function calcSprintBench() {}
+function handleVideoDrop() {}
+function loadVideo() {}
+function jumpFrames() {}
+function togglePlay() {}
+function scrubVideo() {}
+function markTakeoff() {}
+function markLanding() {}
+function clearMarkers() {}
+function saveVideoSalto() {}
+function onFpsChange() {}
+function showApiKeyModal() { alert('API Key en desarrollo'); }
+function regenerarInforme() { alert('Informe IA en desarrollo'); }
+function exportarPDF() { alert('PDF en desarrollo'); }
+
+// EVENTOS
+document.addEventListener('DOMContentLoaded', () => {
+  renderAtletas();
+  ['g-ld','g-li','g-tcd','g-tci'].forEach(id => drawGauge(id, 0, 100));
+  document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', e => { if (e.target === m) closeModal(m.id); }));
+  document.getElementById('btn-congelar')?.addEventListener('click', toggleCongelar);
+  document.getElementById('btn-reiniciar')?.addEventListener('click', reiniciarGoniometro);
+  document.getElementById('btn-confirmar-goniometro')?.addEventListener('click', confirmarGoniometro);
+});
+</script>
 </body>
 </html>
