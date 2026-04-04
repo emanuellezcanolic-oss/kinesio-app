@@ -98,14 +98,34 @@ const SPRINT_NORMS = {
   Básquet: { general:{ sp10:[1.80,1.74,1.68], sp30:[4.45,4.30,4.15], ttest:[9.9,9.6,9.3]  } }
 };
 
+// ── BATERIA COMPLETA BOSCO ──
 const SALTOS_DEF = [
-  { key:'bj',  label:'Broad Jump',     icon:'🏃', unit:'cm', type:'bilateral', desc:'Salto horizontal' },
-  { key:'cmj', label:'CMJ',             icon:'⬆️', unit:'cm', type:'bilateral', desc:'Countermovement Jump' },
-  { key:'dj',  label:'Drop Jump',       icon:'⬇️', unit:'cm', type:'bilateral', r2key:'dj-r0', desc:'RSI' },
-  { key:'sh',  label:'Simple Hop',      icon:'🦵', unit:'cm', type:'unilateral', desc:'Hop for distance · LSI' },
-  { key:'3h',  label:'3 Hop',           icon:'🦘', unit:'cm', type:'unilateral', desc:'Triple Hop · LSI' },
-  { key:'djb', label:'DJ Unilateral',   icon:'🦘', unit:'cm', type:'unilateral', desc:'Drop Jump unilateral' }
+  // Verticales bilaterales
+  { key:'sj',   label:'SJ',             icon:'', unit:'cm', type:'bilateral',  cat:'vertical',   desc:'Squat Jump -- fuerza explosiva pura' },
+  { key:'cmj',  label:'CMJ',            icon:'', unit:'cm', type:'bilateral',  cat:'vertical',   desc:'Countermovement Jump -- fuerza elastico-explosiva' },
+  { key:'abk',  label:'Abalakov',       icon:'', unit:'cm', type:'bilateral',  cat:'vertical',   desc:'CMJ con brazos -- coordin. neuromotora' },
+  { key:'dj',   label:'Drop Jump',      icon:'', unit:'cm', type:'bilateral',  cat:'vertical',   desc:'DJ 20-40cm -- fuerza reflejo-elastico-explosiva', hasRSI:true },
+  { key:'ms15', label:'Multi-salto 15s',icon:'', unit:'W/kg',type:'bilateral', cat:'vertical',   desc:'Potencia anaerob. alactica -- 15 segundos' },
+  // Horizontales unilaterales
+  { key:'bj',   label:'Broad Jump',     icon:'', unit:'cm', type:'bilateral',  cat:'horizontal', desc:'Salto horizontal bilateral' },
+  { key:'sh',   label:'Single Hop',     icon:'', unit:'cm', type:'unilateral', cat:'horizontal', desc:'Hop for distance -- LSI' },
+  { key:'3h',   label:'Triple Hop',     icon:'', unit:'cm', type:'unilateral', cat:'horizontal', desc:'Triple Hop for distance -- LSI' },
+  { key:'ch',   label:'Cross-over Hop', icon:'', unit:'cm', type:'unilateral', cat:'horizontal', desc:'Cross-over 3 saltos -- LSI' },
+  { key:'t6h',  label:'Timed 6m Hop',   icon:'', unit:'s',  type:'unilateral', cat:'horizontal', desc:'6 metros -- tiempo -- LSI', lowerIsBetter:true },
+  { key:'djb',  label:'DJ Unilateral',  icon:'', unit:'cm', type:'unilateral', cat:'vertical',   desc:'Drop Jump unilateral -- LSI + RSI', hasRSI:true },
+  { key:'sideh',label:'Side Hop',       icon:'', unit:'reps',type:'unilateral',cat:'horizontal', desc:'Saltos laterales 30s -- Gustavsson' }
 ];
+
+// Normas Bosco (Garrido-Chamorro, EFDeportes 2004, N=765 deportistas alto nivel)
+const BOSCO_NORMS = {
+  sj:  { male:{ mean:34.49, sd:5.13 }, female:{ mean:26.31, sd:4.47 } },
+  cmj: { male:{ mean:39.23, sd:5.58 }, female:{ mean:29.47, sd:10.86 } },
+  abk: { male:{ mean:47.20, sd:10.23 }, female:{ mean:33.49, sd:5.30 } },
+  ms15:{ male:{ mean:38.18, sd:15.43 }, female:{ mean:32.61, sd:11.57 } }
+};
+
+// Normas Side Hop -- Gustavsson et al.
+const SIDEHOP_NORMS = { male:{ min:55 }, female:{ min:41 } };
 
 const ORTHO_TESTS = {
   subacro: [
@@ -1006,53 +1026,297 @@ function renderFVHist() {
 //  SALTOS
 // ══════════════════════════════════════════════════════
 
+// ── BOSCO CALCULATIONS ──
+function boscoZScore(key, val, sexo) {
+  const norm = BOSCO_NORMS[key];
+  if (!norm || !val) return null;
+  const n = sexo === 'F' ? norm.female : norm.male;
+  return +((val - n.mean) / n.sd).toFixed(2);
+}
+
+function boscoBadge(key, val, sexo) {
+  const z = boscoZScore(key, val, sexo);
+  if (z === null) return '';
+  const label = z >= 1.5 ? 'Elite' : z >= 0.5 ? 'Alto' : z >= -0.5 ? 'Promedio' : z >= -1.5 ? 'Bajo' : 'Muy bajo';
+  const c = z >= 1 ? 'var(--neon)' : z >= 0 ? 'var(--blue)' : z >= -1 ? 'var(--amber)' : 'var(--red)';
+  return `<span class="tag" style="background:${c}22;color:${c}">${label} (z=${z>0?'+':''}${z})</span>`;
+}
+
+function calcBoscoIndices() {
+  const sj  = parseFloat(document.getElementById('sj-avg')?.dataset.val  || '') || 0;
+  const cmj = parseFloat(document.getElementById('cmj-avg')?.dataset.val || '') || 0;
+  const abk = parseFloat(document.getElementById('abk-avg')?.dataset.val || '') || 0;
+  const el  = document.getElementById('bosco-indices');
+  if (!el) return;
+  if (!sj && !cmj && !abk) { el.innerHTML = ''; return; }
+  let html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-top:12px">';
+
+  // Indice elasticidad (CEA lento): ((CMJ-SJ)/SJ)*100
+  if (sj && cmj) {
+    const ie = ((cmj - sj) / sj * 100).toFixed(1);
+    const c  = +ie >= 15 ? 'var(--neon)' : +ie >= 8 ? 'var(--amber)' : 'var(--red)';
+    html += `<div style="background:var(--bg4);border:1px solid ${c}44;border-radius:10px;padding:12px;text-align:center">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text2);text-transform:uppercase;margin-bottom:4px">Indice Elasticidad</div>
+      <div style="font-family:var(--mono);font-size:24px;font-weight:800;color:${c}">${ie}%</div>
+      <div style="font-size:10px;color:var(--text2);margin-top:3px">CMJ - SJ / SJ · CEA lento</div>
+      <div style="font-size:10px;margin-top:4px;color:${c}">${+ie>=15?'Excelente uso elastico':+ie>=8?'Buen uso elastico':'Deficit elastico'}</div>
+    </div>`;
+  }
+
+  // Indice coordinacion de brazos: ((ABK-CMJ)/CMJ)*100
+  if (cmj && abk) {
+    const ib = ((abk - cmj) / cmj * 100).toFixed(1);
+    let interpBraz = '', cBraz = '';
+    if (+ib < 10)      { interpBraz = 'Mala coordinacion de brazos'; cBraz = 'var(--red)'; }
+    else if (+ib <= 20){ interpBraz = 'Buen aprovechamiento de brazos'; cBraz = 'var(--neon)'; }
+    else               { interpBraz = 'Deficit CEA -- dependencia excesiva brazos'; cBraz = 'var(--amber)'; }
+    html += `<div style="background:var(--bg4);border:1px solid ${cBraz}44;border-radius:10px;padding:12px;text-align:center">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text2);text-transform:uppercase;margin-bottom:4px">Coord. de Brazos</div>
+      <div style="font-family:var(--mono);font-size:24px;font-weight:800;color:${cBraz}">${ib}%</div>
+      <div style="font-size:10px;color:var(--text2);margin-top:3px">ABK - CMJ / CMJ</div>
+      <div style="font-size:10px;margin-top:4px;color:${cBraz}">${interpBraz}</div>
+    </div>`;
+  }
+
+  // Potencia Bosco (formula de Bosco et al. 1983)
+  if (cmj && cur?.peso) {
+    const h = cmj / 100;
+    const P = Math.pow(4.9, 0.5) * +cur.peso * Math.pow(h, 0.5);
+    html += `<div style="background:var(--bg4);border:1px solid rgba(77,158,255,.3);border-radius:10px;padding:12px;text-align:center">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text2);text-transform:uppercase;margin-bottom:4px">Potencia mecanica</div>
+      <div style="font-family:var(--mono);font-size:24px;font-weight:800;color:var(--blue)">${P.toFixed(1)}</div>
+      <div style="font-size:10px;color:var(--text2);margin-top:3px">kgm/s -- Formula Bosco 1983</div>
+    </div>`;
+  }
+
+  // RSI si hay DJ
+  const djAvg = parseFloat(document.getElementById('dj-avg')?.dataset.val || '') || 0;
+  const djTc  = parseFloat(document.getElementById('dj-tc')?.value || '') || 0;
+  if (djAvg && djTc) {
+    const rsi = (djAvg / 100 / (djTc / 1000)).toFixed(2);
+    const cRsi = +rsi >= 2.5 ? 'var(--neon)' : +rsi >= 1.5 ? 'var(--amber)' : 'var(--red)';
+    html += `<div style="background:var(--bg4);border:1px solid ${cRsi}44;border-radius:10px;padding:12px;text-align:center">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text2);text-transform:uppercase;margin-bottom:4px">RSI Modificado</div>
+      <div style="font-family:var(--mono);font-size:24px;font-weight:800;color:${cRsi}">${rsi}</div>
+      <div style="font-size:10px;color:var(--text2);margin-top:3px">h(m) / Tc(s) -- DJ reactivo</div>
+      <div style="font-size:10px;margin-top:4px;color:${cRsi}">${+rsi>=2.5?'Elite reactivo':+rsi>=1.5?'Promedio reactivo':'Bajo reactivo'}</div>
+    </div>`;
+  }
+
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+function calcMultiSalto15() {
+  const reps  = +document.getElementById('ms15-reps')?.value  || 0;
+  const avgH  = +document.getElementById('ms15-r1')?.value    || 0;
+  const peso  = cur?.peso ? +cur.peso : (+document.getElementById('bj-pc')?.value || 0);
+  const el    = document.getElementById('ms15-avg');
+  const elPot = document.getElementById('ms15-pot');
+  if (el) { el.textContent = avgH ? avgH.toFixed(1) : '--'; el.dataset.val = avgH || ''; }
+  if (elPot && avgH && peso) {
+    // Formula Bosco potencia anaerobia: P = (4*h*m*g*n) / (4*t*n - Pi*tv)
+    // Simplificada: P = sqrt(4.9) * m * sqrt(h/100)
+    const P = Math.pow(4.9, 0.5) * peso * Math.pow(avgH / 100, 0.5);
+    elPot.textContent = P.toFixed(1) + ' kgm/s';
+    const sexo  = cur?.sexo || 'M';
+    const norms = BOSCO_NORMS.ms15;
+    const n     = sexo === 'F' ? norms.female : norms.male;
+    const z     = ((P - n.mean) / n.sd).toFixed(2);
+    const c     = +z >= 1 ? 'var(--neon)' : +z >= 0 ? 'var(--blue)' : +z >= -1 ? 'var(--amber)' : 'var(--red)';
+    elPot.style.color = c;
+  }
+  calcBoscoIndices();
+}
+
 function buildSaltosGrid() {
   const grid = document.getElementById('saltos-grid'); if (!grid) return;
-  grid.innerHTML = SALTOS_DEF.map(def => {
-    if (def.type === 'bilateral') {
-      const r2id = def.r2key || (def.key + '-r2');
-      return `<div class="card">
-        <div class="card-header"><h3>${def.icon} ${def.label}</h3><span class="tag tag-b">${def.desc}</span></div>
+  const sexo = cur?.sexo || 'M';
+  const vert = SALTOS_DEF.filter(d => d.cat === 'vertical');
+  const horiz = SALTOS_DEF.filter(d => d.cat === 'horizontal');
+
+  let html = '';
+
+  // ── SECCION VERTICALES ──
+  html += `<div style="grid-column:1/-1">
+    <div style="font-family:var(--mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--neon);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(57,255,122,.1)">
+      Saltos verticales -- Bateria Bosco
+    </div>
+  </div>`;
+
+  vert.forEach(def => {
+    if (def.key === 'ms15') {
+      // Multisalto 15s -- card especial
+      html += `<div class="card">
+        <div class="card-header"><h3>Multi-salto 15s</h3><span class="tag tag-y">Potencia anaerob. alactica</span></div>
         <div class="card-body">
-          <div class="ig"><label class="il">Rep 1</label><input class="inp inp-mono" type="number" step=".1" id="${def.key}-r1" placeholder="0" oninput="calcSalto('${def.key}','${r2id}')"></div>
-          <div class="ig"><label class="il">Rep 2${def.r2key ? ' (Rep 0)' : ''}</label><input class="inp inp-mono" type="number" step=".1" id="${r2id}" placeholder="0" oninput="calcSalto('${def.key}','${r2id}')"></div>
-          <div style="background:var(--bg4);border:1px solid var(--border);border-radius:var(--r);padding:12px;text-align:center;margin-top:8px">
-            <div class="il mb-4">Promedio</div>
-            <div id="${def.key}-avg" style="font-family:var(--mono);font-size:28px;font-weight:800;color:var(--neon)">--</div>
+          <div class="grid-2" style="gap:10px">
+            <div class="ig"><label class="il">Altura media (cm)</label>
+              <input class="inp inp-mono" type="number" step=".1" id="ms15-r1" placeholder="27" oninput="calcMultiSalto15()">
+            </div>
+            <div class="ig"><label class="il">N reps en 15s</label>
+              <input class="inp inp-mono" type="number" id="ms15-reps" placeholder="20" oninput="calcMultiSalto15()">
+            </div>
+          </div>
+          <div style="background:var(--bg4);border-radius:10px;padding:12px;text-align:center;margin-top:8px">
+            <div style="font-family:var(--mono);font-size:9px;color:var(--text2);text-transform:uppercase;margin-bottom:4px">Potencia</div>
+            <div id="ms15-pot" style="font-family:var(--mono);font-size:22px;font-weight:800;color:var(--neon)">--</div>
+            <div style="font-size:9px;color:var(--text3);margin-top:2px">Formula Bosco et al. 1983</div>
+          </div>
+          <div style="display:none;font-family:var(--mono);font-size:9px" id="ms15-avg" data-val=""></div>
+          <div style="font-size:11px;color:var(--text2);margin-top:8px;line-height:1.6">
+            Ref. Bosco (2004): Varones ${BOSCO_NORMS.ms15.male.mean}±${BOSCO_NORMS.ms15.male.sd} · Mujeres ${BOSCO_NORMS.ms15.female.mean}±${BOSCO_NORMS.ms15.female.sd} kgm/s
+          </div>
+        </div>
+      </div>`;
+      return;
+    }
+
+    if (def.key === 'dj') {
+      html += `<div class="card">
+        <div class="card-header"><h3>Drop Jump</h3><span class="tag tag-r">Fuerza reflejo-elastico-explosiva</span></div>
+        <div class="card-body">
+          <div class="ig"><label class="il">Altura de caida (cm)</label>
+            <select class="inp" id="dj-altura">
+              <option value="20">20 cm</option><option value="40" selected>40 cm</option>
+              <option value="60">60 cm</option><option value="80">80 cm</option>
+            </select>
+          </div>
+          <div class="grid-2" style="gap:8px">
+            <div class="ig"><label class="il">Rep 1 (cm)</label><input class="inp inp-mono" type="number" step=".1" id="dj-r1" placeholder="0" oninput="calcSalto('dj','dj-r2')"></div>
+            <div class="ig"><label class="il">Rep 2 (cm)</label><input class="inp inp-mono" type="number" step=".1" id="dj-r2" placeholder="0" oninput="calcSalto('dj','dj-r2')"></div>
+          </div>
+          <div class="ig mt-8"><label class="il">Tiempo de contacto (ms)</label>
+            <input class="inp inp-mono" type="number" id="dj-tc" placeholder="200" oninput="calcBoscoIndices()">
+            <div style="font-size:9px;color:var(--text3);margin-top:2px">Ref: BDJ &lt;200ms · CDJ hasta 250ms</div>
+          </div>
+          <div style="background:var(--bg4);border-radius:10px;padding:12px;text-align:center;margin-top:8px">
+            <div style="display:flex;justify-content:space-around">
+              <div><div style="font-family:var(--mono);font-size:9px;color:var(--text2);margin-bottom:3px">ALTURA</div>
+                <div id="dj-avg" style="font-family:var(--mono);font-size:22px;font-weight:800;color:var(--neon)" data-val="">--</div></div>
+              <div><div style="font-family:var(--mono);font-size:9px;color:var(--text2);margin-bottom:3px">RSI mod.</div>
+                <div id="dj-rsi-display" style="font-family:var(--mono);font-size:22px;font-weight:800;color:var(--blue)">--</div></div>
+            </div>
+          </div>
+          <div id="dj-mejora" style="text-align:center;margin-top:6px"></div>
+        </div>
+      </div>`;
+      return;
+    }
+
+    // SJ, CMJ, ABK
+    const unitLabel = def.unit;
+    const norm = BOSCO_NORMS[def.key];
+    const normLine = norm ? `Ref. Bosco (2004): V=${norm.male.mean}±${norm.male.sd} · M=${norm.female.mean}±${norm.female.sd} cm` : '';
+    html += `<div class="card">
+      <div class="card-header"><h3>${def.label}</h3><span class="tag tag-b" style="font-size:9px">${def.desc}</span></div>
+      <div class="card-body">
+        <div class="grid-2" style="gap:8px">
+          <div class="ig"><label class="il">Rep 1</label><input class="inp inp-mono" type="number" step=".1" id="${def.key}-r1" placeholder="0" oninput="calcSalto('${def.key}','${def.key}-r2')"></div>
+          <div class="ig"><label class="il">Rep 2</label><input class="inp inp-mono" type="number" step=".1" id="${def.key}-r2" placeholder="0" oninput="calcSalto('${def.key}','${def.key}-r2')"></div>
+        </div>
+        <div style="background:var(--bg4);border-radius:10px;padding:12px;text-align:center;margin-top:8px">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text2);margin-bottom:4px">PROMEDIO</div>
+          <div id="${def.key}-avg" style="font-family:var(--mono);font-size:32px;font-weight:800;color:var(--neon)" data-val="">--</div>
+          <div style="font-size:10px;color:var(--text3)">${unitLabel}</div>
+          <div id="${def.key}-badge" style="margin-top:6px"></div>
+        </div>
+        ${normLine ? `<div style="font-size:10px;color:var(--text3);margin-top:6px;font-family:var(--mono)">${normLine}</div>` : ''}
+        <div id="${def.key}-mejora" style="text-align:center;margin-top:6px"></div>
+      </div>
+    </div>`;
+  });
+
+  // ── INDICES BOSCO ──
+  html += `<div style="grid-column:1/-1" id="bosco-indices"></div>`;
+
+  // ── SECCION HORIZONTALES ──
+  html += `<div style="grid-column:1/-1;margin-top:8px">
+    <div style="font-family:var(--mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--blue);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(77,158,255,.15)">
+      Saltos horizontales -- Hop Tests
+    </div>
+  </div>`;
+
+  horiz.forEach(def => {
+    if (def.type === 'bilateral') {
+      html += `<div class="card">
+        <div class="card-header"><h3>${def.label}</h3><span class="tag tag-b">${def.desc}</span></div>
+        <div class="card-body">
+          <div class="grid-2" style="gap:8px">
+            <div class="ig"><label class="il">Rep 1</label><input class="inp inp-mono" type="number" step=".1" id="${def.key}-r1" placeholder="0" oninput="calcSalto('${def.key}','${def.key}-r2')"></div>
+            <div class="ig"><label class="il">Rep 2</label><input class="inp inp-mono" type="number" step=".1" id="${def.key}-r2" placeholder="0" oninput="calcSalto('${def.key}','${def.key}-r2')"></div>
+          </div>
+          <div style="background:var(--bg4);border-radius:10px;padding:10px;text-align:center;margin-top:8px">
+            <div id="${def.key}-avg" style="font-family:var(--mono);font-size:28px;font-weight:800;color:var(--neon)" data-val="">--</div>
             <div style="font-size:10px;color:var(--text3)">cm</div>
           </div>
-          ${def.key === 'bj' ? `<div class="ig mt-8"><label class="il">Peso corporal (kg)</label><input class="inp inp-mono" type="number" id="bj-pc" placeholder="75" oninput="calcImpulso()"></div><div style="font-size:12px;color:var(--text2);margin-top:4px">Impulso: <span id="bj-imp" style="font-family:var(--mono);color:var(--neon)">--</span> AU</div>` : ''}
           <div id="${def.key}-mejora" style="text-align:center;margin-top:6px"></div>
         </div>
       </div>`;
-    } else {
-      return `<div class="card">
-        <div class="card-header"><h3>${def.icon} ${def.label}</h3><span class="tag tag-y">${def.desc}</span></div>
+    } else if (def.key === 'sideh') {
+      const normM = SIDEHOP_NORMS.male.min;
+      const normF = SIDEHOP_NORMS.female.min;
+      html += `<div class="card">
+        <div class="card-header"><h3>Side Hop Test</h3><span class="tag tag-y">Gustavsson et al.</span></div>
         <div class="card-body">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
             <div>
-              <div style="font-size:10px;font-weight:700;color:var(--neon);margin-bottom:8px;font-family:var(--mono)">DERECHA</div>
-              <div class="ig"><label class="il">Rep 1</label><input class="inp inp-mono" type="number" step=".1" id="${def.key}-d-r1" placeholder="0" oninput="calcSimetriaHop('${def.key}')"></div>
-              <div class="ig"><label class="il">Rep 2</label><input class="inp inp-mono" type="number" step=".1" id="${def.key}-d-r2" placeholder="0" oninput="calcSimetriaHop('${def.key}')"></div>
-              <div style="background:var(--bg4);border:1px solid var(--border);border-radius:var(--r);padding:10px;text-align:center"><div class="il mb-4">Avg D</div><div id="${def.key}-d-avg" style="font-family:var(--mono);font-size:22px;font-weight:800;color:var(--neon)">--</div></div>
+              <div style="font-size:10px;font-weight:700;color:var(--neon);margin-bottom:6px;font-family:var(--mono)">DERECHA</div>
+              <div class="ig"><label class="il">Reps 30s</label><input class="inp inp-mono" type="number" id="sideh-d-r1" placeholder="0" oninput="calcSideHop()"></div>
+              <div style="background:var(--bg4);border-radius:8px;padding:8px;text-align:center">
+                <div id="sideh-d-avg" style="font-family:var(--mono);font-size:20px;font-weight:800;color:var(--neon)" data-val="">--</div>
+                <div id="sideh-d-norm" style="font-size:10px;margin-top:2px"></div>
+              </div>
             </div>
             <div>
-              <div style="font-size:10px;font-weight:700;color:var(--blue);margin-bottom:8px;font-family:var(--mono)">IZQUIERDA</div>
-              <div class="ig"><label class="il">Rep 1</label><input class="inp inp-mono" type="number" step=".1" id="${def.key}-i-r1" placeholder="0" oninput="calcSimetriaHop('${def.key}')"></div>
-              <div class="ig"><label class="il">Rep 2</label><input class="inp inp-mono" type="number" step=".1" id="${def.key}-i-r2" placeholder="0" oninput="calcSimetriaHop('${def.key}')"></div>
-              <div style="background:var(--bg4);border:1px solid var(--border);border-radius:var(--r);padding:10px;text-align:center"><div class="il mb-4">Avg I</div><div id="${def.key}-i-avg" style="font-family:var(--mono);font-size:22px;font-weight:800;color:var(--blue)">--</div></div>
+              <div style="font-size:10px;font-weight:700;color:var(--blue);margin-bottom:6px;font-family:var(--mono)">IZQUIERDA</div>
+              <div class="ig"><label class="il">Reps 30s</label><input class="inp inp-mono" type="number" id="sideh-i-r1" placeholder="0" oninput="calcSideHop()"></div>
+              <div style="background:var(--bg4);border-radius:8px;padding:8px;text-align:center">
+                <div id="sideh-i-avg" style="font-family:var(--mono);font-size:20px;font-weight:800;color:var(--blue)" data-val="">--</div>
+                <div id="sideh-i-norm" style="font-size:10px;margin-top:2px"></div>
+              </div>
             </div>
           </div>
-          <div style="background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);padding:12px;text-align:center;margin-top:10px">
-            <div class="il mb-4">LSI -- Simetría</div>
-            <div id="${def.key}-sim" style="font-family:var(--mono);font-size:28px;font-weight:800">--</div>
-            <div id="${def.key}-sim-st" style="font-size:11px;color:var(--text3);margin-top:2px"></div>
+          <div style="background:var(--bg4);border-radius:8px;padding:10px;text-align:center;margin-top:8px">
+            <div id="sideh-sim" style="font-family:var(--mono);font-size:22px;font-weight:800">--</div>
+            <div id="sideh-sim-st" style="font-size:10px;color:var(--text3);margin-top:2px"></div>
+          </div>
+          <div style="font-size:10px;color:var(--text3);margin-top:6px;font-family:var(--mono)">
+            Norma Gustavsson et al.: Varones min ${normM} reps · Mujeres min ${normF} reps
+          </div>
+        </div>
+      </div>`;
+    } else {
+      const lowerLabel = def.lowerIsBetter ? 'Menor es mejor' : 'LSI';
+      html += `<div class="card">
+        <div class="card-header"><h3>${def.label}</h3><span class="tag tag-y">${def.desc}</span></div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div>
+              <div style="font-size:10px;font-weight:700;color:var(--neon);margin-bottom:6px;font-family:var(--mono)">DERECHA</div>
+              <div class="ig"><label class="il">Rep 1</label><input class="inp inp-mono" type="number" step=".01" id="${def.key}-d-r1" placeholder="0" oninput="calcSimetriaHop('${def.key}')"></div>
+              <div class="ig"><label class="il">Rep 2</label><input class="inp inp-mono" type="number" step=".01" id="${def.key}-d-r2" placeholder="0" oninput="calcSimetriaHop('${def.key}')"></div>
+              <div style="background:var(--bg4);border-radius:8px;padding:8px;text-align:center"><div id="${def.key}-d-avg" style="font-family:var(--mono);font-size:20px;font-weight:800;color:var(--neon)" data-val="">--</div></div>
+            </div>
+            <div>
+              <div style="font-size:10px;font-weight:700;color:var(--blue);margin-bottom:6px;font-family:var(--mono)">IZQUIERDA</div>
+              <div class="ig"><label class="il">Rep 1</label><input class="inp inp-mono" type="number" step=".01" id="${def.key}-i-r1" placeholder="0" oninput="calcSimetriaHop('${def.key}')"></div>
+              <div class="ig"><label class="il">Rep 2</label><input class="inp inp-mono" type="number" step=".01" id="${def.key}-i-r2" placeholder="0" oninput="calcSimetriaHop('${def.key}')"></div>
+              <div style="background:var(--bg4);border-radius:8px;padding:8px;text-align:center"><div id="${def.key}-i-avg" style="font-family:var(--mono);font-size:20px;font-weight:800;color:var(--blue)" data-val="">--</div></div>
+            </div>
+          </div>
+          <div style="background:var(--bg4);border:1px solid rgba(57,255,122,.1);border-radius:8px;padding:10px;text-align:center;margin-top:8px">
+            <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">${lowerLabel}</div>
+            <div id="${def.key}-sim" style="font-family:var(--mono);font-size:24px;font-weight:800">--</div>
+            <div id="${def.key}-sim-st" style="font-size:10px;margin-top:3px"></div>
           </div>
           <div id="${def.key}-mejora" style="text-align:center;margin-top:6px"></div>
         </div>
       </div>`;
     }
-  }).join('');
+  });
+
+  grid.innerHTML = html;
 }
 
 function calcSalto(key, r2id) {
@@ -1061,9 +1325,24 @@ function calcSalto(key, r2id) {
   const avg = r1 && r2 ? (r1+r2)/2 : r1 || r2;
   const el = document.getElementById(key + '-avg');
   if (el) { el.textContent = avg ? avg.toFixed(1) : '--'; el.dataset.val = avg || ''; }
-  if (key === 'bj') calcImpulso();
+  // RSI display for DJ
+  if (key === 'dj') {
+    const tc = +document.getElementById('dj-tc')?.value || 0;
+    const rsiEl = document.getElementById('dj-rsi-display');
+    if (rsiEl && avg && tc) {
+      const rsi = (avg / 100 / (tc / 1000)).toFixed(2);
+      rsiEl.textContent = rsi;
+      rsiEl.style.color = +rsi >= 2.5 ? 'var(--neon)' : +rsi >= 1.5 ? 'var(--amber)' : 'var(--red)';
+    }
+  }
+  // Bosco z-score badge
+  const sexo = cur?.sexo || 'M';
+  const badge = document.getElementById(key + '-badge');
+  if (badge && avg) badge.innerHTML = boscoBadge(key, avg, sexo);
+  // Update lastCMJ
   if (key === 'cmj' && cur) { cur.lastCMJ = avg || null; atletas = atletas.map(a => a.id===cur.id?cur:a); saveData(); }
   checkMejoraSalto(key, avg);
+  calcBoscoIndices();
 }
 
 function calcImpulso() {
@@ -1130,6 +1409,36 @@ function renderSimetriasTabla() {
   }).filter(Boolean);
   if (!rows.length) { area.innerHTML = '<p style="font-size:12px;color:var(--text3)">Completá datos bilaterales de saltos para ver la tabla.</p>'; return; }
   area.innerHTML = `<table class="data-table"><thead><tr><th>Test</th><th>Derecha</th><th>Izquierda</th><th>LSI %</th><th>Asim. %</th><th>Estado</th></tr></thead><tbody>${rows.join('')}</tbody></table>`;
+}
+
+
+function calcSideHop() {
+  const vD = +document.getElementById('sideh-d-r1')?.value || 0;
+  const vI = +document.getElementById('sideh-i-r1')?.value || 0;
+  const sexo = cur?.sexo || 'M';
+  const norm = SIDEHOP_NORMS[sexo === 'F' ? 'female' : 'male'];
+  const dEl  = document.getElementById('sideh-d-avg');
+  const iEl  = document.getElementById('sideh-i-avg');
+  if (dEl) { dEl.textContent = vD || '--'; dEl.dataset.val = vD || ''; }
+  if (iEl) { iEl.textContent = vI || '--'; iEl.dataset.val = vI || ''; }
+  const evalNorm = (v, el) => {
+    if (!el || !v) return;
+    const pass = v >= norm.min;
+    const c = pass ? 'var(--neon)' : 'var(--red)';
+    el.innerHTML = `<span style="color:${c}">${pass ? 'APRUEBA' : 'NO APRUEBA'} (min ${norm.min})</span>`;
+  };
+  evalNorm(vD, document.getElementById('sideh-d-norm'));
+  evalNorm(vI, document.getElementById('sideh-i-norm'));
+  if (vD && vI) {
+    const mayor = Math.max(vD,vI), menor = Math.min(vD,vI);
+    const lsi = (menor/mayor*100).toFixed(1);
+    const c = +lsi>=90?'var(--neon)':+lsi>=85?'var(--amber)':'var(--red)';
+    const simEl = document.getElementById('sideh-sim');
+    const simSt = document.getElementById('sideh-sim-st');
+    if (simEl) { simEl.textContent = lsi + '%'; simEl.style.color = c; }
+    if (simSt) simSt.innerHTML = `<span style="color:${c}">${+lsi>=90?'Simetrico':+lsi>=85?'Asimetria leve':'ASIMETRIA CRITICA'}</span>`;
+  }
+  renderSimetriasTabla();
 }
 
 function saveSaltos() {
