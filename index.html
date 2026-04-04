@@ -224,15 +224,20 @@
               <ellipse id="z-hombro-i" class="body-zone" data-zone="hombro-i" data-label="Hombro Izquierdo" data-panel="hombro"
                 cx="143" cy="82" rx="17" ry="15" fill="rgba(57,255,122,0)" stroke="#333" stroke-width="1.5"/>
               <!-- Codo D -->
-              <ellipse id="z-codo-d" class="body-zone" data-zone="codo-d" data-label="Codo Derecho" data-panel="hombro"
+              <ellipse id="z-codo-d" class="body-zone" data-zone="codo-d" data-label="Codo Derecho" data-panel="codo"
                 cx="42" cy="140" rx="11" ry="9" fill="rgba(57,255,122,0)" stroke="#333" stroke-width="1.5"/>
               <!-- Codo I -->
-              <ellipse id="z-codo-i" class="body-zone" data-zone="codo-i" data-label="Codo Izquierdo" data-panel="hombro"
+              <ellipse id="z-codo-i" class="body-zone" data-zone="codo-i" data-label="Codo Izquierdo" data-panel="codo"
                 cx="158" cy="140" rx="11" ry="9" fill="rgba(57,255,122,0)" stroke="#333" stroke-width="1.5"/>
               <!-- Lumbar (frente = abdomen/lumbar) -->
               <rect id="z-lumbar" class="body-zone" data-zone="lumbar" data-label="Lumbar" data-panel="lumbar"
                 x="80" y="132" width="40" height="32" rx="8" fill="rgba(57,255,122,0)" stroke="#333" stroke-width="1.5"/>
               <!-- Cadera D -->
+              <!-- Ingle D/I -->
+              <ellipse id="z-ingle-d" class="body-zone" data-zone="ingle-d" data-label="Ingle Derecha" data-panel="ingle"
+                cx="108" cy="205" rx="14" ry="10" fill="rgba(57,255,122,.04)" stroke="rgba(57,255,122,.15)" stroke-width="1"/>
+              <ellipse id="z-ingle-i" class="body-zone" data-zone="ingle-i" data-label="Ingle Izquierda" data-panel="ingle"
+                cx="82" cy="205" rx="14" ry="10" fill="rgba(57,255,122,.04)" stroke="rgba(57,255,122,.15)" stroke-width="1"/>
               <ellipse id="z-cadera-d" class="body-zone" data-zone="cadera-d" data-label="Cadera Derecha" data-panel="cadera"
                 cx="68" cy="178" rx="22" ry="16" fill="rgba(57,255,122,0)" stroke="#333" stroke-width="1.5"/>
               <!-- Cadera I -->
@@ -287,7 +292,7 @@
               <ellipse cx="128" cy="388" rx="15" ry="8" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
 
               <!-- ZONAS POSTERIORES -->
-              <ellipse id="z-cervical" class="body-zone" data-zone="cervical" data-label="Cervical" data-panel="lumbar"
+              <ellipse id="z-cervical" class="body-zone" data-zone="cervical" data-label="Cervical" data-panel="cervical"
                 cx="100" cy="58" rx="14" ry="8" fill="rgba(57,255,122,0)" stroke="#333" stroke-width="1.5"/>
               <rect id="z-dorsal" class="body-zone" data-zone="dorsal" data-label="Dorsal/Torácica" data-panel="lumbar"
                 x="82" y="82" width="36" height="40" rx="8" fill="rgba(57,255,122,0)" stroke="#333" stroke-width="1.5"/>
@@ -430,6 +435,19 @@
           🔬 Tests ortopédicos — <span id="kine-zona-label">seleccioná una zona</span>
         </div>
       </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;padding:12px;background:rgba(57,255,122,.03);border:1px solid rgba(57,255,122,.08);border-radius:12px">
+        <div style="width:100%;font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Acceso rapido por zona</div>
+        <button class="btn btn-ghost btn-sm" onclick="showKinePanel('hombro','Hombro')" style="font-size:10px">Hombro</button>
+        <button class="btn btn-ghost btn-sm" onclick="showKinePanel('codo','Codo')" style="font-size:10px">Codo</button>
+        <button class="btn btn-ghost btn-sm" onclick="showKinePanel('cervical','Cervical')" style="font-size:10px">Cervical</button>
+        <button class="btn btn-ghost btn-sm" onclick="showKinePanel('lumbar','Lumbar')" style="font-size:10px">Lumbar</button>
+        <button class="btn btn-ghost btn-sm" onclick="showKinePanel('cadera','Cadera')" style="font-size:10px">Cadera</button>
+        <button class="btn btn-sm" onclick="showKinePanel('ingle','Ingle Doha')" style="font-size:10px;background:rgba(255,176,32,.08);border:1px solid rgba(255,176,32,.2);color:#FFB020">Ingle/Doha</button>
+        <button class="btn btn-ghost btn-sm" onclick="showKinePanel('rodilla','Rodilla')" style="font-size:10px">Rodilla</button>
+        <button class="btn btn-ghost btn-sm" onclick="showKinePanel('patelo','Patelofemoral')" style="font-size:10px">Patelofemoral</button>
+        <button class="btn btn-ghost btn-sm" onclick="showKinePanel('tobillo','Tobillo')" style="font-size:10px">Tobillo</button>
+        <button class="btn btn-ghost btn-sm" onclick="showKinePanel('muneca','Muneca y Pie')" style="font-size:10px">Muneca / Pie</button>
+      </div>
 
       <!-- Panel hombro -->
       <div id="tests-panel-hombro" class="kine-panel hidden">
@@ -513,6 +531,95 @@
           <div class="card">
             <div class="card-header"><h3>ROM Cadera</h3><span class="tag tag-b">Act / Pas</span></div>
             <div class="card-body" id="tp-rom-cadera"></div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Panel ingle / Doha -->
+      <div id="tests-panel-ingle" class="kine-panel hidden">
+        <div class="grid-2" style="gap:12px">
+          <div class="card">
+            <div class="card-header"><h3>Consenso de Doha -- Aductores</h3><span class="tag tag-r">Ingle deportiva</span></div>
+            <div class="card-body" id="tp-doha-aductores"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Consenso de Doha -- Iliopsoas</h3><span class="tag tag-y">Ingle anterior</span></div>
+            <div class="card-body" id="tp-doha-psoas"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Consenso de Doha -- Inguinal</h3><span class="tag tag-b">Canal inguinal</span></div>
+            <div class="card-body" id="tp-doha-inguinal"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Tests complementarios</h3><span class="tag tag-g">Cadera / Pubis</span></div>
+            <div class="card-body" id="tp-doha-complementarios"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel cervical -->
+      <div id="tests-panel-cervical" class="kine-panel hidden">
+        <div class="grid-2" style="gap:12px">
+          <div class="card">
+            <div class="card-header"><h3>Tests neurales cervicales</h3><span class="tag tag-r">Neural / Compresion</span></div>
+            <div class="card-body" id="tp-cervical-neural"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Tests articulares</h3><span class="tag tag-y">Articular / Ligamentario</span></div>
+            <div class="card-body" id="tp-cervical-articular"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>ROM Cervical</h3><span class="tag tag-b">Goniometria</span></div>
+            <div class="card-body" id="tp-rom-cervical"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Tests musculares</h3><span class="tag tag-g">Fuerza / Estabilidad</span></div>
+            <div class="card-body" id="tp-cervical-muscular"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel codo -->
+      <div id="tests-panel-codo" class="kine-panel hidden">
+        <div class="grid-2" style="gap:12px">
+          <div class="card">
+            <div class="card-header"><h3>Epicondilalgia lateral</h3><span class="tag tag-r">Tenis / Lateral</span></div>
+            <div class="card-body" id="tp-codo-lateral"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Epicondilalgia medial</h3><span class="tag tag-y">Golfer / Medial</span></div>
+            <div class="card-body" id="tp-codo-medial"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Ligamentos codo</h3><span class="tag tag-b">Estabilidad</span></div>
+            <div class="card-body" id="tp-codo-ligamentos"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>ROM Codo</h3><span class="tag tag-b">Goniometria</span></div>
+            <div class="card-body" id="tp-rom-codo"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel patelofemoral / pie -->
+      <div id="tests-panel-patelo" class="kine-panel hidden">
+        <div class="grid-2" style="gap:12px">
+          <div class="card">
+            <div class="card-header"><h3>Articulacion patelofemoral</h3><span class="tag tag-y">Rotula</span></div>
+            <div class="card-body" id="tp-patelo"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Tendones rodilla</h3><span class="tag tag-r">Patelar / Cuadricipital</span></div>
+            <div class="card-body" id="tp-tendones-rodilla"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Pie y Aquiles</h3><span class="tag tag-b">Tendones / Fascia</span></div>
+            <div class="card-body" id="tp-pie"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Muñeca y mano</h3><span class="tag tag-g">Ligamentos / Tendones</span></div>
+            <div class="card-body" id="tp-muneca"></div>
           </div>
         </div>
       </div>
