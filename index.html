@@ -1671,5 +1671,85 @@
   </div>
 </div>
 
+
+<!-- Modal Video Jump -- reutilizable para todos los saltos verticales -->
+<div class="modal" id="modal-vj">
+  <div class="modal-sheet" style="max-width:520px">
+    <div class="modal-handle"></div>
+    <div class="flex-b mb-12">
+      <div class="modal-title" id="vj-modal-title" style="font-size:16px">Video Salto</div>
+      <select class="inp inp-mono" id="vj-fps" style="width:130px;font-size:11px">
+        <option value="30">30 FPS</option>
+        <option value="60" selected>60 FPS</option>
+        <option value="120">120 FPS</option>
+        <option value="240">240 FPS</option>
+      </select>
+    </div>
+
+    <!-- Upload area -->
+    <div id="vj-upload-area" style="border:2px dashed rgba(57,255,122,.2);border-radius:10px;padding:24px;text-align:center;cursor:pointer;margin-bottom:12px" onclick="document.getElementById('vj-file-inp').click()">
+      <div style="font-size:24px;margin-bottom:6px">🎬</div>
+      <div style="font-size:13px;font-weight:700;color:var(--neon)">Cargar video del salto</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:4px">Grabado con camara lenta recomendado (120+ FPS)</div>
+    </div>
+    <input type="file" id="vj-file-inp" accept="video/*" class="hidden" onchange="loadVJVideo(this)">
+
+    <!-- Player -->
+    <div id="vj-player-wrap" style="display:none">
+      <video id="vj-video" style="width:100%;border-radius:8px;background:#000;display:block;max-height:220px"></video>
+
+      <!-- Frame controls -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" onclick="vjJump(-10)" style="font-size:10px">-10</button>
+        <button class="btn btn-ghost btn-sm" onclick="vjJump(-1)" style="font-size:10px">-1</button>
+        <button class="btn btn-ghost btn-sm" onclick="vjTogglePlay()" id="vj-play-btn" style="padding:6px 14px;font-size:11px">Play</button>
+        <button class="btn btn-ghost btn-sm" onclick="vjJump(1)" style="font-size:10px">+1</button>
+        <button class="btn btn-ghost btn-sm" onclick="vjJump(10)" style="font-size:10px">+10</button>
+      </div>
+      <input type="range" id="vj-scrubber" min="0" max="1000" value="0" style="width:100%;margin-top:6px;accent-color:var(--neon)" oninput="vjScrub(this.value)">
+      <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--text2);margin-top:3px;padding:0 2px">
+        <span>Frame <span id="vj-frame-cur">0</span> / <span id="vj-frame-tot">0</span></span>
+        <span id="vj-time-cur">0.000s</span>
+      </div>
+    </div>
+
+    <!-- Markers -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+      <button class="btn btn-outline btn-full" onclick="vjMarkTakeoff()" id="vj-btn-takeoff" style="font-size:12px">
+        Marcar Despegue
+      </button>
+      <button class="btn btn-red btn-full" onclick="vjMarkLanding()" id="vj-btn-landing" style="font-size:12px;border-color:rgba(255,59,59,.3)">
+        Marcar Aterrizaje
+      </button>
+    </div>
+
+    <!-- Status -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+      <div style="background:var(--dark4);border-radius:8px;padding:8px 10px">
+        <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;margin-bottom:3px">Despegue</div>
+        <div id="vj-takeoff-disp" style="font-family:var(--mono);font-size:11px;color:var(--neon)">--</div>
+      </div>
+      <div style="background:var(--dark4);border-radius:8px;padding:8px 10px">
+        <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;margin-bottom:3px">Aterrizaje</div>
+        <div id="vj-landing-disp" style="font-family:var(--mono);font-size:11px;color:var(--red)">--</div>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div id="vj-result-area"></div>
+
+    <!-- Actions -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px">
+      <button class="btn btn-ghost btn-sm" onclick="vjClearMarkers()" style="font-size:11px">Limpiar</button>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-vj')" style="font-size:11px">Cancelar</button>
+      <button class="btn btn-neon btn-sm" onclick="confirmarVJResult()" style="font-size:11px">Confirmar Rep</button>
+    </div>
+
+    <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:8px;font-family:var(--mono)">
+      Formula: h = g*t²/8 · Fisica de caida libre
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
