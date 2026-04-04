@@ -270,9 +270,10 @@ function getLastEval(type) {
 //  GONIÓMETRO DIGITAL
 // ══════════════════════════════════════════════════════
 
-function iniciarGoniometro(testId, testNombre) {
+function iniciarGoniometro(testId, testNombre, anguloMaximo) {
   if (!cur) { alert('Seleccioná un atleta primero'); return; }
   testEnCurso = testId;
+  window.anguloMaxActual = anguloMaximo || 60;
   document.getElementById('goniometro-title').textContent = `📐 ${testNombre}`;
   goniometroActivo = true;
   goniometroCongelado = false;
@@ -284,13 +285,17 @@ function iniciarGoniometro(testId, testNombre) {
   document.getElementById('goniometro-angulo').textContent = '0.0';
   if (!goniometroCanvas) {
     goniometroCanvas = document.getElementById('goniometro-canvas');
-    if (goniometroCanvas) goniometroCtx = goniometroCanvas.getContext('2d');
+    if (goniometroCanvas) {
+      goniometroCanvas.width = 250;
+      goniometroCanvas.height = 250;
+      goniometroCtx = goniometroCanvas.getContext('2d');
+    }
   }
   dibujarGoniometro(0);
+  actualizarFlecha(0);
   solicitarPermisoSensor();
   openModal('modal-goniometro');
 }
-
 function solicitarPermisoSensor() {
   if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
     document.getElementById('goniometro-estado').innerHTML = '⚠️ Toca para activar sensor';
@@ -310,13 +315,13 @@ function solicitarPermisoSensor() {
     document.getElementById('goniometro-estado').innerHTML = '🟢 Sensor activo';
   }
 }
-
-function manejarOrientacion(event) {
+ function manejarOrientacion(event) {
   if (!goniometroActivo) return;
   let angulo = event.beta || 0;
   if (!calibrado) { anguloOffset = angulo; calibrado = true; }
   angulo = angulo - anguloOffset;
-  angulo = Math.max(-30, Math.min(60, angulo));
+  const maximo = window.anguloMaxActual || 60;
+  angulo = Math.max(-10, Math.min(maximo, angulo));
   if (!goniometroCongelado) {
     anguloActual = Math.round(angulo * 10) / 10;
     document.getElementById('goniometro-angulo').textContent = anguloActual.toFixed(1);
@@ -350,7 +355,9 @@ function dibujarGoniometro(angulo) {
   ctx.strokeStyle = 'rgba(57,255,122,.4)';
   ctx.lineWidth = 2;
   ctx.stroke();
-  for (let i = -30; i <= 60; i += 5) {
+  
+  const maximo = window.anguloMaxActual || 60;
+  for (let i = 0; i <= maximo; i += 10) {
     const rad = (i * Math.PI) / 180;
     const esPrincipal = i % 10 === 0;
     const largo = esPrincipal ? 12 : 6;
@@ -414,7 +421,15 @@ function confirmarGoniometro() {
   const anguloFinal = goniometroCongelado ? anguloCongelado : anguloActual;
   const mapeo = {
     'tobillo-d': { campo: 'lungeD', inputId: 'lunge-d' },
-    'tobillo-i': { campo: 'lungeI', inputId: 'lunge-i' }
+    'tobillo-i': { campo: 'lungeI', inputId: 'lunge-i' },
+    'cadera-ri-d': { campo: 'cadRiD', inputId: 'cad-ri-d' },
+    'cadera-re-d': { campo: 'cadReD', inputId: 'cad-re-d' },
+    'cadera-ri-i': { campo: 'cadRiI', inputId: 'cad-ri-i' },
+    'cadera-re-i': { campo: 'cadReI', inputId: 'cad-re-i' },
+    'hombro-ri-d': { campo: 'homRiD', inputId: 'hom-ri-d' },
+    'hombro-re-d': { campo: 'homReD', inputId: 'hom-re-d' },
+    'hombro-ri-i': { campo: 'homRiI', inputId: 'hom-ri-i' },
+    'hombro-re-i': { campo: 'homReI', inputId: 'hom-re-i' }
   };
   const testInfo = mapeo[testEnCurso];
   if (testInfo) {
