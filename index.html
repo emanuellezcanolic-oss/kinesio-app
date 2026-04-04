@@ -707,6 +707,132 @@
       </div>
       <div class="card-body" id="simetrias-tabla" style="overflow-x:auto"></div>
     </div>
+
+    <!-- ANALIZADOR DE VALGO DE RODILLA -->
+    <div class="card mt-16">
+      <div class="card-header">
+        <h3>Analisis de Valgo de Rodilla</h3>
+        <span class="tag tag-r">Evaluacion de angulo</span>
+      </div>
+      <div class="card-body">
+        <div class="grid-2" style="gap:18px;align-items:start">
+          <!-- VIDEO -->
+          <div>
+            <div class="ig">
+              <label class="il">Test a analizar</label>
+              <select class="inp" id="valgo-test-type" style="font-size:12px">
+                <option value="CMJ bilateral">CMJ Bilateral</option>
+                <option value="DJ bilateral">Drop Jump Bilateral</option>
+                <option value="CMJ unilateral D">CMJ Unilateral Derecha</option>
+                <option value="CMJ unilateral I">CMJ Unilateral Izquierda</option>
+                <option value="DJ unilateral D">DJ Unilateral Derecha</option>
+                <option value="DJ unilateral I">DJ Unilateral Izquierda</option>
+                <option value="Single Leg Squat D">Single Leg Squat Derecha</option>
+                <option value="Single Leg Squat I">Single Leg Squat Izquierda</option>
+              </select>
+            </div>
+            <div id="valgo-upload-area" style="border:2px dashed rgba(57,255,122,.2);border-radius:10px;padding:24px;text-align:center;cursor:pointer;margin-bottom:10px" onclick="document.getElementById('valgo-file-inp').click()">
+              <div style="font-size:24px;margin-bottom:6px">🎬</div>
+              <div style="font-size:13px;font-weight:700;color:var(--neon)">Cargar video frontal</div>
+              <div style="font-size:11px;color:var(--text2);margin-top:4px">Camara frontal -- se deben ver ambas rodillas</div>
+            </div>
+            <input type="file" id="valgo-file-inp" accept="video/*" class="hidden" onchange="loadValgoVideo(this)">
+            <div id="valgo-player-wrap" style="display:none">
+              <div style="position:relative;width:100%;display:block">
+                <video id="valgo-video" style="width:100%;display:block;border-radius:8px;background:#000" preload="metadata"></video>
+                <canvas id="valgo-canvas" style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:8px;cursor:crosshair"></canvas>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px">
+                <button class="btn btn-ghost btn-sm" onclick="valgoJump(-10)" style="font-size:10px">-10</button>
+                <button class="btn btn-ghost btn-sm" onclick="valgoJump(-1)" style="font-size:10px">-1</button>
+                <button class="btn btn-ghost btn-sm" onclick="valgoTogglePlay()" id="valgo-play-btn" style="padding:6px 16px;font-size:11px">Play</button>
+                <button class="btn btn-ghost btn-sm" onclick="valgoJump(1)" style="font-size:10px">+1</button>
+                <button class="btn btn-ghost btn-sm" onclick="valgoJump(10)" style="font-size:10px">+10</button>
+              </div>
+              <input type="range" id="valgo-scrubber" min="0" max="1000" value="0" style="width:100%;margin-top:6px;accent-color:var(--neon)" oninput="valgoScrub(this.value)">
+              <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--text2);margin-top:2px">
+                <span>Frame <span id="valgo-frame-cur">0</span> / <span id="valgo-frame-tot">0</span></span>
+                <span id="valgo-time-cur">0.000s</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+                <label style="font-family:var(--mono);font-size:9px;color:var(--text2);text-transform:uppercase;white-space:nowrap">FPS</label>
+                <div style="display:flex;gap:4px" id="valgo-fps-btns">
+                  <button class="btn btn-neon btn-sm" onclick="setValgoFps(30,this)" style="font-size:10px;padding:4px 10px">30</button>
+                  <button class="btn btn-ghost btn-sm" onclick="setValgoFps(60,this)" style="font-size:10px;padding:4px 10px">60</button>
+                  <button class="btn btn-ghost btn-sm" onclick="setValgoFps(120,this)" style="font-size:10px;padding:4px 10px">120</button>
+                  <button class="btn btn-ghost btn-sm" onclick="setValgoFps(240,this)" style="font-size:10px;padding:4px 10px">240</button>
+                </div>
+                <input type="hidden" id="valgo-fps" value="30">
+              </div>
+            </div>
+          </div>
+
+          <!-- HERRAMIENTAS -->
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="card">
+              <div class="card-header"><h3>Herramienta de medicion</h3></div>
+              <div class="card-body">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
+                  <button class="btn btn-outline btn-full btn-sm" id="valgo-btn-linea1" onclick="setValgoMode('linea1')" style="font-size:11px">Linea 1 -- Femur</button>
+                  <button class="btn btn-ghost btn-full btn-sm" id="valgo-btn-linea2" onclick="setValgoMode('linea2')" style="font-size:11px">Linea 2 -- Tibia</button>
+                </div>
+                <div id="valgo-mode-info" style="font-size:11px;color:var(--text2);line-height:1.7;padding:8px;background:rgba(255,255,255,.02);border-radius:8px;margin-bottom:10px">
+                  1. Congela el frame en el momento de mayor valgo<br>
+                  2. Selecciona Linea 1 y traza el eje del femur (2 puntos)<br>
+                  3. Selecciona Linea 2 y traza el eje de la tibia (2 puntos)<br>
+                  4. El angulo se calcula automaticamente
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
+                  <button class="btn btn-ghost btn-sm" onclick="clearValgoLines()" style="font-size:11px">Limpiar</button>
+                  <button class="btn btn-ghost btn-sm" onclick="undoValgoPoint()" style="font-size:11px">Deshacer</button>
+                </div>
+                <div class="ig">
+                  <label class="il">Color de lineas</label>
+                  <div style="display:flex;gap:6px;align-items:center">
+                    <div style="width:26px;height:26px;border-radius:6px;background:#39FF7A;cursor:pointer;border:2px solid #fff" onclick="setValgoColor('#39FF7A',this)" id="vc-1"></div>
+                    <div style="width:26px;height:26px;border-radius:6px;background:#FF4444;cursor:pointer" onclick="setValgoColor('#FF4444',this)" id="vc-2"></div>
+                    <div style="width:26px;height:26px;border-radius:6px;background:#4D9EFF;cursor:pointer" onclick="setValgoColor('#4D9EFF',this)" id="vc-3"></div>
+                    <div style="width:26px;height:26px;border-radius:6px;background:#FFB020;cursor:pointer" onclick="setValgoColor('#FFB020',this)" id="vc-4"></div>
+                    <div style="width:26px;height:26px;border-radius:6px;background:#fff;cursor:pointer;border:1px solid #444" onclick="setValgoColor('#ffffff',this)" id="vc-5"></div>
+                    <span style="font-family:var(--mono);font-size:9px;color:var(--text2)">Grosor:</span>
+                    <input type="range" id="valgo-line-width" min="1" max="6" value="2" style="flex:1;accent-color:var(--neon)" oninput="redrawValgoCanvas()">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RESULTADO -->
+            <div class="card card-glow" id="valgo-result-card" style="display:none">
+              <div class="card-header"><h3>Angulo de Valgo</h3><span id="valgo-result-badge" class="tag"></span></div>
+              <div class="card-body" style="text-align:center;padding:16px">
+                <div style="font-family:var(--mono);font-size:9px;color:var(--text2);text-transform:uppercase;margin-bottom:6px">Angulo medido</div>
+                <div id="valgo-angle-display" style="font-family:var(--mono);font-size:52px;font-weight:800;color:var(--neon);line-height:1">--</div>
+                <div style="font-size:13px;color:var(--text2);margin-top:4px">grados</div>
+                <div id="valgo-interp" style="margin-top:10px;font-size:12px;line-height:1.7"></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+                  <button class="btn btn-outline btn-sm" onclick="saveValgoResult()" style="font-size:11px">Guardar</button>
+                  <button class="btn btn-ghost btn-sm" onclick="captureValgoImage()" style="font-size:11px">Captura</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Referencias -->
+            <div class="card">
+              <div class="card-header"><h3>Referencia clinica</h3></div>
+              <div class="card-body" style="font-size:11px;color:var(--text2);line-height:2.2">
+                <div style="display:grid;grid-template-columns:auto 1fr;gap:2px 10px">
+                  <span style="font-family:var(--mono);color:var(--neon)">&lt; 5deg</span><span>Normal -- sin valgo significativo</span>
+                  <span style="font-family:var(--mono);color:var(--amber)">5 - 10deg</span><span>Valgo leve -- monitorear</span>
+                  <span style="font-family:var(--mono);color:var(--red)">&gt; 10deg</span><span>Valgo critico -- riesgo LCA</span>
+                </div>
+                <div style="margin-top:8px;font-size:9px;color:var(--text3);font-family:var(--mono)">Ref: Sigward &amp; Powers 2006 · Hewett et al. 2005</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- ══ TAB: MOVILIDAD ══ -->
