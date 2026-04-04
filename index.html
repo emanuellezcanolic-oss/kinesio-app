@@ -1676,14 +1676,31 @@
 <div class="modal" id="modal-vj">
   <div class="modal-sheet" style="max-width:520px">
     <div class="modal-handle"></div>
-    <div class="flex-b mb-12">
-      <div class="modal-title" id="vj-modal-title" style="font-size:16px">Video Salto</div>
-      <select class="inp inp-mono" id="vj-fps" style="width:130px;font-size:11px">
-        <option value="30">30 FPS</option>
-        <option value="60" selected>60 FPS</option>
-        <option value="120">120 FPS</option>
-        <option value="240">240 FPS</option>
-      </select>
+    <div class="mb-12">
+      <div class="modal-title" id="vj-modal-title" style="font-size:16px;margin-bottom:10px">Video Salto</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div>
+          <label style="font-family:var(--mono);font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:4px">FPS de grabacion</label>
+          <select class="inp inp-mono" id="vj-fps-grab" style="font-size:11px" onchange="vjUpdateFpsInfo()">
+            <option value="30">30 FPS -- normal</option>
+            <option value="60">60 FPS -- iPhone normal</option>
+            <option value="120">120 FPS -- slow mo</option>
+            <option value="240" selected>240 FPS -- slow mo</option>
+            <option value="480">480 FPS -- super slow</option>
+            <option value="960">960 FPS -- ultra slow</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-family:var(--mono);font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:4px">FPS de reproduccion</label>
+          <select class="inp inp-mono" id="vj-fps-repro" style="font-size:11px" onchange="vjUpdateFpsInfo()">
+            <option value="30" selected>30 FPS -- estandar</option>
+            <option value="60">60 FPS</option>
+          </select>
+        </div>
+      </div>
+      <div id="vj-fps-info" style="font-family:var(--mono);font-size:9px;color:var(--neon);margin-top:6px;padding:5px 8px;background:rgba(57,255,122,.05);border-radius:6px">
+        Factor de correccion: 8x -- cada segundo de video = 0.125s real
+      </div>
     </div>
 
     <!-- Upload area -->
