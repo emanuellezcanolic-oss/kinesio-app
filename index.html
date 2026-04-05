@@ -2047,5 +2047,646 @@
   </div>
 </div>
 
+
+<!-- ══════════════════════════════════════════════ -->
+<!--   SHEETS CLÍNICOS — se abren desde Body Chart  -->
+<!-- ══════════════════════════════════════════════ -->
+
+<!-- SHEET: HOMBRO -->
+<div class="modal" id="sheet-hombro">
+  <div class="modal-sheet" style="max-width:600px">
+    <div class="modal-handle"></div>
+    <div class="flex-b mb-12">
+      <div><div class="modal-title" style="font-size:18px">💪 Hombro</div>
+        <div style="font-size:12px;color:var(--text2)">RC Tendinopatía · CPG 2025 · Desmeules et al.</div></div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('sheet-hombro')">✕</button>
+    </div>
+
+    <!-- Tab strip -->
+    <div style="display:flex;gap:3px;background:var(--bg4);border-radius:8px;padding:3px;margin-bottom:16px;overflow-x:auto">
+      <button class="btn btn-neon btn-sm" id="htab-obs-btn" onclick="showHTab('obs',this)" style="white-space:nowrap;font-size:10px">Observación</button>
+      <button class="btn btn-ghost btn-sm" id="htab-rom-btn" onclick="showHTab('rom',this)" style="white-space:nowrap;font-size:10px">ROM</button>
+      <button class="btn btn-ghost btn-sm" id="htab-tests-btn" onclick="showHTab('tests',this)" style="white-space:nowrap;font-size:10px">Tests</button>
+      <button class="btn btn-ghost btn-sm" id="htab-fuerza-btn" onclick="showHTab('fuerza',this)" style="white-space:nowrap;font-size:10px">Fuerza</button>
+      <button class="btn btn-ghost btn-sm" id="htab-cuest-btn" onclick="showHTab('cuest',this)" style="white-space:nowrap;font-size:10px">Escalas</button>
+    </div>
+
+    <!-- TAB: OBSERVACIÓN -->
+    <div id="htab-obs">
+      <!-- Banderas rojas CPG 2025 -->
+      <div class="card card-danger mb-12">
+        <div class="card-header"><h3 style="color:var(--red)">🚨 Banderas rojas (CPG 2025 Rec.#3)</h3></div>
+        <div class="card-body">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <label style="display:flex;align-items:center;justify-content:space-between;font-size:12px">Deformidad sospechosa<input type="checkbox" class="hombro-redflag" style="accent-color:var(--red);width:18px;height:18px" onchange="checkHombroRedFlags()"></label>
+            <label style="display:flex;align-items:center;justify-content:space-between;font-size:12px">Fiebre / escalofríos<input type="checkbox" class="hombro-redflag" style="accent-color:var(--red);width:18px;height:18px" onchange="checkHombroRedFlags()"></label>
+            <label style="display:flex;align-items:center;justify-content:space-between;font-size:12px">Síntomas cardiovasculares / viscerales<input type="checkbox" class="hombro-redflag" style="accent-color:var(--red);width:18px;height:18px" onchange="checkHombroRedFlags()"></label>
+            <label style="display:flex;align-items:center;justify-content:space-between;font-size:12px">Antecedentes o sospecha de cáncer<input type="checkbox" class="hombro-redflag" style="accent-color:var(--red);width:18px;height:18px" onchange="checkHombroRedFlags()"></label>
+          </div>
+          <div id="hombro-redflag-alert" style="display:none;margin-top:10px;padding:10px;background:var(--red);border-radius:8px;color:#000;font-weight:700;font-size:12px">
+            ⚠️ BANDERA ROJA ACTIVA — Derivar a especialista médico
+          </div>
+        </div>
+      </div>
+      <!-- Factores pronósticos -->
+      <div class="card mb-12" style="border-color:rgba(255,176,32,.25)">
+        <div class="card-header"><h3 style="color:var(--amber)">⚠️ Factores pronósticos (CPG 2025 Rec.#4)</h3></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:8px">
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:12px">Edad &gt;50 años (OR=3.8 cronicidad)<input type="checkbox" style="accent-color:var(--amber);width:18px;height:18px"></label>
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:12px">Duración prolongada de síntomas<input type="checkbox" style="accent-color:var(--amber);width:18px;height:18px"></label>
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:12px">Alta intensidad de dolor<input type="checkbox" style="accent-color:var(--amber);width:18px;height:18px"></label>
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:12px">Factores psicosociales (kinesiofobia)<input type="checkbox" style="accent-color:var(--amber);width:18px;height:18px"></label>
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:12px">Demandas laborales elevadas (&gt;90° repetitivo)<input type="checkbox" style="accent-color:var(--amber);width:18px;height:18px"></label>
+        </div>
+      </div>
+      <!-- Atrofia -->
+      <div class="card">
+        <div class="card-header"><h3>Atrofia muscular</h3></div>
+        <div class="card-body">
+          <div class="grid-2" style="gap:8px">
+            <div class="ig"><label class="il">Derecho</label>
+              <select class="inp" style="font-size:12px"><option>Sin atrofia</option><option>Leve</option><option>Moderada</option><option>Marcada</option></select></div>
+            <div class="ig"><label class="il">Izquierdo</label>
+              <select class="inp" style="font-size:12px"><option>Sin atrofia</option><option>Leve</option><option>Moderada</option><option>Marcada</option></select></div>
+          </div>
+          <div class="ig mt-8"><label class="il">Observaciones</label>
+            <textarea class="inp" rows="2" placeholder="Postura escapular, alineación, asimetría..."></textarea></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: ROM -->
+    <div id="htab-rom" style="display:none">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:10px;padding:8px;background:rgba(77,158,255,.08);border-radius:8px">
+        CPG 2025 Rec.#6 — MDC activo: 8–23° · MDC pasivo: 3–21°
+      </div>
+      <div id="hombro-rom-fields"></div>
+      <div class="card mt-12">
+        <div class="card-header"><h3>GIRD — Déficit rotación interna glenohumeral</h3></div>
+        <div class="card-body">
+          <div class="grid-2" style="gap:8px">
+            <div><div class="il mb-4">TROM D (RI+RE)</div><div id="hombro-trom-d" style="font-family:var(--mono);font-size:20px;color:var(--text2)">—</div></div>
+            <div><div class="il mb-4">TROM I (RI+RE)</div><div id="hombro-trom-i" style="font-family:var(--mono);font-size:20px;color:var(--text2)">—</div></div>
+          </div>
+          <div id="hombro-gird-result" style="font-size:12px;color:var(--text3);margin-top:8px">GIRD: completar RI y RE para calcular</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: TESTS PROVOCATIVOS -->
+    <div id="htab-tests" style="display:none">
+      <!-- Painful arc -->
+      <div class="card mb-10">
+        <div class="card-header"><h3>Arco doloroso (Painful arc)</h3><span class="tag tag-r">Confirmar RC · LR+ 3.44</span></div>
+        <div class="card-body">
+          <div class="grid-2" style="gap:10px">
+            <div><div class="il mb-4">D</div><div style="display:flex;gap:6px"><button class="ot-btn" onclick="toggleOT(this,'pos')">+ POS</button><button class="ot-btn" onclick="toggleOT(this,'neg')">– NEG</button></div>
+              <div class="ig mt-8"><label class="il">Rango dolor D (°)</label>
+                <div style="display:flex;gap:6px"><input class="inp inp-mono" type="number" placeholder="desde" style="flex:1"><span style="align-self:center;color:var(--text3)">–</span><input class="inp inp-mono" type="number" placeholder="hasta" style="flex:1"></div></div>
+              <div class="ig"><label class="il">EVA D</label><input type="range" class="eva-slider" min="0" max="10" value="0" oninput="this.nextElementSibling.textContent=this.value"><span class="il" style="text-align:center;display:block">0</span></div>
+            </div>
+            <div><div class="il mb-4">I</div><div style="display:flex;gap:6px"><button class="ot-btn" onclick="toggleOT(this,'pos')">+ POS</button><button class="ot-btn" onclick="toggleOT(this,'neg')">– NEG</button></div>
+              <div class="ig mt-8"><label class="il">Rango dolor I (°)</label>
+                <div style="display:flex;gap:6px"><input class="inp inp-mono" type="number" placeholder="desde" style="flex:1"><span style="align-self:center;color:var(--text3)">–</span><input class="inp inp-mono" type="number" placeholder="hasta" style="flex:1"></div></div>
+              <div class="ig"><label class="il">EVA I</label><input type="range" class="eva-slider" min="0" max="10" value="0" oninput="this.nextElementSibling.textContent=this.value"><span class="il" style="text-align:center;display:block">0</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Tests rápidos -->
+      <div id="hombro-tests-rapidos"></div>
+      <!-- Drop Catches / Ball Taps -->
+      <div class="card">
+        <div class="card-header"><h3>Tests de rendimiento hombro</h3><span class="tag tag-b">Funcional</span></div>
+        <div class="card-body">
+          <div class="grid-2" style="gap:10px">
+            <div class="ig"><label class="il">Drop Catches D (capturas/intentos)</label>
+              <div style="display:flex;gap:6px"><input class="inp inp-mono" type="number" placeholder="cap." style="flex:1"><span style="align-self:center;color:var(--text3)">/</span><input class="inp inp-mono" type="number" placeholder="int." style="flex:1"></div></div>
+            <div class="ig"><label class="il">Drop Catches I</label>
+              <div style="display:flex;gap:6px"><input class="inp inp-mono" type="number" placeholder="cap." style="flex:1"><span style="align-self:center;color:var(--text3)">/</span><input class="inp inp-mono" type="number" placeholder="int." style="flex:1"></div></div>
+            <div class="ig"><label class="il">Ball Taps 30s D</label><input class="inp inp-mono" type="number" placeholder="golpes"></div>
+            <div class="ig"><label class="il">Ball Taps 30s I</label><input class="inp inp-mono" type="number" placeholder="golpes"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: FUERZA -->
+    <div id="htab-fuerza" style="display:none">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:10px;padding:8px;background:rgba(77,158,255,.08);border-radius:8px">
+        CPG 2025 Rec.#7 — HHD Valkyria/PushPull. MDC: 15–20%. Medir en ángulo estandarizado.
+      </div>
+      <div id="hombro-fuerza-fields"></div>
+      <div id="hombro-asimetria-result" style="font-size:12px;color:var(--text3)">Completá valores para calcular asimetría</div>
+    </div>
+
+    <!-- TAB: ESCALAS -->
+    <div id="htab-cuest" style="display:none">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:12px;padding:8px;background:rgba(57,255,122,.05);border-radius:8px">
+        CPG 2025 Rec.#8 — Cuestionarios obligatorios. Usá MCID para interpretar cambio clínico.
+      </div>
+      <!-- ASES -->
+      <div class="card mb-10" style="border-color:rgba(167,139,250,.2)">
+        <div class="card-header" style="cursor:pointer" onclick="toggleSheetSection('ases-body')">
+          <h3>ASES Score</h3><span class="tag" style="background:rgba(167,139,250,.15);color:#A78BFA">0–100 · MCID 6.4–21.9</span>
+        </div>
+        <div id="ases-body" style="display:none">
+          <div class="card-body">
+            <div class="ig"><label class="il">Dolor (VAS 0–10)</label>
+              <input type="range" class="eva-slider" min="0" max="10" value="0" oninput="document.getElementById('ases-dolor-val').textContent=this.value;calcASES()">
+              <div id="ases-dolor-val" style="font-family:var(--mono);font-size:20px;text-align:center;color:var(--neon)">0</div></div>
+            <div class="il mb-8">Función — 10 actividades (0=Imposible · 3=Sin dificultad)</div>
+            <div id="ases-actividades-list"></div>
+            <div class="card mt-10" style="border-color:rgba(167,139,250,.3)">
+              <div class="card-body" style="display:flex;justify-content:space-between;align-items:center">
+                <div><div style="font-size:12px;font-weight:600">Score ASES total</div><div style="font-size:10px;color:var(--text2)">MCID: 6.4–21.9 pts</div></div>
+                <div id="ases-total" style="font-family:var(--mono);font-size:28px;font-weight:800;color:var(--neon)">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- WORC -->
+      <div class="card mb-10" style="border-color:rgba(167,139,250,.2)">
+        <div class="card-header" style="cursor:pointer" onclick="toggleSheetSection('worc-body')">
+          <h3>WORC Index</h3><span class="tag" style="background:rgba(167,139,250,.15);color:#A78BFA">0–2100 · MCID 245.3</span>
+        </div>
+        <div id="worc-body" style="display:none">
+          <div class="card-body">
+            <div style="font-size:11px;color:var(--text2);margin-bottom:10px">Versión española validada — Arcuri et al. 2015 (Argentina). 0 = mejor.</div>
+            <div id="worc-fields-sheet"></div>
+            <div class="card mt-10" style="border-color:rgba(167,139,250,.3)">
+              <div class="card-body" style="display:flex;justify-content:space-between;align-items:center">
+                <div><div style="font-size:12px;font-weight:600">WORC total</div><div style="font-size:10px;color:var(--text2)">MCID: 245.3 pts · 0 = asintomático</div></div>
+                <div><div id="worc-total-sheet" style="font-family:var(--mono);font-size:28px;font-weight:800;color:var(--neon)">—</div>
+                <div id="worc-pct-sheet" style="font-size:10px;color:var(--text3);text-align:right"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- DASH -->
+      <div class="card mb-10" style="border-color:rgba(167,139,250,.2)">
+        <div class="card-header" style="cursor:pointer" onclick="toggleSheetSection('dash-body')">
+          <h3>DASH / QuickDASH</h3><span class="tag" style="background:rgba(167,139,250,.15);color:#A78BFA">0–100 · MCID 10.2</span>
+        </div>
+        <div id="dash-body" style="display:none">
+          <div class="card-body">
+            <div style="font-size:10px;color:var(--text3);margin-bottom:10px">1=Sin dificultad · 2=Poca · 3=Moderada · 4=Mucha · 5=Imposible</div>
+            <div id="dash-fields-sheet"></div>
+            <div class="card mt-10" style="border-color:rgba(167,139,250,.3)">
+              <div class="card-body" style="display:flex;justify-content:space-between;align-items:center">
+                <div><div style="font-size:12px;font-weight:600">Score DASH</div><div style="font-size:10px;color:var(--text2)">MCID: 10.2 pts</div></div>
+                <div id="dash-total-sheet" style="font-family:var(--mono);font-size:28px;font-weight:800;color:var(--neon)">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- SPADI -->
+      <div class="card" style="border-color:rgba(167,139,250,.2)">
+        <div class="card-header" style="cursor:pointer" onclick="toggleSheetSection('spadi-body')">
+          <h3>SPADI</h3><span class="tag" style="background:rgba(167,139,250,.15);color:#A78BFA">0–100 · MCID 8</span>
+        </div>
+        <div id="spadi-body" style="display:none">
+          <div class="card-body">
+            <div class="ig"><label class="il">Dolor promedio 5 ítems (0–100)</label>
+              <input type="range" class="eva-slider" min="0" max="100" value="0" oninput="this.nextElementSibling.textContent=this.value;calcSPADI()">
+              <div style="font-family:var(--mono);font-size:18px;text-align:center;color:var(--amber)">0</div></div>
+            <div class="ig"><label class="il">Discapacidad promedio 8 ítems (0–100)</label>
+              <input type="range" class="eva-slider" min="0" max="100" value="0" oninput="this.nextElementSibling.textContent=this.value;calcSPADI()">
+              <div style="font-family:var(--mono);font-size:18px;text-align:center;color:var(--amber)">0</div></div>
+            <div class="card mt-10" style="border-color:rgba(167,139,250,.3)">
+              <div class="card-body" style="display:flex;justify-content:space-between;align-items:center">
+                <div><div style="font-size:12px;font-weight:600">SPADI total</div><div style="font-size:10px;color:var(--text2)">0 = mejor · MCID: 8 pts</div></div>
+                <div id="spadi-total" style="font-family:var(--mono);font-size:28px;font-weight:800;color:var(--neon)">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <button class="btn btn-neon btn-full" onclick="saveKlinicalSheet('hombro');closeModal('sheet-hombro')">💾 Guardar evaluación hombro</button>
+  </div>
+</div>
+
+<!-- SHEET: RODILLA -->
+<div class="modal" id="sheet-rodilla">
+  <div class="modal-sheet" style="max-width:600px">
+    <div class="modal-handle"></div>
+    <div class="flex-b mb-12">
+      <div><div class="modal-title" style="font-size:18px">🦵 Rodilla</div>
+        <div style="font-size:12px;color:var(--text2)">LCA · LLI · LLE · Menisco · SPF · RTP</div></div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('sheet-rodilla')">✕</button>
+    </div>
+    <!-- Tab strip -->
+    <div style="display:flex;gap:3px;background:var(--bg4);border-radius:8px;padding:3px;margin-bottom:16px;overflow-x:auto">
+      <button class="btn btn-neon btn-sm" id="rtab-spf-btn" onclick="showRTab('spf',this)" style="white-space:nowrap;font-size:10px">SPF</button>
+      <button class="btn btn-ghost btn-sm" id="rtab-lca-btn" onclick="showRTab('lca',this)" style="white-space:nowrap;font-size:10px">LCA</button>
+      <button class="btn btn-ghost btn-sm" id="rtab-lig-btn" onclick="showRTab('lig',this)" style="white-space:nowrap;font-size:10px">LLI/LLE</button>
+      <button class="btn btn-ghost btn-sm" id="rtab-men-btn" onclick="showRTab('men',this)" style="white-space:nowrap;font-size:10px">Menisco</button>
+      <button class="btn btn-ghost btn-sm" id="rtab-cuest-btn" onclick="showRTab('cuest',this)" style="white-space:nowrap;font-size:10px">Escalas</button>
+      <button class="btn btn-ghost btn-sm" id="rtab-rtp-btn" onclick="showRTab('rtp',this)" style="white-space:nowrap;font-size:10px">RTP</button>
+    </div>
+
+    <!-- SPF -->
+    <div id="rtab-spf">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:10px;padding:8px;background:rgba(77,158,255,.08);border-radius:8px">Powers et al. 2017 — Complementar con ROM tobillo, cadera, HHD, Drop navicular, Ratio I/Q</div>
+      <div id="rodilla-spf-fields"></div>
+      <!-- Drop Navicular -->
+      <div class="card mt-10">
+        <div class="card-header"><h3>Drop Navicular</h3><span class="tag tag-b">Pronación &gt;10mm = excesiva</span></div>
+        <div class="card-body">
+          <div class="grid-2" style="gap:8px">
+            <div class="ig"><label class="il">Descarga D (mm)</label><input class="inp inp-mono" type="number" id="nav-desc-d" placeholder="0"></div>
+            <div class="ig"><label class="il">Carga D (mm)</label><input class="inp inp-mono" type="number" id="nav-carg-d" placeholder="0" oninput="calcDropNavicular('d')"></div>
+          </div>
+          <div id="nav-result-d" style="font-size:11px;color:var(--text3);margin-bottom:8px">Drop D: —</div>
+          <div class="grid-2" style="gap:8px">
+            <div class="ig"><label class="il">Descarga I (mm)</label><input class="inp inp-mono" type="number" id="nav-desc-i" placeholder="0"></div>
+            <div class="ig"><label class="il">Carga I (mm)</label><input class="inp inp-mono" type="number" id="nav-carg-i" placeholder="0" oninput="calcDropNavicular('i')"></div>
+          </div>
+          <div id="nav-result-i" style="font-size:11px;color:var(--text3)">Drop I: —</div>
+        </div>
+      </div>
+      <!-- Cadencia corredores -->
+      <div class="card mt-10" style="border-color:rgba(77,158,255,.2)">
+        <div class="card-header"><h3 style="color:var(--blue)">🏃 Control de cadencia (corredores)</h3></div>
+        <div class="card-body">
+          <div style="font-size:11px;color:var(--text2);margin-bottom:8px">Rango óptimo: 170–180 pasos/min. Modificación sugerida: +5% o +10%.</div>
+          <div class="ig"><label class="il">Cadencia actual (pasos/min)</label>
+            <input class="inp inp-mono" type="number" id="cadencia-actual" placeholder="160" oninput="calcCadencia()"></div>
+          <div id="cadencia-result" style="font-size:12px;color:var(--text3)">Completá para ver recomendación</div>
+          <div class="grid-2" style="gap:8px;margin-top:8px">
+            <div class="ig"><label class="il">Ritmo captura (min/km)</label><input class="inp inp-mono" type="text" placeholder="5:30"></div>
+            <div class="ig"><label class="il">Overstriding (cm)</label><input class="inp inp-mono" type="number" placeholder="15"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LCA -->
+    <div id="rtab-lca" style="display:none">
+      <div id="rodilla-lca-fields"></div>
+      <!-- Ratio I/Q -->
+      <div class="card mt-10">
+        <div class="card-header"><h3>Ratio Isquiotibiales / Cuádriceps</h3><span class="tag tag-b">&gt;0.60 = funcional</span></div>
+        <div class="card-body">
+          <div style="font-size:11px;color:var(--text2);margin-bottom:8px">HHD Valkyria — extensión 60° y flexión 20°</div>
+          <div class="grid-2" style="gap:8px">
+            <div class="ig"><label class="il">Cuádriceps D (N)</label><input class="inp inp-mono" type="number" id="cuad-d" placeholder="0" oninput="calcRatioIQ('d')"></div>
+            <div class="ig"><label class="il">Isquiotib. D (N)</label><input class="inp inp-mono" type="number" id="isq-d" placeholder="0" oninput="calcRatioIQ('d')"></div>
+          </div>
+          <div id="ratio-iq-d" style="font-size:12px;color:var(--text3);margin-bottom:8px">Ratio D: —</div>
+          <div class="grid-2" style="gap:8px">
+            <div class="ig"><label class="il">Cuádriceps I (N)</label><input class="inp inp-mono" type="number" id="cuad-i" placeholder="0" oninput="calcRatioIQ('i')"></div>
+            <div class="ig"><label class="il">Isquiotib. I (N)</label><input class="inp inp-mono" type="number" id="isq-i" placeholder="0" oninput="calcRatioIQ('i')"></div>
+          </div>
+          <div id="ratio-iq-i" style="font-size:12px;color:var(--text3)">Ratio I: —</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LLI/LLE -->
+    <div id="rtab-lig" style="display:none">
+      <div class="card mb-10">
+        <div class="card-header"><h3>Stress en valgo — LLI</h3><span class="tag tag-r">Estabilidad</span></div>
+        <div class="card-body">
+          <div class="grid-2" style="gap:8px">
+            <div><div class="il mb-4">D (0°)</div><div style="display:flex;gap:6px"><button class="ot-btn" onclick="toggleOT(this,'pos')">+ POS</button><button class="ot-btn" onclick="toggleOT(this,'neg')">– NEG</button></div></div>
+            <div><div class="il mb-4">D (30°)</div><div style="display:flex;gap:6px"><button class="ot-btn" onclick="toggleOT(this,'pos')">+ POS</button><button class="ot-btn" onclick="toggleOT(this,'neg')">– NEG</button></div></div>
+            <div><div class="il mb-4">I (0°)</div><div style="display:flex;gap:6px"><button class="ot-btn" onclick="toggleOT(this,'pos')">+ POS</button><button class="ot-btn" onclick="toggleOT(this,'neg')">– NEG</button></div></div>
+            <div><div class="il mb-4">I (30°)</div><div style="display:flex;gap:6px"><button class="ot-btn" onclick="toggleOT(this,'pos')">+ POS</button><button class="ot-btn" onclick="toggleOT(this,'neg')">– NEG</button></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>Stress en varo — LLE</h3><span class="tag tag-r">Estabilidad</span></div>
+        <div class="card-body">
+          <div class="grid-2" style="gap:8px">
+            <div><div class="il mb-4">D (0°)</div><div style="display:flex;gap:6px"><button class="ot-btn" onclick="toggleOT(this,'pos')">+ POS</button><button class="ot-btn" onclick="toggleOT(this,'neg')">– NEG</button></div></div>
+            <div><div class="il mb-4">D (30°)</div><div style="display:flex;gap:6px"><button class="ot-btn" onclick="toggleOT(this,'pos')">+ POS</button><button class="ot-btn" onclick="toggleOT(this,'neg')">– NEG</button></div></div>
+            <div><div class="il mb-4">I (0°)</div><div style="display:flex;gap:6px"><button class="ot-btn" onclick="toggleOT(this,'pos')">+ POS</button><button class="ot-btn" onclick="toggleOT(this,'neg')">– NEG</button></div></div>
+            <div><div class="il mb-4">I (30°)</div><div style="display:flex;gap:6px"><button class="ot-btn" onclick="toggleOT(this,'pos')">+ POS</button><button class="ot-btn" onclick="toggleOT(this,'neg')">– NEG</button></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Menisco -->
+    <div id="rtab-men" style="display:none">
+      <div id="rodilla-menisco-fields"></div>
+    </div>
+
+    <!-- Escalas rodilla -->
+    <div id="rtab-cuest" style="display:none">
+      <!-- KUJALA -->
+      <div class="card mb-10" style="border-color:rgba(167,139,250,.2)">
+        <div class="card-header" style="cursor:pointer" onclick="toggleSheetSection('kujala-body')">
+          <h3>Kujala AKP Score</h3><span class="tag" style="background:rgba(167,139,250,.15);color:#A78BFA">0–100 · MCID 8–10</span>
+        </div>
+        <div id="kujala-body" style="display:none">
+          <div class="card-body">
+            <div style="font-size:11px;color:var(--text2);margin-bottom:8px">13 ítems · &lt;82 = sintomático</div>
+            <div class="ig"><label class="il">Puntaje total (0–100)</label>
+              <input class="inp inp-mono" type="number" min="0" max="100" placeholder="0" id="kujala-input"
+                oninput="const v=+this.value;const c=v>=82?'var(--neon)':v>=60?'var(--amber)':'var(--red)';document.getElementById('kujala-total-val').textContent=v;document.getElementById('kujala-total-val').style.color=c">
+              <div style="font-size:10px;color:var(--text3);margin-top:3px">&lt;82 = sintomático · MCID: 8–10 pts</div>
+            </div>
+            <div class="card mt-10" style="border-color:rgba(167,139,250,.3)">
+              <div class="card-body" style="display:flex;justify-content:space-between;align-items:center">
+                <div style="font-size:12px;font-weight:600">Kujala total</div>
+                <div id="kujala-total-val" style="font-family:var(--mono);font-size:28px;font-weight:800;color:var(--neon)">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- VISA-P -->
+      <div class="card mb-10" style="border-color:rgba(167,139,250,.2)">
+        <div class="card-header" style="cursor:pointer" onclick="toggleSheetSection('visap-body')">
+          <h3>VISA-P (tendinopatía rotuliana)</h3><span class="tag" style="background:rgba(167,139,250,.15);color:#A78BFA">0–100 · MCID 13</span>
+        </div>
+        <div id="visap-body" style="display:none">
+          <div class="card-body">
+            <div style="font-size:11px;color:var(--text2);margin-bottom:10px">Victorian Institute of Sport Assessment — Patella. 8 ítems. &lt;80 = sintomático. Validado en español.</div>
+            <div id="visap-fields"></div>
+            <div class="card mt-10" style="border-color:rgba(167,139,250,.3)">
+              <div class="card-body" style="display:flex;justify-content:space-between;align-items:center">
+                <div><div style="font-size:12px;font-weight:600">VISA-P total</div><div style="font-size:10px;color:var(--text2)">0 = peor · 100 = asintomático · MCID: 13</div></div>
+                <div id="visap-total" style="font-family:var(--mono);font-size:28px;font-weight:800;color:var(--neon)">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RTP -->
+    <div id="rtab-rtp" style="display:none">
+      <div class="card mb-10" style="border-color:rgba(57,255,122,.2);background:rgba(57,255,122,.03)">
+        <div class="card-header"><h3 style="color:var(--neon)">✅ Return to Play — Criterios</h3></div>
+        <div class="card-body">
+          <div style="font-size:11px;color:var(--text2);margin-bottom:10px">Hop Tests LSI: criterio RTP &gt;90% en todos</div>
+          <div id="hop-tests-rtp"></div>
+          <div class="grid-2" style="gap:8px;margin-top:10px">
+            <div class="ig"><label class="il">IKDC (0–100)</label><input class="inp inp-mono" type="number" placeholder="Score"></div>
+            <div class="ig"><label class="il">ACL-RSI (0–100)</label><input class="inp inp-mono" type="number" placeholder="Psico-readiness"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <button class="btn btn-neon btn-full" onclick="saveKlinicalSheet('rodilla');closeModal('sheet-rodilla')">💾 Guardar evaluación rodilla</button>
+  </div>
+</div>
+
+<!-- SHEET: TOBILLO -->
+<div class="modal" id="sheet-tobillo">
+  <div class="modal-sheet" style="max-width:600px">
+    <div class="modal-handle"></div>
+    <div class="flex-b mb-12">
+      <div><div class="modal-title" style="font-size:18px">🦶 Tobillo</div>
+        <div style="font-size:12px;color:var(--text2)">IAC · Lunge · SEBT · CAIT · FAAM · VISA-A</div></div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('sheet-tobillo')">✕</button>
+    </div>
+    <div style="display:flex;gap:3px;background:var(--bg4);border-radius:8px;padding:3px;margin-bottom:16px;overflow-x:auto">
+      <button class="btn btn-neon btn-sm" id="ttab-lig-btn" onclick="showTTab('lig',this)" style="white-space:nowrap;font-size:10px">Ligamentos</button>
+      <button class="btn btn-ghost btn-sm" id="ttab-func-btn" onclick="showTTab('func',this)" style="white-space:nowrap;font-size:10px">Funcional</button>
+      <button class="btn btn-ghost btn-sm" id="ttab-cuest-btn" onclick="showTTab('tcuest',this)" style="white-space:nowrap;font-size:10px">CAIT / FAAM</button>
+      <button class="btn btn-ghost btn-sm" id="ttab-visa-btn" onclick="showTTab('tvisa',this)" style="white-space:nowrap;font-size:10px">VISA-A</button>
+    </div>
+    <!-- Ligamentos -->
+    <div id="ttab-lig">
+      <!-- Lunge -->
+      <div class="card mb-10">
+        <div class="card-header"><h3>Lunge Test — Dorsiflexión</h3><span class="tag tag-b">ROM · &gt;40° verde · 35–40° amarillo · &lt;35° rojo</span></div>
+        <div class="card-body">
+          <div class="grid-2" style="gap:8px">
+            <div class="ig"><label class="il">Derecho (°)</label>
+              <input class="inp inp-mono" type="number" id="tob-lunge-d" placeholder="0" oninput="calcLungeTob()">
+              <div id="tob-lunge-d-sema" style="margin-top:4px;font-size:11px"></div></div>
+            <div class="ig"><label class="il">Izquierdo (°)</label>
+              <input class="inp inp-mono" type="number" id="tob-lunge-i" placeholder="0" oninput="calcLungeTob()">
+              <div id="tob-lunge-i-sema" style="margin-top:4px;font-size:11px"></div></div>
+          </div>
+          <div id="tob-lunge-asim" style="font-size:12px;color:var(--text3);margin-top:6px">Asimetría: completá ambos lados</div>
+        </div>
+      </div>
+      <!-- Tests ligamentarios -->
+      <div id="tobillo-lig-fields"></div>
+      <!-- Drop navicular tobillo -->
+      <div class="card mt-10">
+        <div class="card-header"><h3>Drop Navicular</h3><span class="tag tag-b">&gt;10mm = pronación excesiva</span></div>
+        <div class="card-body">
+          <div class="grid-2" style="gap:8px">
+            <div class="ig"><label class="il">Drop D (mm)</label><input class="inp inp-mono" type="number" placeholder="0"></div>
+            <div class="ig"><label class="il">Drop I (mm)</label><input class="inp inp-mono" type="number" placeholder="0"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Funcional -->
+    <div id="ttab-func" style="display:none">
+      <!-- SEBT -->
+      <div class="card mb-10">
+        <div class="card-header"><h3>SEBT — Star Excursion Balance Test</h3><span class="tag tag-b">Funcional</span></div>
+        <div class="card-body">
+          <div class="ig"><label class="il">Largo miembro inferior (cm)</label><input class="inp inp-mono" type="number" id="sebt-llm" placeholder="90"></div>
+          <div id="sebt-sheet-fields"></div>
+        </div>
+      </div>
+      <!-- Balance monopodal -->
+      <div class="card">
+        <div class="card-header"><h3>Balance monopodal</h3></div>
+        <div class="card-body">
+          <div class="grid-2" style="gap:8px">
+            <div class="ig"><label class="il">D ojos abiertos (s)</label><input class="inp inp-mono" type="number" step="0.1" placeholder="0.0"></div>
+            <div class="ig"><label class="il">D ojos cerrados (s)</label><input class="inp inp-mono" type="number" step="0.1" placeholder="0.0"></div>
+            <div class="ig"><label class="il">I ojos abiertos (s)</label><input class="inp inp-mono" type="number" step="0.1" placeholder="0.0"></div>
+            <div class="ig"><label class="il">I ojos cerrados (s)</label><input class="inp inp-mono" type="number" step="0.1" placeholder="0.0"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- CAIT / FAAM -->
+    <div id="ttab-tcuest" style="display:none">
+      <div class="card mb-10" style="border-color:rgba(45,212,191,.2)">
+        <div class="card-header" style="cursor:pointer" onclick="toggleSheetSection('cait-body')">
+          <h3>CAIT</h3><span class="tag" style="background:rgba(45,212,191,.15);color:var(--teal)">0–30 · IAC ≤27</span>
+        </div>
+        <div id="cait-body" style="display:none">
+          <div class="card-body">
+            <div style="font-size:11px;color:var(--text2);margin-bottom:8px">Cumberland Ankle Instability Tool · 9 ítems. Versión española SECOT.</div>
+            <div id="cait-sheet-fields"></div>
+            <div class="card mt-10" style="border-color:rgba(45,212,191,.3)">
+              <div class="card-body" style="display:flex;justify-content:space-between;align-items:center">
+                <div><div style="font-size:12px;font-weight:600">CAIT total</div><div style="font-size:10px;color:var(--text2)">IAC: ≤27 pts</div></div>
+                <div><div id="cait-sheet-total" style="font-family:var(--mono);font-size:28px;font-weight:800;color:var(--neon)">—</div>
+                <div id="cait-sheet-interp" style="font-size:10px;text-align:right"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="border-color:rgba(45,212,191,.2)">
+        <div class="card-header" style="cursor:pointer" onclick="toggleSheetSection('faam-body')">
+          <h3>FAAM</h3><span class="tag" style="background:rgba(45,212,191,.15);color:var(--teal)">% función</span>
+        </div>
+        <div id="faam-body" style="display:none">
+          <div class="card-body">
+            <div style="font-size:11px;color:var(--text2);margin-bottom:8px">Foot and Ankle Ability Measure · AVD (21 ítems) + Deportiva (8 ítems)</div>
+            <div style="display:flex;gap:4px;background:var(--bg4);border-radius:8px;padding:3px;margin-bottom:12px">
+              <button class="btn btn-neon btn-sm" id="faam-avd-btn" onclick="setFAAMTab2('avd',this)" style="flex:1;font-size:10px">AVD (21)</button>
+              <button class="btn btn-ghost btn-sm" id="faam-dep-btn" onclick="setFAAMTab2('dep',this)" style="flex:1;font-size:10px">Deportiva (8)</button>
+            </div>
+            <div id="faam-avd-sheet"></div>
+            <div id="faam-dep-sheet" style="display:none"></div>
+            <div class="grid-2" style="gap:8px;margin-top:10px">
+              <div class="card" style="border-color:rgba(45,212,191,.3)">
+                <div class="card-body" style="display:flex;justify-content:space-between;align-items:center">
+                  <div><div style="font-size:11px;font-weight:600">FAAM AVD</div><div style="font-size:9px;color:var(--text2)">84 pts máx</div></div>
+                  <div id="faam-avd-sheet-total" style="font-family:var(--mono);font-size:20px;font-weight:800;color:var(--neon)">—</div>
+                </div>
+              </div>
+              <div class="card" style="border-color:rgba(45,212,191,.3)">
+                <div class="card-body" style="display:flex;justify-content:space-between;align-items:center">
+                  <div><div style="font-size:11px;font-weight:600">FAAM Dep.</div><div style="font-size:9px;color:var(--text2)">32 pts máx</div></div>
+                  <div id="faam-dep-sheet-total" style="font-family:var(--mono);font-size:20px;font-weight:800;color:var(--neon)">—</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- VISA-A -->
+    <div id="ttab-tvisa" style="display:none">
+      <div class="card" style="border-color:rgba(45,212,191,.2)">
+        <div class="card-header"><h3>VISA-A (tendinopatía Aquiles)</h3><span class="tag" style="background:rgba(45,212,191,.15);color:var(--teal)">0–100 · MCID 8</span></div>
+        <div class="card-body">
+          <div style="font-size:11px;color:var(--text2);margin-bottom:10px">Victorian Institute of Sport Assessment — Achilles. 8 ítems. 100 = asintomático. &lt;75 = sintomático.</div>
+          <div id="visaa-fields"></div>
+          <div class="card mt-10" style="border-color:rgba(45,212,191,.3)">
+            <div class="card-body" style="display:flex;justify-content:space-between;align-items:center">
+              <div><div style="font-size:12px;font-weight:600">VISA-A total</div><div style="font-size:10px;color:var(--text2)">MCID: 8 pts · &lt;75 = sintomático</div></div>
+              <div id="visaa-total" style="font-family:var(--mono);font-size:28px;font-weight:800;color:var(--neon)">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <button class="btn btn-neon btn-full" onclick="saveKlinicalSheet('tobillo');closeModal('sheet-tobillo')">💾 Guardar evaluación tobillo</button>
+  </div>
+</div>
+
+<!-- SHEET: LUMBAR / LBP -->
+<div class="modal" id="sheet-lbp">
+  <div class="modal-sheet" style="max-width:600px">
+    <div class="modal-handle"></div>
+    <div class="flex-b mb-12">
+      <div><div class="modal-title" style="font-size:18px">🔶 Columna lumbar</div>
+        <div style="font-size:12px;color:var(--text2)">O'Sullivan 2018 · STarT Back · ODI · Tests provocativos</div></div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('sheet-lbp')">✕</button>
+    </div>
+    <div class="card mb-10">
+      <div class="card-header"><h3>Tests provocativos</h3></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)">
+          <div><div style="font-size:12px;font-weight:600">SLR (Lasègue)</div><div style="font-size:10px;color:var(--text2)">L4-S1 · Positivo &lt;60° · Sn 0.91</div></div>
+          <div style="display:flex;gap:6px"><button class="ot-btn" onclick="toggleOT(this,'pos')">+ POS</button><button class="ot-btn" onclick="toggleOT(this,'neg')">– NEG</button></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)">
+          <div><div style="font-size:12px;font-weight:600">SLUMP test</div><div style="font-size:10px;color:var(--text2)">Tensión dural / radiculopatía · Sn 0.84</div></div>
+          <div style="display:flex;gap:6px"><button class="ot-btn" onclick="toggleOT(this,'pos')">+ POS</button><button class="ot-btn" onclick="toggleOT(this,'neg')">– NEG</button></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0">
+          <div><div style="font-size:12px;font-weight:600">ASLR</div><div style="font-size:10px;color:var(--text2)">Estabilidad lumbopélvica</div></div>
+          <div style="display:flex;gap:6px"><button class="ot-btn" onclick="toggleOT(this,'pos')">+ POS</button><button class="ot-btn" onclick="toggleOT(this,'neg')">– NEG</button></div>
+        </div>
+      </div>
+    </div>
+    <!-- STarT Back -->
+    <div class="card mb-10" style="border-color:rgba(255,176,32,.2)">
+      <div class="card-header" style="cursor:pointer" onclick="toggleSheetSection('startback-body')">
+        <h3>STarT Back Tool</h3><span class="tag tag-y">Estratificación riesgo</span>
+      </div>
+      <div id="startback-body" style="display:none">
+        <div class="card-body">
+          <div style="font-size:11px;color:var(--text2);margin-bottom:10px">9 ítems — bajo / medio / alto riesgo. Guía intensidad de tratamiento.</div>
+          <div id="startback-sheet-fields"></div>
+          <div class="card mt-10" style="border-color:rgba(255,176,32,.3)">
+            <div class="card-body" style="display:flex;justify-content:space-between;align-items:center">
+              <div style="font-size:12px;font-weight:600">Grupo de riesgo</div>
+              <div id="startback-sheet-result" style="font-family:var(--mono);font-size:16px;font-weight:800;color:var(--amber)">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ODI -->
+    <div class="card" style="border-color:rgba(167,139,250,.2)">
+      <div class="card-header" style="cursor:pointer" onclick="toggleSheetSection('odi-body')">
+        <h3>Oswestry Disability Index (ODI)</h3><span class="tag" style="background:rgba(167,139,250,.15);color:#A78BFA">0–100% · MCID 10</span>
+      </div>
+      <div id="odi-body" style="display:none">
+        <div class="card-body">
+          <div style="font-size:11px;color:var(--text2);margin-bottom:8px">0–20% mínima · 20–40% moderada · 40–60% grave · &gt;60% muy grave</div>
+          <div class="ig"><label class="il">Score ODI directo (%)</label>
+            <input class="inp inp-mono" type="number" min="0" max="100" placeholder="0–100"
+              oninput="const v=+this.value;const el=document.getElementById('odi-sheet-total');el.textContent=v+'%';el.style.color=v<=20?'var(--neon)':v<=40?'var(--amber)':'var(--red)'">
+            <div style="font-size:10px;color:var(--text3);margin-top:3px">MCID: 10 puntos</div>
+          </div>
+          <div class="card mt-10" style="border-color:rgba(167,139,250,.3)">
+            <div class="card-body" style="display:flex;justify-content:space-between;align-items:center">
+              <div style="font-size:12px;font-weight:600">ODI %</div>
+              <div id="odi-sheet-total" style="font-family:var(--mono);font-size:28px;font-weight:800;color:var(--neon)">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <button class="btn btn-neon btn-full" onclick="saveKlinicalSheet('lbp');closeModal('sheet-lbp')">💾 Guardar evaluación lumbar</button>
+  </div>
+</div>
+
+<!-- SHEET: GROIN PAIN (Doha) -->
+<div class="modal" id="sheet-groin">
+  <div class="modal-sheet" style="max-width:600px">
+    <div class="modal-handle"></div>
+    <div class="flex-b mb-12">
+      <div><div class="modal-title" style="font-size:18px">🔵 Groin Pain</div>
+        <div style="font-size:12px;color:var(--text2)">Consenso Doha 2015 · 5 entidades · Ranking clínico</div></div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('sheet-groin')">✕</button>
+    </div>
+    <div class="card mb-10" style="border-color:rgba(77,158,255,.2);background:rgba(77,158,255,.05)">
+      <div class="card-body" style="font-size:11px;color:var(--text2);line-height:1.7">
+        <strong style="color:var(--blue)">Clasificación Doha:</strong> Clasificar cada entidad como <strong>1° (primaria)</strong> · <strong>2° (secundaria)</strong> · <strong>Ausente</strong>.
+        Confiabilidad perfecta (100%) cuando existe una sola entidad unilateral.
+      </div>
+    </div>
+    <div id="doha-entidades-sheet"></div>
+    <!-- HAGOS -->
+    <div class="card mt-12" style="border-color:rgba(167,139,250,.2)">
+      <div class="card-header" style="cursor:pointer" onclick="toggleSheetSection('hagos-body')">
+        <h3>HAGOS — Copenhagen Hip and Groin Outcome Score</h3><span class="tag" style="background:rgba(167,139,250,.15);color:#A78BFA">6 dominios</span>
+      </div>
+      <div id="hagos-body" style="display:none">
+        <div class="card-body">
+          <div style="font-size:11px;color:var(--text2);margin-bottom:8px">0–100 por dominio · 0 = máximos síntomas</div>
+          <div id="hagos-sheet-fields"></div>
+        </div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <button class="btn btn-neon btn-full" onclick="saveKlinicalSheet('groin');closeModal('sheet-groin')">💾 Guardar evaluación</button>
+  </div>
+</div>
+
 </body>
 </html>
