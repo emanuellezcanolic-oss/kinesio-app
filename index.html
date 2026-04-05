@@ -105,6 +105,7 @@
         <div id="profile-meta" style="font-size:12px;color:var(--text2);margin-bottom:6px">—</div>
         <div id="profile-tags"></div>
       </div>
+      <div id="fuerza-rel-kpi"></div>
     </div>
     <div id="profile-stats-row" class="grid-4"></div>
   </div>
@@ -117,9 +118,8 @@
     <button class="ptab" onclick="showProfileTab('saltos',this)">Saltos</button>
     <button class="ptab" onclick="showProfileTab('movilidad',this)">Movilidad</button>
     <button class="ptab" onclick="showProfileTab('velocidad',this)">Sprint</button>
-    <button class="ptab" onclick="showProfileTab('sprint-horiz',this)">🏃 Sprint H</button>
     <button class="ptab" onclick="showProfileTab('fms',this)">Calidad Mov.</button>
-    <button class="ptab" onclick="showProfileTab('fatiga',this)">Fatiga</button>
+    <button class="ptab" onclick="showProfileTab('fatiga',this)">🌿 Wellness</button>
     <button class="ptab" onclick="showProfileTab('video',this)">🎬 Video</button>
     <button class="ptab" onclick="showProfileTab('vmp',this)">⚡ VMP</button>
     <button class="ptab" onclick="showProfileTab('historial',this)">Historial</button>
@@ -626,109 +626,162 @@
       </div>
 
       <!-- Tests positivos summary -->
-      <div class="card card-danger mt-16" id="kine-positivos-card" style="display:none">
-        <div class="card-header"><h3 style="color:var(--red)">🔴 Tests positivos activos</h3><span style="font-size:10px;color:var(--text2);font-family:var(--mono)">Incluidos en el informe PDF</span></div>
-        <div class="card-body" id="kine-positivos-list"></div>
-      </div>
 
-      <!-- ══ WELLNESS — integrado en Kinesiología ══ -->
-      <div class="card mt-16">
+      <!-- ══ SEGUIMIENTO DE LESIÓN ══ -->
+      <div class="card mt-16" style="border-color:rgba(255,176,32,.2)">
         <div class="card-header">
-          <h3>🌿 Wellness — Control del Atleta</h3>
-          <div class="flex" style="gap:8px">
-            <input class="inp" type="date" id="wellness-fecha" style="width:150px;font-size:12px">
-            <button class="btn btn-neon btn-sm" onclick="saveWellness()">💾 Guardar Wellness</button>
-          </div>
+          <h3 style="color:var(--amber)">📌 Seguimiento de Lesión Activa</h3>
+          <span class="tag tag-y">Estado · Etapa · RTS</span>
         </div>
         <div class="card-body">
           <div class="grid-2" style="gap:14px">
 
-            <!-- Calidad de sueño -->
-            <div>
-              <div style="font-family:var(--mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--white20);margin-bottom:6px">🌙 Sueño</div>
-              <div class="ig">
-                <label class="il">Calidad del sueño (1-10)</label>
-                <input type="range" class="hooper-slider" id="w-sueno" min="1" max="10" value="5" oninput="updateWellnessSlider('w-sueno','w-sueno-v')">
-                <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--white20)"><span>Muy malo</span><span id="w-sueno-v" style="color:var(--neon)">5</span><span>Excelente</span></div>
-              </div>
-              <div class="ig">
-                <label class="il">Horas dormidas</label>
-                <input class="inp inp-mono" type="number" step=".5" id="w-horas-sueno" placeholder="7.5">
-              </div>
-            </div>
-
-            <!-- Dolor / Molestias -->
-            <div>
-              <div style="font-family:var(--mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--white20);margin-bottom:6px">🩹 Dolor / Molestias</div>
-              <div class="ig">
-                <label class="il">Nivel de dolor general (0-10)</label>
-                <input type="range" class="hooper-slider" id="w-dolor" min="0" max="10" value="0" oninput="updateWellnessSlider('w-dolor','w-dolor-v')">
-                <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--white20)"><span>Sin dolor</span><span id="w-dolor-v" style="color:var(--neon)">0</span><span>Máximo</span></div>
-              </div>
-              <div class="ig">
-                <label class="il">Zona de molestia</label>
-                <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:4px" id="w-zonas-dolor">
-                  <button class="fms-btn" onclick="toggleWellnessZona(this,'Hombro')">Hombro</button>
-                  <button class="fms-btn" onclick="toggleWellnessZona(this,'Rodilla')">Rodilla</button>
-                  <button class="fms-btn" onclick="toggleWellnessZona(this,'Lumbar')">Lumbar</button>
-                  <button class="fms-btn" onclick="toggleWellnessZona(this,'Cadera')">Cadera</button>
-                  <button class="fms-btn" onclick="toggleWellnessZona(this,'Tobillo')">Tobillo</button>
-                  <button class="fms-btn" onclick="toggleWellnessZona(this,'Cuello')">Cuello</button>
-                  <button class="fms-btn" onclick="toggleWellnessZona(this,'Otro')">Otro</button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Estado físico -->
-            <div>
-              <div style="font-family:var(--mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--white20);margin-bottom:6px">💪 Estado físico y mental</div>
-              <div class="ig">
-                <label class="il">Energía / Vitalidad (1-10)</label>
-                <input type="range" class="hooper-slider" id="w-energia" min="1" max="10" value="5" oninput="updateWellnessSlider('w-energia','w-energia-v')">
-                <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--white20)"><span>Agotado</span><span id="w-energia-v" style="color:var(--neon)">5</span><span>Muy energizado</span></div>
-              </div>
-              <div class="ig">
-                <label class="il">Estado emocional / Ánimo (1-10)</label>
-                <input type="range" class="hooper-slider" id="w-animo" min="1" max="10" value="5" oninput="updateWellnessSlider('w-animo','w-animo-v')">
-                <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--white20)"><span>Muy bajo</span><span id="w-animo-v" style="color:var(--neon)">5</span><span>Excelente</span></div>
-              </div>
-              <div class="ig">
-                <label class="il">Estrés percibido (1-10)</label>
-                <input type="range" class="hooper-slider" id="w-estres" min="1" max="10" value="5" oninput="updateWellnessSlider('w-estres','w-estres-v')">
-                <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--white20)"><span>Sin estrés</span><span id="w-estres-v" style="color:var(--neon)">5</span><span>Máximo</span></div>
-              </div>
-            </div>
-
-            <!-- Score wellness y observaciones -->
+            <!-- Columna 1: Estado y etapa -->
             <div style="display:flex;flex-direction:column;gap:12px">
-              <!-- Score -->
-              <div class="card card-glow" style="text-align:center;padding:16px">
-                <div style="font-family:var(--mono);font-size:9px;color:var(--white20);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Score Wellness Total</div>
-                <div style="position:relative;display:inline-flex;align-items:center;justify-content:center;width:80px;height:80px;margin-bottom:8px">
-                  <svg width="80" height="80" viewBox="0 0 80 80" style="transform:rotate(-90deg)">
-                    <circle cx="40" cy="40" r="34" fill="none" stroke="#2a2a2a" stroke-width="6"/>
-                    <circle id="wellness-ring" cx="40" cy="40" r="34" fill="none" stroke="var(--neon)" stroke-width="6" stroke-dasharray="213.6" stroke-dashoffset="213.6" stroke-linecap="round" style="transition:stroke-dashoffset .8s,stroke .4s"/>
-                  </svg>
-                  <div style="position:absolute;font-family:var(--mono);font-size:18px;font-weight:800;color:var(--neon)" id="wellness-score-val">—</div>
-                </div>
-                <div id="wellness-score-label" style="font-size:12px;font-weight:700"></div>
-                <div id="wellness-score-rec" style="font-size:10px;color:var(--white50);margin-top:4px;line-height:1.5"></div>
-              </div>
-              <!-- Observaciones -->
-              <div class="ig">
-                <label class="il">Observaciones clínicas</label>
-                <textarea class="inp" id="w-obs" rows="3" placeholder="Notas sobre el estado del atleta, señales de alerta, factores contextuales..."></textarea>
-              </div>
-              <button class="btn btn-ghost btn-full btn-sm" onclick="showWellnessHistory()">📋 Ver historial Wellness</button>
-            </div>
-          </div>
 
-          <!-- Historial wellness mini -->
-          <div id="wellness-hist" class="mt-12 hidden">
-            <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--white20);margin-bottom:8px">Últimos registros</div>
-            <div id="wellness-hist-table" style="overflow-x:auto"></div>
+              <div class="ig">
+                <label class="il">Tipo de lesión</label>
+                <select class="inp" id="les-tipo">
+                  <option value="">— Seleccionar —</option>
+                  <option>Esguince ligamentario</option>
+                  <option>Rotura muscular parcial</option>
+                  <option>Rotura muscular total</option>
+                  <option>Tendinopatia</option>
+                  <option>Rotura LCA</option>
+                  <option>Rotura LCA + reconstruccion</option>
+                  <option>Rotura meniscal</option>
+                  <option>Fractura</option>
+                  <option>Luxacion</option>
+                  <option>Contusion</option>
+                  <option>Sobrecarga</option>
+                  <option>Hernia discal</option>
+                  <option>Pubalgia / ingle deportiva</option>
+                  <option>Tendon de Aquiles (rotura)</option>
+                  <option>Tendinopatia Aquiles</option>
+                  <option>Osteitis pubis</option>
+                  <option>Otro</option>
+                </select>
+              </div>
+
+              <div class="ig">
+                <label class="il">Estructura afectada</label>
+                <input class="inp" id="les-estructura" placeholder="Ej: LCA derecho, bíceps femoral proximal...">
+              </div>
+
+              <div class="ig">
+                <label class="il">Estado actual</label>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+                  <button class="fms-btn" id="les-est-agudo" onclick="setLesEstado('agudo')">Agudo</button>
+                  <button class="fms-btn" id="les-est-subagudo" onclick="setLesEstado('subagudo')">Subagudo</button>
+                  <button class="fms-btn" id="les-est-cronico" onclick="setLesEstado('cronico')">Crónico</button>
+                  <button class="fms-btn" id="les-est-readap" onclick="setLesEstado('readap')">Readaptación</button>
+                </div>
+              </div>
+
+              <div class="ig">
+                <label class="il">Etapa de rehabilitación</label>
+                <select class="inp" id="les-etapa" onchange="updateLesDias()">
+                  <option value="">— Seleccionar —</option>
+                  <option value="0">Fase 0 — Protección / Reposo</option>
+                  <option value="1">Fase 1 — Control del dolor e inflamación</option>
+                  <option value="2">Fase 2 — Recuperación del ROM</option>
+                  <option value="3">Fase 3 — Fortalecimiento progresivo</option>
+                  <option value="4">Fase 4 — Entrenamiento funcional</option>
+                  <option value="5">Fase 5 — Retorno al deporte (RTS)</option>
+                  <option value="rts">RTS — Alta deportiva</option>
+                </select>
+              </div>
+
+              <div class="grid-2" style="gap:8px">
+                <div class="ig">
+                  <label class="il">Días desde lesión</label>
+                  <input class="inp inp-mono" type="number" id="les-dias" placeholder="0" oninput="updateLesDias()">
+                </div>
+                <div class="ig">
+                  <label class="il">Días estimados RTS</label>
+                  <input class="inp inp-mono" type="number" id="les-dias-rts" placeholder="0">
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Columna 2: Criterios RTS y observaciones -->
+            <div style="display:flex;flex-direction:column;gap:12px">
+
+              <!-- RTS checklist -->
+              <div class="card">
+                <div class="card-header"><h3>Criterios RTS</h3><span id="les-rts-pct" class="tag tag-y">0%</span></div>
+                <div class="card-body" style="padding:12px">
+                  <div style="display:flex;flex-direction:column;gap:6px" id="les-rts-checks">
+                    <label style="display:flex;align-items:center;gap:8px;font-size:11px;cursor:pointer">
+                      <input type="checkbox" class="les-rts-cb" style="accent-color:var(--neon)" onchange="updateRTSPercent()">
+                      Sin dolor en reposo (EVA 0/10)
+                    </label>
+                    <label style="display:flex;align-items:center;gap:8px;font-size:11px;cursor:pointer">
+                      <input type="checkbox" class="les-rts-cb" style="accent-color:var(--neon)" onchange="updateRTSPercent()">
+                      ROM completo bilateral
+                    </label>
+                    <label style="display:flex;align-items:center;gap:8px;font-size:11px;cursor:pointer">
+                      <input type="checkbox" class="les-rts-cb" style="accent-color:var(--neon)" onchange="updateRTSPercent()">
+                      Fuerza ≥90% miembro contralateral (LSI)
+                    </label>
+                    <label style="display:flex;align-items:center;gap:8px;font-size:11px;cursor:pointer">
+                      <input type="checkbox" class="les-rts-cb" style="accent-color:var(--neon)" onchange="updateRTSPercent()">
+                      Hop tests LSI ≥90%
+                    </label>
+                    <label style="display:flex;align-items:center;gap:8px;font-size:11px;cursor:pointer">
+                      <input type="checkbox" class="les-rts-cb" style="accent-color:var(--neon)" onchange="updateRTSPercent()">
+                      Sin dolor en gesto deportivo específico
+                    </label>
+                    <label style="display:flex;align-items:center;gap:8px;font-size:11px;cursor:pointer">
+                      <input type="checkbox" class="les-rts-cb" style="accent-color:var(--neon)" onchange="updateRTSPercent()">
+                      Alta médica
+                    </label>
+                    <label style="display:flex;align-items:center;gap:8px;font-size:11px;cursor:pointer">
+                      <input type="checkbox" class="les-rts-cb" style="accent-color:var(--neon)" onchange="updateRTSPercent()">
+                      Apto psicológico (confianza deportiva)
+                    </label>
+                  </div>
+                  <!-- Barra de progreso RTS -->
+                  <div style="margin-top:12px">
+                    <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--text2);margin-bottom:4px">
+                      <span>Progreso RTS</span>
+                      <span id="les-rts-pct2">0 / 7</span>
+                    </div>
+                    <div style="height:6px;background:var(--bg5);border-radius:3px;overflow:hidden">
+                      <div id="les-rts-bar" style="height:100%;width:0%;border-radius:3px;background:var(--neon);transition:width .4s"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Observaciones clínicas -->
+              <div class="ig">
+                <label class="il">Notas clínicas / Plan de tratamiento</label>
+                <textarea class="inp" id="les-obs" rows="3" placeholder="Describí el plan de tratamiento, objetivos de la semana, ejercicios, etc..."></textarea>
+              </div>
+
+              <!-- Timeline visual -->
+              <div id="les-timeline-display" style="background:var(--bg4);border-radius:10px;padding:12px;display:none">
+                <div style="font-family:var(--mono);font-size:9px;color:var(--text2);text-transform:uppercase;margin-bottom:8px">Timeline estimado</div>
+                <div id="les-timeline-bar" style="position:relative;height:12px;background:var(--bg5);border-radius:6px;overflow:visible;margin-bottom:6px">
+                  <div id="les-prog-bar" style="height:100%;border-radius:6px;background:linear-gradient(90deg,var(--neon),var(--amber));transition:width .5s"></div>
+                  <div id="les-prog-dot" style="position:absolute;top:50%;transform:translateY(-50%);width:16px;height:16px;border-radius:50%;background:var(--neon);border:2px solid var(--dark2);box-shadow:0 0 10px var(--neon);transition:left .5s"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--text2)">
+                  <span>Día 0</span>
+                  <span id="les-dias-mid">—</span>
+                  <span id="les-rts-label">RTS</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
+
+      <div class="card card-danger mt-16" id="kine-positivos-card" style="display:none">
+        <div class="card-header"><h3 style="color:var(--red)">🔴 Tests positivos activos</h3><span style="font-size:10px;color:var(--text2);font-family:var(--mono)">Incluidos en el informe PDF</span></div>
+        <div class="card-body" id="kine-positivos-list"></div>
       </div>
     </div>
   </div>
@@ -781,71 +834,6 @@
         <div class="card-header"><h3>Semáforo Fuerza Relativa — 1RM / Peso corporal</h3></div>
         <div class="card-body" id="fv-fuerza-rel"></div>
       </div>
-
-      <!-- FUERZA RELATIVA INTEGRADA CON SALTOS -->
-      <div class="card card-glow mt-12" id="fv-frel-saltos-card">
-        <div class="card-header">
-          <h3>💪 Indicador de Fuerza Relativa — 1.26 × PC (Elite)</h3>
-          <span class="tag tag-g">Integración F-V + Saltos</span>
-        </div>
-        <div class="card-body">
-          <!-- KPI row -->
-          <div class="grid-3 mb-14" style="gap:10px">
-            <div class="kpi" id="frel-1rm-kpi">
-              <div class="kpi-label">1RM estimado</div>
-              <div class="kpi-val" id="frel-1rm-val">—</div>
-              <div class="kpi-sub" id="frel-1rm-ej">—</div>
-            </div>
-            <div class="kpi" id="frel-ratio-kpi">
-              <div class="kpi-label">Ratio 1RM / PC</div>
-              <div class="kpi-val" id="frel-ratio-val">—</div>
-              <div class="kpi-sub">Objetivo: ≥ 1.26</div>
-            </div>
-            <div class="kpi" id="frel-target-kpi">
-              <div class="kpi-label">Target Elite (1.26 × PC)</div>
-              <div class="kpi-val" id="frel-target-val">—</div>
-              <div class="kpi-sub">kg necesarios</div>
-            </div>
-          </div>
-
-          <!-- Barra de progreso hacia elite -->
-          <div style="margin-bottom:14px">
-            <div class="flex-b mb-4">
-              <span style="font-family:var(--mono);font-size:9px;color:var(--white20);text-transform:uppercase;letter-spacing:.1em">Progreso hacia nivel Elite (1.26 × PC)</span>
-              <span id="frel-pct-label" style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--neon)">—%</span>
-            </div>
-            <div class="sem-bar-wrap" style="height:8px;border-radius:4px">
-              <div class="sem-bar" id="frel-bar" style="height:100%;border-radius:4px;background:var(--neon);width:0%;transition:width .8s cubic-bezier(.4,0,.2,1)"></div>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--white20);margin-top:4px">
-              <span>Inicio</span><span>Intermedio (0.9×)</span><span>Avanzado (1.1×)</span><span>Elite (1.26×)</span>
-            </div>
-          </div>
-
-          <!-- Relación con CMJ y SJ -->
-          <div style="background:rgba(57,255,122,.04);border:1px solid rgba(57,255,122,.1);border-radius:10px;padding:12px;margin-bottom:12px">
-            <div style="font-family:var(--mono);font-size:9px;color:var(--white20);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">📊 Correlación con datos de Saltos (CMJ / SJ)</div>
-            <div class="grid-2" style="gap:10px">
-              <div style="text-align:center;background:rgba(0,0,0,.2);border-radius:8px;padding:10px">
-                <div style="font-family:var(--mono);font-size:9px;color:var(--white20);text-transform:uppercase;margin-bottom:4px">CMJ registrado</div>
-                <div id="frel-cmj-val" style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--blue)">—</div>
-                <div style="font-size:9px;color:var(--white20)">cm</div>
-                <div id="frel-cmj-fuerza" style="font-size:10px;color:var(--white50);margin-top:4px"></div>
-              </div>
-              <div style="text-align:center;background:rgba(0,0,0,.2);border-radius:8px;padding:10px">
-                <div style="font-family:var(--mono);font-size:9px;color:var(--white20);text-transform:uppercase;margin-bottom:4px">SJ registrado</div>
-                <div id="frel-sj-val" style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--purple)">—</div>
-                <div style="font-size:9px;color:var(--white20)">cm</div>
-                <div id="frel-sj-fuerza" style="font-size:10px;color:var(--white50);margin-top:4px"></div>
-              </div>
-            </div>
-            <div id="frel-bosco-idx" style="margin-top:10px;font-size:11px;color:var(--white50);text-align:center;font-family:var(--mono)"></div>
-          </div>
-
-          <!-- Interpretación -->
-          <div id="frel-interpretacion" style="font-size:12px;color:var(--white50);line-height:1.7;padding:10px;background:rgba(255,255,255,.02);border-radius:8px"></div>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -877,18 +865,9 @@
     <div class="card mt-16">
       <div class="card-header">
         <h3>Analisis de Valgo de Rodilla</h3>
-        <div class="flex" style="gap:8px">
-          <span class="tag tag-r">Evaluacion de angulo</span>
-          <!-- Selector unilateral/bilateral -->
-          <div style="display:flex;gap:4px;background:#1a1a1a;border-radius:8px;padding:3px;box-shadow:var(--nm-inset-sm)">
-            <button id="valgo-mode-uni" class="btn btn-neon btn-sm" onclick="setValgoLegs('uni')" style="font-size:10px;padding:4px 12px">🦵 1 Pierna</button>
-            <button id="valgo-mode-bi" class="btn btn-ghost btn-sm" onclick="setValgoLegs('bi')" style="font-size:10px;padding:4px 12px">🦵🦵 2 Piernas</button>
-          </div>
-        </div>
+        <span class="tag tag-r">Evaluacion de angulo</span>
       </div>
       <div class="card-body">
-        <!-- Modo unilateral (default) -->
-        <div id="valgo-uni-section">
         <div class="grid-2" style="gap:18px;align-items:start">
           <!-- VIDEO -->
           <div>
@@ -908,7 +887,7 @@
             <div id="valgo-upload-area" style="border:2px dashed rgba(57,255,122,.2);border-radius:10px;padding:24px;text-align:center;cursor:pointer;margin-bottom:10px" onclick="document.getElementById('valgo-file-inp').click()">
               <div style="font-size:24px;margin-bottom:6px">🎬</div>
               <div style="font-size:13px;font-weight:700;color:var(--neon)">Cargar video frontal</div>
-              <div style="font-size:11px;color:var(--white50);margin-top:4px">Camara frontal -- se deben ver ambas rodillas</div>
+              <div style="font-size:11px;color:var(--text2);margin-top:4px">Camara frontal -- se deben ver ambas rodillas</div>
             </div>
             <input type="file" id="valgo-file-inp" accept="video/*" class="hidden" onchange="loadValgoVideo(this)">
             <div id="valgo-player-wrap" style="display:none">
@@ -924,12 +903,12 @@
                 <button class="btn btn-ghost btn-sm" onclick="valgoJump(10)" style="font-size:10px">+10</button>
               </div>
               <input type="range" id="valgo-scrubber" min="0" max="1000" value="0" style="width:100%;margin-top:6px;accent-color:var(--neon)" oninput="valgoScrub(this.value)">
-              <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--white50);margin-top:2px">
+              <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--text2);margin-top:2px">
                 <span>Frame <span id="valgo-frame-cur">0</span> / <span id="valgo-frame-tot">0</span></span>
                 <span id="valgo-time-cur">0.000s</span>
               </div>
               <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
-                <label style="font-family:var(--mono);font-size:9px;color:var(--white50);text-transform:uppercase;white-space:nowrap">FPS</label>
+                <label style="font-family:var(--mono);font-size:9px;color:var(--text2);text-transform:uppercase;white-space:nowrap">FPS</label>
                 <div style="display:flex;gap:4px" id="valgo-fps-btns">
                   <button class="btn btn-neon btn-sm" onclick="setValgoFps(30,this)" style="font-size:10px;padding:4px 10px">30</button>
                   <button class="btn btn-ghost btn-sm" onclick="setValgoFps(60,this)" style="font-size:10px;padding:4px 10px">60</button>
@@ -950,7 +929,7 @@
                   <button class="btn btn-outline btn-full btn-sm" id="valgo-btn-linea1" onclick="setValgoMode('linea1')" style="font-size:11px">Linea 1 -- Femur</button>
                   <button class="btn btn-ghost btn-full btn-sm" id="valgo-btn-linea2" onclick="setValgoMode('linea2')" style="font-size:11px">Linea 2 -- Tibia</button>
                 </div>
-                <div id="valgo-mode-info" style="font-size:11px;color:var(--white50);line-height:1.7;padding:8px;background:rgba(255,255,255,.02);border-radius:8px;margin-bottom:10px">
+                <div id="valgo-mode-info" style="font-size:11px;color:var(--text2);line-height:1.7;padding:8px;background:rgba(255,255,255,.02);border-radius:8px;margin-bottom:10px">
                   1. Congela el frame en el momento de mayor valgo<br>
                   2. Selecciona Linea 1 y traza el eje del femur (2 puntos)<br>
                   3. Selecciona Linea 2 y traza el eje de la tibia (2 puntos)<br>
@@ -968,7 +947,7 @@
                     <div style="width:26px;height:26px;border-radius:6px;background:#4D9EFF;cursor:pointer" onclick="setValgoColor('#4D9EFF',this)" id="vc-3"></div>
                     <div style="width:26px;height:26px;border-radius:6px;background:#FFB020;cursor:pointer" onclick="setValgoColor('#FFB020',this)" id="vc-4"></div>
                     <div style="width:26px;height:26px;border-radius:6px;background:#fff;cursor:pointer;border:1px solid #444" onclick="setValgoColor('#ffffff',this)" id="vc-5"></div>
-                    <span style="font-family:var(--mono);font-size:9px;color:var(--white50)">Grosor:</span>
+                    <span style="font-family:var(--mono);font-size:9px;color:var(--text2)">Grosor:</span>
                     <input type="range" id="valgo-line-width" min="1" max="6" value="2" style="flex:1;accent-color:var(--neon)" oninput="redrawValgoCanvas()">
                   </div>
                 </div>
@@ -979,168 +958,35 @@
             <div class="card card-glow" id="valgo-result-card" style="display:none">
               <div class="card-header"><h3>Angulo de Valgo</h3><span id="valgo-result-badge" class="tag"></span></div>
               <div class="card-body" style="text-align:center;padding:16px">
-                <div style="font-family:var(--mono);font-size:9px;color:var(--white50);text-transform:uppercase;margin-bottom:6px">Angulo medido</div>
+                <div style="font-family:var(--mono);font-size:9px;color:var(--text2);text-transform:uppercase;margin-bottom:6px">Angulo medido</div>
                 <div id="valgo-angle-display" style="font-family:var(--mono);font-size:52px;font-weight:800;color:var(--neon);line-height:1">--</div>
-                <div style="font-size:13px;color:var(--white50);margin-top:4px">grados</div>
+                <div style="font-size:13px;color:var(--text2);margin-top:4px">grados</div>
                 <div id="valgo-interp" style="margin-top:10px;font-size:12px;line-height:1.7"></div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
                   <button class="btn btn-outline btn-sm" onclick="saveValgoResult()" style="font-size:11px">Guardar</button>
-                  <button class="btn btn-ghost btn-sm" onclick="captureValgoImage()" style="font-size:11px">📷 Captura</button>
+                  <button class="btn btn-ghost btn-sm" onclick="captureValgoImage()" style="font-size:11px">Captura</button>
                 </div>
               </div>
-            </div>
-
-            <!-- Imagen capturada unilateral -->
-            <div id="valgo-captured-img-wrap" style="display:none">
-              <div style="font-family:var(--mono);font-size:9px;color:var(--white20);text-transform:uppercase;margin-bottom:6px">Imagen guardada</div>
-              <img id="valgo-captured-img" style="width:100%;border-radius:8px;border:1px solid rgba(57,255,122,.2)" src="" alt="Captura valgo">
             </div>
 
             <!-- Referencias -->
             <div class="card">
               <div class="card-header"><h3>Referencia clinica</h3></div>
-              <div class="card-body" style="font-size:11px;color:var(--white50);line-height:2.2">
+              <div class="card-body" style="font-size:11px;color:var(--text2);line-height:2.2">
                 <div style="display:grid;grid-template-columns:auto 1fr;gap:2px 10px">
                   <span style="font-family:var(--mono);color:var(--neon)">&lt; 5deg</span><span>Normal -- sin valgo significativo</span>
                   <span style="font-family:var(--mono);color:var(--amber)">5 - 10deg</span><span>Valgo leve -- monitorear</span>
                   <span style="font-family:var(--mono);color:var(--red)">&gt; 10deg</span><span>Valgo critico -- riesgo LCA</span>
                 </div>
-                <div style="margin-top:8px;font-size:9px;color:var(--white20);font-family:var(--mono)">Ref: Sigward &amp; Powers 2006 · Hewett et al. 2005</div>
+                <div style="margin-top:8px;font-size:9px;color:var(--text3);font-family:var(--mono)">Ref: Sigward &amp; Powers 2006 · Hewett et al. 2005</div>
               </div>
             </div>
           </div>
         </div>
-        </div><!-- /valgo-uni-section -->
-
-        <!-- ══ Modo BILATERAL (2 piernas) ══ -->
-        <div id="valgo-bi-section" style="display:none">
-          <p style="font-size:12px;color:var(--white50);margin-bottom:14px">Medí cada pierna por separado con su propio video / frame congelado. Ambas imágenes se muestran en el dashboard e informe.</p>
-
-          <div class="grid-2" style="gap:18px">
-
-            <!-- PIERNA DERECHA -->
-            <div>
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-                <div style="width:3px;height:24px;background:var(--neon);border-radius:2px"></div>
-                <span style="font-size:14px;font-weight:700">Pierna Derecha</span>
-                <span class="tag tag-g" style="font-size:9px">D</span>
-              </div>
-              <div id="valgo-d-upload" style="border:2px dashed rgba(57,255,122,.2);border-radius:10px;padding:18px;text-align:center;cursor:pointer;margin-bottom:8px" onclick="document.getElementById('valgo-d-file-inp').click()">
-                <div style="font-size:20px;margin-bottom:4px">🎬</div>
-                <div style="font-size:12px;font-weight:700;color:var(--neon)">Video / Imagen — Pierna Derecha</div>
-              </div>
-              <input type="file" id="valgo-d-file-inp" accept="video/*,image/*" class="hidden" onchange="loadValgoBilateral(this,'d')">
-              <div id="valgo-d-player-wrap" style="display:none;position:relative">
-                <video id="valgo-d-video" style="width:100%;display:block;border-radius:8px;background:#000" preload="metadata"></video>
-                <canvas id="valgo-d-canvas" style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:8px;cursor:crosshair"></canvas>
-                <div style="display:flex;justify-content:center;gap:5px;margin-top:6px">
-                  <button class="btn btn-ghost btn-sm" onclick="valgoBiJump('d',-1)" style="font-size:10px">-1</button>
-                  <button class="btn btn-ghost btn-sm" onclick="valgoBiTogglePlay('d')" id="valgo-d-play-btn" style="padding:4px 14px;font-size:11px">▶</button>
-                  <button class="btn btn-ghost btn-sm" onclick="valgoBiJump('d',1)" style="font-size:10px">+1</button>
-                </div>
-                <input type="range" id="valgo-d-scrubber" min="0" max="1000" value="0" style="width:100%;margin-top:4px;accent-color:var(--neon)" oninput="valgoBiScrub('d',this.value)">
-              </div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px;margin-bottom:6px">
-                <button class="btn btn-outline btn-sm" id="valgo-d-btn-l1" onclick="setValgoBiMode('d','linea1')" style="font-size:10px">Línea 1 — Fémur</button>
-                <button class="btn btn-ghost btn-sm" id="valgo-d-btn-l2" onclick="setValgoBiMode('d','linea2')" style="font-size:10px">Línea 2 — Tibia</button>
-              </div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
-                <button class="btn btn-ghost btn-sm" onclick="clearValgoBiLines('d')" style="font-size:10px">Limpiar</button>
-                <button class="btn btn-ghost btn-sm" onclick="captureValgoBiImage('d')" style="font-size:10px">📷 Capturar</button>
-              </div>
-              <!-- Resultado D -->
-              <div class="card card-glow" id="valgo-d-result-card" style="display:none">
-                <div class="card-body" style="text-align:center;padding:12px">
-                  <div style="font-family:var(--mono);font-size:9px;color:var(--white20);margin-bottom:4px">ÁNGULO DERECHO</div>
-                  <div id="valgo-d-angle" style="font-family:var(--mono);font-size:42px;font-weight:800;color:var(--neon);line-height:1">--</div>
-                  <div style="font-size:11px;color:var(--white50)">grados</div>
-                  <div id="valgo-d-badge" class="mt-4"></div>
-                </div>
-              </div>
-              <!-- Imagen capturada D -->
-              <div id="valgo-d-img-wrap" style="display:none;margin-top:8px">
-                <img id="valgo-d-img" style="width:100%;border-radius:8px;border:1px solid rgba(57,255,122,.2)" src="" alt="Valgo Derecho">
-                <div style="font-family:var(--mono);font-size:9px;color:var(--white20);text-align:center;margin-top:4px">Pierna Derecha — guardada</div>
-              </div>
-            </div>
-
-            <!-- PIERNA IZQUIERDA -->
-            <div>
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-                <div style="width:3px;height:24px;background:var(--blue);border-radius:2px"></div>
-                <span style="font-size:14px;font-weight:700">Pierna Izquierda</span>
-                <span class="tag tag-b" style="font-size:9px">I</span>
-              </div>
-              <div id="valgo-i-upload" style="border:2px dashed rgba(77,158,255,.2);border-radius:10px;padding:18px;text-align:center;cursor:pointer;margin-bottom:8px" onclick="document.getElementById('valgo-i-file-inp').click()">
-                <div style="font-size:20px;margin-bottom:4px">🎬</div>
-                <div style="font-size:12px;font-weight:700;color:var(--blue)">Video / Imagen — Pierna Izquierda</div>
-              </div>
-              <input type="file" id="valgo-i-file-inp" accept="video/*,image/*" class="hidden" onchange="loadValgoBilateral(this,'i')">
-              <div id="valgo-i-player-wrap" style="display:none;position:relative">
-                <video id="valgo-i-video" style="width:100%;display:block;border-radius:8px;background:#000" preload="metadata"></video>
-                <canvas id="valgo-i-canvas" style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:8px;cursor:crosshair"></canvas>
-                <div style="display:flex;justify-content:center;gap:5px;margin-top:6px">
-                  <button class="btn btn-ghost btn-sm" onclick="valgoBiJump('i',-1)" style="font-size:10px">-1</button>
-                  <button class="btn btn-ghost btn-sm" onclick="valgoBiTogglePlay('i')" id="valgo-i-play-btn" style="padding:4px 14px;font-size:11px">▶</button>
-                  <button class="btn btn-ghost btn-sm" onclick="valgoBiJump('i',1)" style="font-size:10px">+1</button>
-                </div>
-                <input type="range" id="valgo-i-scrubber" min="0" max="1000" value="0" style="width:100%;margin-top:4px;accent-color:var(--blue)" oninput="valgoBiScrub('i',this.value)">
-              </div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px;margin-bottom:6px">
-                <button class="btn btn-outline btn-sm" id="valgo-i-btn-l1" onclick="setValgoBiMode('i','linea1')" style="font-size:10px;border-color:rgba(77,158,255,.4);color:var(--blue)">Línea 1 — Fémur</button>
-                <button class="btn btn-ghost btn-sm" id="valgo-i-btn-l2" onclick="setValgoBiMode('i','linea2')" style="font-size:10px">Línea 2 — Tibia</button>
-              </div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
-                <button class="btn btn-ghost btn-sm" onclick="clearValgoBiLines('i')" style="font-size:10px">Limpiar</button>
-                <button class="btn btn-ghost btn-sm" onclick="captureValgoBiImage('i')" style="font-size:10px">📷 Capturar</button>
-              </div>
-              <!-- Resultado I -->
-              <div class="card" id="valgo-i-result-card" style="display:none;border:1px solid rgba(77,158,255,.15)">
-                <div class="card-body" style="text-align:center;padding:12px">
-                  <div style="font-family:var(--mono);font-size:9px;color:var(--white20);margin-bottom:4px">ÁNGULO IZQUIERDO</div>
-                  <div id="valgo-i-angle" style="font-family:var(--mono);font-size:42px;font-weight:800;color:var(--blue);line-height:1">--</div>
-                  <div style="font-size:11px;color:var(--white50)">grados</div>
-                  <div id="valgo-i-badge" class="mt-4"></div>
-                </div>
-              </div>
-              <!-- Imagen capturada I -->
-              <div id="valgo-i-img-wrap" style="display:none;margin-top:8px">
-                <img id="valgo-i-img" style="width:100%;border-radius:8px;border:1px solid rgba(77,158,255,.2)" src="" alt="Valgo Izquierdo">
-                <div style="font-family:var(--mono);font-size:9px;color:var(--white20);text-align:center;margin-top:4px">Pierna Izquierda — guardada</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Comparación bilateral -->
-          <div class="card card-glow mt-14" id="valgo-bi-compare-card" style="display:none">
-            <div class="card-header"><h3>📊 Comparación Bilateral — Asimetría de Valgo</h3><span id="valgo-bi-asim-badge" class="tag"></span></div>
-            <div class="card-body">
-              <div class="grid-2" style="gap:12px;margin-bottom:12px">
-                <div style="text-align:center;background:rgba(57,255,122,.04);border-radius:8px;padding:12px">
-                  <div style="font-family:var(--mono);font-size:9px;color:var(--white20);margin-bottom:4px">DERECHA</div>
-                  <div id="valgo-bi-d-val" style="font-family:var(--mono);font-size:32px;font-weight:800;color:var(--neon)">—°</div>
-                </div>
-                <div style="text-align:center;background:rgba(77,158,255,.04);border-radius:8px;padding:12px">
-                  <div style="font-family:var(--mono);font-size:9px;color:var(--white20);margin-bottom:4px">IZQUIERDA</div>
-                  <div id="valgo-bi-i-val" style="font-family:var(--mono);font-size:32px;font-weight:800;color:var(--blue)">—°</div>
-                </div>
-              </div>
-              <div id="valgo-bi-interp" style="font-size:12px;color:var(--white50);line-height:1.7;margin-bottom:12px"></div>
-              <!-- Preview de ambas imágenes -->
-              <div id="valgo-bi-imgs-preview" style="display:none">
-                <div style="font-family:var(--mono);font-size:9px;color:var(--white20);text-transform:uppercase;margin-bottom:8px">Capturas guardadas (se incluyen en el informe)</div>
-                <div class="grid-2" style="gap:8px">
-                  <div><img id="valgo-bi-preview-d" style="width:100%;border-radius:8px;border:1px solid rgba(57,255,122,.2)" src="" alt=""><div style="font-size:9px;color:var(--neon);text-align:center;font-family:var(--mono);margin-top:4px">DERECHA</div></div>
-                  <div><img id="valgo-bi-preview-i" style="width:100%;border-radius:8px;border:1px solid rgba(77,158,255,.2)" src="" alt=""><div style="font-size:9px;color:var(--blue);text-align:center;font-family:var(--mono);margin-top:4px">IZQUIERDA</div></div>
-                </div>
-              </div>
-              <button class="btn btn-neon btn-full mt-12" onclick="saveValgoBilateral()">💾 Guardar análisis bilateral</button>
-            </div>
-          </div>
-        </div><!-- /valgo-bi-section -->
       </div>
     </div>
-  </div><!-- /ptab-saltos -->
+
+  </div>
 
   <!-- ══ TAB: MOVILIDAD ══ -->
   <div id="ptab-movilidad" class="hidden">
@@ -1300,205 +1146,6 @@
     <div id="sprint-bench-area"></div>
   </div>
 
-  <!-- ══ TAB: SPRINT HORIZONTAL (S-MAS / Samozino) ══ -->
-  <div id="ptab-sprint-horiz" class="hidden">
-    <div class="flex-b mb-16">
-      <div>
-        <div style="font-size:15px;font-weight:700">🏃 Sprint Horizontal — Perfil S-MAS</div>
-        <div style="font-size:12px;color:var(--white50)">Tiempos de contacto · Desaceleración · Modelo Samozino · Fuerza horizontal</div>
-      </div>
-      <div class="flex" style="gap:8px">
-        <select class="inp inp-mono" id="sh-eval-num" style="width:100px;font-size:11px">
-          <option value="0">1ra Eval</option><option value="1">2da Eval</option><option value="2">3ra Eval</option><option value="3">4ta Eval</option>
-        </select>
-        <input class="inp" type="date" id="sh-fecha" style="width:150px;font-size:12px">
-        <button class="btn btn-neon btn-sm" onclick="saveSprintHoriz()">💾 Guardar</button>
-      </div>
-    </div>
-
-    <!-- FILA SUPERIOR: Config + Tiempos split -->
-    <div class="grid-2 mb-14" style="gap:14px;align-items:start">
-
-      <!-- Configuración y tiempos split -->
-      <div style="display:flex;flex-direction:column;gap:12px">
-        <div class="card">
-          <div class="card-header"><h3>⚙️ Configuración del sprint</h3></div>
-          <div class="card-body">
-            <div class="grid-2" style="gap:10px">
-              <div class="ig">
-                <label class="il">Distancia total (m)</label>
-                <select class="inp" id="sh-dist-total" onchange="updateSprintGrid()">
-                  <option value="20">20 metros</option>
-                  <option value="30" selected>30 metros</option>
-                  <option value="40">40 metros</option>
-                  <option value="60">60 metros</option>
-                  <option value="100">100 metros</option>
-                </select>
-              </div>
-              <div class="ig">
-                <label class="il">Masa corporal (kg)</label>
-                <input class="inp inp-mono" type="number" id="sh-masa" placeholder="75" step=".1" oninput="calcSprintHoriz()">
-              </div>
-              <div class="ig">
-                <label class="il">Tipo de superficie</label>
-                <select class="inp" id="sh-superficie">
-                  <option value="cesped">Césped natural</option>
-                  <option value="sintetico">Sintético</option>
-                  <option value="tartan">Tartán / Pista</option>
-                  <option value="parquet">Parquet / Madera</option>
-                </select>
-              </div>
-              <div class="ig">
-                <label class="il">Condición</label>
-                <select class="inp" id="sh-condicion">
-                  <option value="frescos">Frescos / Descansado</option>
-                  <option value="activado">Post-entrada en calor</option>
-                  <option value="fatigado">Fatigado</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Tiempos split -->
-        <div class="card card-glow">
-          <div class="card-header"><h3>⏱️ Tiempos split (acumulados)</h3><span class="tag tag-b">Desde salida</span></div>
-          <div class="card-body">
-            <div id="sh-splits-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px">
-              <!-- Se genera con JS según distancia seleccionada -->
-            </div>
-            <button class="btn btn-ghost btn-full btn-sm mt-8" onclick="autoFillSprintSplits()" style="font-size:11px">🔄 Auto-completar desde t10 y t30</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tiempos de contacto y desaceleración -->
-      <div style="display:flex;flex-direction:column;gap:12px">
-        <div class="card">
-          <div class="card-header"><h3>👣 Tiempos de contacto (ms)</h3><span class="tag tag-y">Por zona</span></div>
-          <div class="card-body">
-            <p style="font-size:11px;color:var(--white50);margin-bottom:10px">Medido con célula fotoeléctrica, app de cámara lenta o sensor de contacto.</p>
-            <div class="grid-2" style="gap:8px">
-              <div class="ig">
-                <label class="il">0-10m — Aceleración (ms)</label>
-                <input class="inp inp-mono" type="number" id="sh-tc-acel" placeholder="180" oninput="calcSprintHoriz()">
-                <div style="font-size:9px;color:var(--white20);margin-top:3px;font-family:var(--mono)">Ref: 130-200 ms (élite)</div>
-              </div>
-              <div class="ig">
-                <label class="il">10-20m — Transición (ms)</label>
-                <input class="inp inp-mono" type="number" id="sh-tc-trans" placeholder="120" oninput="calcSprintHoriz()">
-                <div style="font-size:9px;color:var(--white20);margin-top:3px;font-family:var(--mono)">Ref: 100-130 ms (élite)</div>
-              </div>
-              <div class="ig">
-                <label class="il">20-30m+ — Velocidad máx (ms)</label>
-                <input class="inp inp-mono" type="number" id="sh-tc-vmax" placeholder="90" oninput="calcSprintHoriz()">
-                <div style="font-size:9px;color:var(--white20);margin-top:3px;font-family:var(--mono)">Ref: 80-100 ms (élite)</div>
-              </div>
-              <div class="ig">
-                <label class="il">Frecuencia de pasos (pasos/s)</label>
-                <input class="inp inp-mono" type="number" step=".1" id="sh-freq-pasos" placeholder="4.5" oninput="calcSprintHoriz()">
-                <div style="font-size:9px;color:var(--white20);margin-top:3px;font-family:var(--mono)">Cadencia de zancada</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Desaceleración -->
-        <div class="card">
-          <div class="card-header"><h3>📉 Perfil de Desaceleración</h3><span class="tag tag-r">Post Vmax</span></div>
-          <div class="card-body">
-            <div class="grid-2" style="gap:8px">
-              <div class="ig">
-                <label class="il">Vel. máxima alcanzada (m/s)</label>
-                <input class="inp inp-mono" type="number" step=".01" id="sh-vmax-ms" placeholder="9.2" oninput="calcSprintHoriz()">
-              </div>
-              <div class="ig">
-                <label class="il">Vel. al finalizar (m/s)</label>
-                <input class="inp inp-mono" type="number" step=".01" id="sh-vfin-ms" placeholder="8.1" oninput="calcSprintHoriz()">
-              </div>
-              <div class="ig">
-                <label class="il">Distancia mantenimiento Vmax (m)</label>
-                <input class="inp inp-mono" type="number" step=".5" id="sh-dist-vmax" placeholder="10" oninput="calcSprintHoriz()">
-              </div>
-              <div class="ig">
-                <label class="il">Distancia desaceleración (m)</label>
-                <input class="inp inp-mono" type="number" step=".5" id="sh-dist-desacel" placeholder="10" oninput="calcSprintHoriz()">
-              </div>
-            </div>
-            <div id="sh-desacel-result" style="margin-top:10px"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- RESULTADOS: Perfil S-MAS -->
-    <div id="sh-output" class="hidden">
-      <!-- KPIs -->
-      <div class="grid-4 mb-14" style="gap:10px">
-        <div class="kpi kpi-green">
-          <div class="kpi-label">Vel. Máxima</div>
-          <div class="kpi-val" id="sh-kpi-vmax">—</div>
-          <div class="kpi-sub">m/s</div>
-        </div>
-        <div class="kpi">
-          <div class="kpi-label">F. Horizontal Relativa</div>
-          <div class="kpi-val" id="sh-kpi-fh">—</div>
-          <div class="kpi-sub">N/kg</div>
-        </div>
-        <div class="kpi">
-          <div class="kpi-label">Potencia Horizontal</div>
-          <div class="kpi-val" id="sh-kpi-ph">—</div>
-          <div class="kpi-sub">W/kg</div>
-        </div>
-        <div class="kpi">
-          <div class="kpi-label">Índice Ratio (RF%)</div>
-          <div class="kpi-val" id="sh-kpi-rf">—</div>
-          <div class="kpi-sub">% fuerza neta →</div>
-        </div>
-      </div>
-
-      <div class="grid-2 mb-14" style="gap:14px">
-        <!-- Gráfico perfil sprint -->
-        <div class="card card-glow">
-          <div class="card-header"><h3>📊 Curva Velocidad-Distancia</h3><span class="tag tag-g">S-MAS Profile</span></div>
-          <div class="card-body"><canvas id="sh-vel-chart" height="200"></canvas></div>
-        </div>
-
-        <!-- Perfil F-V horizontal -->
-        <div class="card card-glow">
-          <div class="card-header"><h3>⚡ Perfil F-V Horizontal (Samozino)</h3><span class="tag tag-b">Modelo mecánico</span></div>
-          <div class="card-body">
-            <canvas id="sh-fv-chart" height="180"></canvas>
-            <div id="sh-fv-interp" style="margin-top:10px;font-size:11px;color:var(--white50);line-height:1.7"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tabla tiempos de contacto -->
-      <div class="grid-2 mb-14" style="gap:14px">
-        <div class="card">
-          <div class="card-header"><h3>👣 Análisis de Tiempos de Contacto</h3><span class="tag tag-y">Por fase</span></div>
-          <div class="card-body">
-            <table class="data-table">
-              <thead><tr><th>Fase</th><th>tc (ms)</th><th>Clasificación</th><th>Referencia</th></tr></thead>
-              <tbody id="sh-tc-table"></tbody>
-            </table>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-header"><h3>📉 Análisis de Desaceleración</h3></div>
-          <div class="card-body" id="sh-desacel-analysis"></div>
-        </div>
-      </div>
-
-      <!-- Historial -->
-      <div class="card">
-        <div class="card-header"><h3>📋 Historial Sprint Horizontal</h3></div>
-        <div class="card-body" id="sh-hist-table" style="overflow-x:auto"></div>
-      </div>
-    </div>
-  </div>
-
   <!-- ══ TAB: FMS ══ -->
   <div id="ptab-fms" class="hidden">
     <div class="flex-b mb-16">
@@ -1561,7 +1208,7 @@
   <!-- ══ TAB: FATIGA ══ -->
   <div id="ptab-fatiga" class="hidden">
     <div class="flex-b mb-14">
-      <div><div style="font-size:15px;font-weight:700">Control de Fatiga Diaria</div><div style="font-size:12px;color:var(--text2)">Hooper Index · HRV · Pérdida de velocidad</div></div>
+      <div><div style="font-size:15px;font-weight:700">🌿 Wellness — Control del Atleta</div><div style="font-size:12px;color:var(--text2)">Hooper Index · HRV · Pérdida de velocidad · Bienestar diario</div></div>
       <div class="flex" style="gap:8px">
         <input class="inp" type="date" id="fat-fecha" style="width:150px;font-size:12px">
         <button class="btn btn-neon btn-sm" onclick="saveFatiga()">💾 Guardar</button>
