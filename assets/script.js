@@ -331,15 +331,16 @@ function showPage(id) {
 }
 
 function showProfileTab(tab, btn) {
-  const tabs = ['dashboard','kinesio','fuerza','saltos','movilidad','velocidad','fms','fatiga','video','vmp','historial'];
+  const tabs = ['dashboard','kinesio','fuerza','saltos','movilidad','velocidad','sprint-horiz','fms','fatiga','video','vmp','historial'];
   tabs.forEach(t => document.getElementById('ptab-' + t)?.classList.toggle('hidden', t !== tab));
   document.querySelectorAll('#profile-tab-bar .ptab').forEach(b => b.classList.remove('active'));
   btn?.classList.add('active');
-  if (tab === 'dashboard')  renderDashboard();
-  if (tab === 'historial')  renderHistorial();
-  if (tab === 'kinesio')    initKinesio();
-  if (tab === 'fuerza')     renderFVHist();
-  if (tab === 'saltos')     renderSimetriasTabla();
+  if (tab === 'dashboard')     renderDashboard();
+  if (tab === 'historial')     renderHistorial();
+  if (tab === 'kinesio')       { initKinesio(); setTimeout(initWellness, 100); }
+  if (tab === 'fuerza')        { renderFVHist(); setTimeout(updateFuerzaRelativaIntegrada, 150); }
+  if (tab === 'saltos')        renderSimetriasTabla();
+  if (tab === 'sprint-horiz')  { updateSprintGrid(); renderSprintHorizHist(); }
   if (tab === 'movilidad') {
     setTimeout(redrawGauges, 60);
     const amPanel = document.getElementById('adulto-mayor-tests');
@@ -3697,6 +3698,22 @@ function captureValgoImage() {
 }
 
 // ══════════════════════════════════════════════════════
+//  ALIASES para nuevos módulos
+// ══════════════════════════════════════════════════════
+function saveAtletaData(a) {
+  atletas = atletas.map(x => x.id === a.id ? a : x);
+  saveData();
+}
+function showToast(msg) {
+  const t = document.getElementById('save-toast');
+  if (!t) return;
+  t.textContent = msg || '✓ Guardado';
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.opacity = '0'; t.textContent = '✓ Guardado'; }, 2200);
+}
+
+// ══════════════════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════════════════
 
@@ -3716,3 +3733,326 @@ document.addEventListener('DOMContentLoaded', () => {
     if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); if (cur) saveData(); }
   });
 });
+// ══════════════════════════════════════════════════════════════
+//  NUEVOS MÓDULOS v12.1
+// ══════════════════════════════════════════════════════════════
+
+// ── ALIASES ──
+function saveAtletaData(a) {
+  atletas = atletas.map(x => x.id === a.id ? a : x);
+  saveData();
+}
+function showToast(msg) {
+  const t = document.getElementById('save-toast');
+  if (!t) return;
+  t.textContent = msg || '✓ Guardado';
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.opacity = '0'; t.textContent = '✓ Guardado'; }, 2200);
+}
+
+// ── 1. FUERZA RELATIVA INTEGRADA ──
+function updateFuerzaRelativaIntegrada() {
+  const a = cur; if (!a) return;
+  const peso = parseFloat(a.peso) || 0; if (!peso) return;
+  let rm1 = 0, ejName = '—';
+  const ejOrder = ['sentadilla','press-banca','peso-muerto','hip-thrust','media-sent'];
+  for (const ej of ejOrder) {
+    const entries = Object.entries(a.evals || {})
+      .filter(([k]) => k.startsWith('fv_' + ej + '_'))
+      .map(([,v]) => v).filter(v => v.oneRM)
+      .sort((x,y) => new Date(y.fecha||0) - new Date(x.fecha||0));
+    if (entries.length) { rm1 = entries[0].oneRM; ejName = entries[0].ejercicio || ej; break; }
+  }
+  if (!rm1 && a.lastFV?.oneRM) { rm1 = a.lastFV.oneRM; ejName = a.lastFV.ejercicio || '—'; }
+  const lastSaltos = Object.entries(a.evals || {})
+    .filter(([k]) => k.startsWith('saltos_')).map(([,v]) => v)
+    .sort((x,y) => new Date(y.fecha||0) - new Date(x.fecha||0))[0];
+  const cmj = parseFloat(a.lastCMJ) || parseFloat(lastSaltos?.avg?.cmj) || 0;
+  const sj  = parseFloat(lastSaltos?.avg?.sj) || 0;
+  const ratio = peso > 0 && rm1 > 0 ? rm1 / peso : 0;
+  const target = peso * 1.26;
+  const pct = Math.min(ratio / 1.26 * 100, 100);
+  const setEl = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
+  setEl('frel-1rm-val',    rm1 > 0 ? rm1.toFixed(1) + ' kg' : '—');
+  setEl('frel-1rm-ej',     ejName.replace(/-/g,' '));
+  setEl('frel-ratio-val',  ratio > 0 ? ratio.toFixed(2) : '—');
+  setEl('frel-target-val', target.toFixed(1) + ' kg');
+  setEl('frel-pct-label',  pct.toFixed(0) + '%');
+  const bar = document.getElementById('frel-bar');
+  if (bar) { bar.style.width = pct + '%'; bar.style.background = pct >= 100 ? 'var(--neon)' : pct >= 80 ? 'var(--amber)' : 'var(--red)'; }
+  setEl('frel-cmj-val', cmj > 0 ? cmj.toFixed(1) : '—');
+  setEl('frel-sj-val',  sj  > 0 ? sj.toFixed(1)  : '—');
+  if (cmj > 0 && peso > 0) {
+    const g = 9.81, h = cmj / 100, v0 = Math.sqrt(2 * g * h);
+    setEl('frel-cmj-fuerza', 'F estim: ~' + (peso * (g + v0*v0/(2*h))).toFixed(0) + ' N');
+  }
+  if (cmj > 0 && sj > 0) {
+    const bosco = ((cmj - sj) / sj * 100).toFixed(1);
+    const el = document.getElementById('frel-bosco-idx');
+    if (el) el.textContent = `Índice Bosco (CMJ-SJ)/SJ: ${bosco}% — ${parseFloat(bosco) > 15 ? '⚡ Buen uso elástico' : '⚠️ Revisar componente elástico'}`;
+  }
+  const interpEl = document.getElementById('frel-interpretacion');
+  if (interpEl) {
+    if (!rm1) { interpEl.textContent = 'Registrá un Perfil F-V para ver el indicador de Fuerza Relativa.'; return; }
+    interpEl.textContent = ratio >= 1.26 ? `✅ Supera el umbral élite 1.26×PC (ratio: ${ratio.toFixed(2)}).`
+      : ratio >= 1.1 ? `🟡 Avanzado (${ratio.toFixed(2)}×PC). Faltan ${(target-rm1).toFixed(1)} kg para élite.`
+      : ratio >= 0.9 ? `🟠 Intermedio (${ratio.toFixed(2)}×PC). Target élite: ${target.toFixed(1)} kg.`
+      : `🔴 Inicial (${ratio.toFixed(2)}×PC). Priorizar fuerza base. Target: ${target.toFixed(1)} kg.`;
+  }
+}
+
+// ── 2. SPRINT HORIZONTAL ──
+function updateSprintGrid() {
+  const grid = document.getElementById('sh-splits-grid'); if (!grid) return;
+  const dist = parseInt(document.getElementById('sh-dist-total')?.value || 30);
+  const splits = [10,20,30,40,60,100].filter(d => d <= dist);
+  grid.innerHTML = splits.map(d => `<div class="ig" style="margin:0"><label class="il">${d}m (seg)</label><input class="inp inp-mono" type="number" step=".001" id="sh-t${d}" placeholder="${(d*0.137).toFixed(2)}" oninput="calcSprintHoriz()"></div>`).join('');
+}
+
+function calcSprintHoriz() {
+  const masa = parseFloat(document.getElementById('sh-masa')?.value) || 0; if (!masa) return;
+  const g = 9.81;
+  const t10 = parseFloat(document.getElementById('sh-t10')?.value) || 0;
+  const t20 = parseFloat(document.getElementById('sh-t20')?.value) || 0;
+  const t30 = parseFloat(document.getElementById('sh-t30')?.value) || 0;
+  const v10 = t10 > 0 ? 10/t10 : 0, v20 = (t20-t10)>0 ? 10/(t20-t10) : 0, v30 = (t30-t20)>0 ? 10/(t30-t20) : 0;
+  const vmaxMs = parseFloat(document.getElementById('sh-vmax-ms')?.value) || Math.max(v10,v20,v30);
+  const vfinMs = parseFloat(document.getElementById('sh-vfin-ms')?.value) || 0;
+  const distDesacel = parseFloat(document.getElementById('sh-dist-desacel')?.value) || 10;
+  if (vmaxMs > 0 && vfinMs > 0 && vfinMs < vmaxMs) {
+    const desacel = (vmaxMs*vmaxMs - vfinMs*vfinMs)/(2*distDesacel);
+    const pctP = ((vmaxMs-vfinMs)/vmaxMs*100);
+    const resEl = document.getElementById('sh-desacel-result');
+    const c = desacel > 3 ? 'var(--red)' : desacel > 1.5 ? 'var(--amber)' : 'var(--neon)';
+    if (resEl) resEl.innerHTML = `<div style="font-family:var(--mono);font-size:18px;font-weight:800;color:${c}">${desacel.toFixed(2)} m/s²</div><div style="font-size:10px;color:var(--white50)">Pérdida: ${pctP.toFixed(1)}% de Vmax</div>`;
+  }
+  if (vmaxMs <= 0) return;
+  const tau = 1.0, fhRel = g*vmaxMs/(vmaxMs+g*tau), phRel = fhRel*vmaxMs, rf = (fhRel/g)*100;
+  document.getElementById('sh-output')?.classList.remove('hidden');
+  const setKpi = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  setKpi('sh-kpi-vmax', vmaxMs.toFixed(2)); setKpi('sh-kpi-fh', fhRel.toFixed(2));
+  setKpi('sh-kpi-ph', phRel.toFixed(1)); setKpi('sh-kpi-rf', rf.toFixed(1)+'%');
+  const tcA=parseFloat(document.getElementById('sh-tc-acel')?.value)||0;
+  const tcT=parseFloat(document.getElementById('sh-tc-trans')?.value)||0;
+  const tcV=parseFloat(document.getElementById('sh-tc-vmax')?.value)||0;
+  const tb=document.getElementById('sh-tc-table');
+  if (tb) {
+    const cls=(tc,t1,t2)=>tc<=t1?'<span class="tag tag-g">Élite</span>':tc<=t2?'<span class="tag tag-y">Bueno</span>':'<span class="tag tag-r">Mejorar</span>';
+    tb.innerHTML=[tcA?`<tr><td>Aceleración (0–10m)</td><td class="mono-cell">${tcA} ms</td><td>${cls(tcA,150,180)}</td><td style="font-size:10px;color:var(--white20)">≤150ms élite</td></tr>`:'',tcT?`<tr><td>Transición (10–20m)</td><td class="mono-cell">${tcT} ms</td><td>${cls(tcT,110,130)}</td><td style="font-size:10px;color:var(--white20)">≤110ms élite</td></tr>`:'',tcV?`<tr><td>Vel. Máxima (20m+)</td><td class="mono-cell">${tcV} ms</td><td>${cls(tcV,90,105)}</td><td style="font-size:10px;color:var(--white20)">≤90ms élite</td></tr>`:''].join('');
+  }
+  if (vmaxMs > 0 && vfinMs > 0) {
+    const desacel=(vmaxMs*vmaxMs-vfinMs*vfinMs)/(2*distDesacel), pctP=((vmaxMs-vfinMs)/vmaxMs*100);
+    const dEl=document.getElementById('sh-desacel-analysis');
+    if (dEl) { const c1=desacel>3?'var(--red)':desacel>1.5?'var(--amber)':'var(--neon)'; const c2=pctP>15?'var(--red)':pctP>8?'var(--amber)':'var(--neon)';
+      dEl.innerHTML=`<div class="grid-2" style="gap:8px"><div style="background:rgba(0,0,0,.2);border-radius:8px;padding:10px;text-align:center"><div style="font-family:var(--mono);font-size:9px;color:var(--white20)">DESACELERACIÓN</div><div style="font-family:var(--mono);font-size:24px;font-weight:700;color:${c1}">${desacel.toFixed(2)}</div><div style="font-size:9px;color:var(--white20)">m/s²</div></div><div style="background:rgba(0,0,0,.2);border-radius:8px;padding:10px;text-align:center"><div style="font-family:var(--mono);font-size:9px;color:var(--white20)">PÉRDIDA Vmax</div><div style="font-family:var(--mono);font-size:24px;font-weight:700;color:${c2}">${pctP.toFixed(1)}%</div><div style="font-size:9px;color:var(--white20)">velocidad</div></div></div><div style="margin-top:10px;font-size:11px;color:var(--white50);line-height:1.7">${pctP>15?'🔴 Alta pérdida — revisar resistencia de velocidad.':pctP>8?'🟡 Pérdida moderada.':'✅ Buen mantenimiento de velocidad.'}</div>`; }
+  }
+  const pts=[]; if(v10) pts.push({d:10,v:v10}); if(v20) pts.push({d:20,v:v20}); if(v30) pts.push({d:30,v:v30});
+  if (pts.length >= 2) {
+    const ctx=document.getElementById('sh-vel-chart'); if(ctx){if(window._shVelChart)window._shVelChart.destroy();window._shVelChart=new Chart(ctx,{type:'line',data:{labels:pts.map(p=>p.d+'m'),datasets:[{label:'Vel (m/s)',data:pts.map(p=>p.v),borderColor:'#39FF7A',backgroundColor:'rgba(57,255,122,.08)',tension:.4,fill:true,pointBackgroundColor:'#39FF7A',pointRadius:5}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(255,255,255,.3)',font:{family:'JetBrains Mono',size:10}}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(255,255,255,.3)',font:{family:'JetBrains Mono',size:10}}}}}});}
+  }
+}
+
+function saveSprintHoriz() {
+  if (!cur) { showToast('Seleccioná un atleta'); return; }
+  if (!cur.evals) cur.evals = {};
+  const evalNum = parseInt(document.getElementById('sh-eval-num')?.value || 0);
+  cur.evals['sh_' + evalNum] = {
+    fecha: document.getElementById('sh-fecha')?.value || new Date().toISOString().slice(0,10),
+    dist: document.getElementById('sh-dist-total')?.value,
+    masa: document.getElementById('sh-masa')?.value,
+    t10: document.getElementById('sh-t10')?.value, t20: document.getElementById('sh-t20')?.value, t30: document.getElementById('sh-t30')?.value,
+    vmaxMs: document.getElementById('sh-vmax-ms')?.value, vfinMs: document.getElementById('sh-vfin-ms')?.value,
+    tcAcel: document.getElementById('sh-tc-acel')?.value, tcTrans: document.getElementById('sh-tc-trans')?.value, tcVmax: document.getElementById('sh-tc-vmax')?.value,
+  };
+  saveAtletaData(cur); showToast('Sprint Horizontal guardado ✓'); renderSprintHorizHist();
+}
+
+function autoFillSprintSplits() {
+  const t10=parseFloat(document.getElementById('sh-t10')?.value)||0, t30=parseFloat(document.getElementById('sh-t30')?.value)||0;
+  if (t10>0&&t30>0){const el=document.getElementById('sh-t20');if(el&&!el.value)el.value=((t10+t30)/2).toFixed(3);calcSprintHoriz();}
+}
+
+function renderSprintHorizHist() {
+  const el=document.getElementById('sh-hist-table'); if(!el||!cur) return;
+  const entries=Object.entries(cur.evals||{}).filter(([k])=>k.startsWith('sh_')).map(([,v])=>v).filter(v=>v.fecha).sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
+  if(!entries.length){el.innerHTML='<p style="font-size:12px;color:var(--white20)">Sin registros de Sprint Horizontal.</p>';return;}
+  el.innerHTML=`<table class="data-table"><thead><tr><th>Fecha</th><th>Dist.</th><th>10m</th><th>20m</th><th>30m</th><th>Vmax</th><th>tc Acel</th><th>tc Vmax</th></tr></thead><tbody>${entries.map(e=>`<tr><td class="mono-cell">${e.fecha}</td><td>${e.dist||'--'}m</td><td class="mono-cell">${e.t10||'--'}s</td><td class="mono-cell">${e.t20||'--'}s</td><td class="mono-cell">${e.t30||'--'}s</td><td class="mono-cell text-neon">${e.vmaxMs||'--'} m/s</td><td class="mono-cell">${e.tcAcel||'--'} ms</td><td class="mono-cell">${e.tcVmax||'--'} ms</td></tr>`).join('')}</tbody></table>`;
+}
+
+// ── 3. WELLNESS ──
+function initWellness() {
+  calcWellnessScore();
+  if (!cur) return;
+  const last=(cur.wellnessData||[]).slice(-1)[0]; if(!last) return;
+  const set=(id,val)=>{const e=document.getElementById(id);if(e)e.value=val;};
+  const setD=(id,val)=>{const e=document.getElementById(id);if(e)e.textContent=val;};
+  set('w-sueno',last.sueno||5);setD('w-sueno-v',last.sueno||5);
+  set('w-dolor',last.dolor||0);setD('w-dolor-v',last.dolor||0);
+  set('w-energia',last.energia||5);setD('w-energia-v',last.energia||5);
+  set('w-animo',last.animo||5);setD('w-animo-v',last.animo||5);
+  set('w-estres',last.estres||5);setD('w-estres-v',last.estres||5);
+  if(last.obs){const e=document.getElementById('w-obs');if(e)e.value=last.obs;}
+  calcWellnessScore();
+}
+
+function updateWellnessSlider(sliderId, displayId) {
+  const val=document.getElementById(sliderId)?.value;
+  const disp=document.getElementById(displayId); if(disp) disp.textContent=val;
+  calcWellnessScore();
+}
+
+function calcWellnessScore() {
+  const sueno=parseInt(document.getElementById('w-sueno')?.value||5);
+  const dolor=parseInt(document.getElementById('w-dolor')?.value||0);
+  const energia=parseInt(document.getElementById('w-energia')?.value||5);
+  const animo=parseInt(document.getElementById('w-animo')?.value||5);
+  const estres=parseInt(document.getElementById('w-estres')?.value||5);
+  const score=Math.round((sueno+(10-dolor)+energia+animo+(11-estres))/5);
+  const ring=document.getElementById('wellness-ring'), valEl=document.getElementById('wellness-score-val');
+  const lblEl=document.getElementById('wellness-score-label'), recEl=document.getElementById('wellness-score-rec');
+  if(!ring||!valEl) return;
+  ring.style.strokeDashoffset=213.6-(score/10)*213.6; valEl.textContent=score;
+  const [label,rec,color]=score>=8?['Óptimo','Listo para entrenar a máxima intensidad.','var(--neon)']:score>=6?['Bueno','Sesión moderada-alta. Monitorear.','var(--blue)']:score>=4?['Regular','Reducir carga. Priorizar técnica.','var(--amber)']:['Bajo','⚠️ Descanso recomendado.','var(--red)'];
+  ring.style.stroke=color; valEl.style.color=color;
+  if(lblEl){lblEl.textContent=label;lblEl.style.color=color;} if(recEl) recEl.textContent=rec;
+}
+
+function toggleWellnessZona(btn) { btn.classList.toggle('yes'); }
+
+function saveWellness() {
+  if(!cur){showToast('Seleccioná un atleta');return;}
+  if(!cur.wellnessData) cur.wellnessData=[];
+  const zonas=[...document.querySelectorAll('#w-zonas-dolor .fms-btn.yes')].map(b=>b.textContent.trim());
+  const sueno=parseInt(document.getElementById('w-sueno')?.value||5);
+  const dolor=parseInt(document.getElementById('w-dolor')?.value||0);
+  const energia=parseInt(document.getElementById('w-energia')?.value||5);
+  const animo=parseInt(document.getElementById('w-animo')?.value||5);
+  const estres=parseInt(document.getElementById('w-estres')?.value||5);
+  const score=Math.round((sueno+(10-dolor)+energia+animo+(11-estres))/5);
+  cur.wellnessData.push({fecha:document.getElementById('wellness-fecha')?.value||new Date().toISOString().slice(0,10),sueno,dolor,energia,animo,estres,score,zonas,obs:document.getElementById('w-obs')?.value||''});
+  saveAtletaData(cur); showToast('Wellness guardado ✓'); renderWellnessHistory();
+}
+
+function showWellnessHistory() {
+  const h=document.getElementById('wellness-hist'); if(h) h.classList.toggle('hidden'); renderWellnessHistory();
+}
+
+function renderWellnessHistory() {
+  const el=document.getElementById('wellness-hist-table'); if(!el||!cur) return;
+  const data=(cur.wellnessData||[]).slice(-6).reverse();
+  if(!data.length){el.innerHTML='<p style="font-size:12px;color:var(--white20)">Sin registros.</p>';return;}
+  el.innerHTML=`<table class="data-table"><thead><tr><th>Fecha</th><th>Score</th><th>Sueño</th><th>Dolor</th><th>Energía</th><th>Ánimo</th><th>Estrés</th></tr></thead><tbody>${data.map(r=>`<tr><td class="mono-cell">${r.fecha}</td><td><span class="tag ${r.score>=8?'tag-g':r.score>=6?'tag-b':r.score>=4?'tag-y':'tag-r'}">${r.score}/10</span></td><td class="mono-cell">${r.sueno}</td><td class="mono-cell">${r.dolor}</td><td class="mono-cell">${r.energia}</td><td class="mono-cell">${r.animo}</td><td class="mono-cell">${r.estres}</td></tr>`).join('')}</tbody></table>`;
+}
+
+// ── 4. VALGO BILATERAL ──
+const valgoBiState={d:{points:[],mode:null,angle:null,imageData:null},i:{points:[],mode:null,angle:null,imageData:null}};
+
+function setValgoLegs(mode) {
+  const uniSec=document.getElementById('valgo-uni-section'), biSec=document.getElementById('valgo-bi-section');
+  const uniBtn=document.getElementById('valgo-mode-uni'), biBtn=document.getElementById('valgo-mode-bi');
+  if(!uniSec||!biSec) return;
+  if(mode==='bi'){uniSec.style.display='none';biSec.style.display='block';if(uniBtn)uniBtn.className='btn btn-ghost btn-sm';if(biBtn)biBtn.className='btn btn-neon btn-sm';}
+  else{uniSec.style.display='block';biSec.style.display='none';if(uniBtn)uniBtn.className='btn btn-neon btn-sm';if(biBtn)biBtn.className='btn btn-ghost btn-sm';}
+}
+
+function loadValgoBilateral(inp, side) {
+  const file=inp.files[0];if(!file)return;
+  const vid=document.getElementById(`valgo-${side}-video`),wrap=document.getElementById(`valgo-${side}-player-wrap`),upDiv=document.getElementById(`valgo-${side}-upload`);
+  if(!vid||!wrap)return;
+  vid.src=URL.createObjectURL(file);
+  const onReady=()=>{wrap.style.display='block';if(upDiv)upDiv.style.display='none';initValgoBiCanvas(side);};
+  vid.onloadedmetadata=onReady; vid.onloadeddata=onReady;
+}
+
+function initValgoBiCanvas(side) {
+  const canvas=document.getElementById(`valgo-${side}-canvas`),vid=document.getElementById(`valgo-${side}-video`);
+  if(!canvas||!vid)return;
+  canvas.width=vid.videoWidth||640; canvas.height=vid.videoHeight||360;
+  if(canvas._vbH)canvas.removeEventListener('click',canvas._vbH);
+  canvas._vbH=(e)=>handleValgoBiClick(e,side,canvas,vid);
+  canvas.addEventListener('click',canvas._vbH);
+}
+
+function valgoBiJump(side,frames){const vid=document.getElementById(`valgo-${side}-video`);if(!vid)return;vid.currentTime=Math.max(0,vid.currentTime+frames/30);setTimeout(()=>redrawValgoBiCanvas(side),40);}
+function valgoBiTogglePlay(side){const vid=document.getElementById(`valgo-${side}-video`),btn=document.getElementById(`valgo-${side}-play-btn`);if(!vid)return;if(vid.paused){vid.play();if(btn)btn.textContent='⏸';}else{vid.pause();if(btn)btn.textContent='▶';redrawValgoBiCanvas(side);}}
+function valgoBiScrub(side,val){const vid=document.getElementById(`valgo-${side}-video`);if(!vid||!vid.duration)return;vid.currentTime=(val/1000)*vid.duration;vid.pause();setTimeout(()=>redrawValgoBiCanvas(side),40);}
+function setValgoBiMode(side,mode){valgoBiState[side].mode=mode;const l1=document.getElementById(`valgo-${side}-btn-l1`),l2=document.getElementById(`valgo-${side}-btn-l2`);if(l1)l1.className=mode==='linea1'?'btn btn-outline btn-sm':'btn btn-ghost btn-sm';if(l2)l2.className=mode==='linea2'?'btn btn-outline btn-sm':'btn btn-ghost btn-sm';}
+function clearValgoBiLines(side){valgoBiState[side].points=[];valgoBiState[side].angle=null;redrawValgoBiCanvas(side);const rc=document.getElementById(`valgo-${side}-result-card`);if(rc)rc.style.display='none';const cc=document.getElementById('valgo-bi-compare-card');if(cc)cc.style.display='none';}
+
+function handleValgoBiClick(e,side,canvas,vid) {
+  const rect=canvas.getBoundingClientRect(),scaleX=canvas.width/rect.width,scaleY=canvas.height/rect.height;
+  const x=(e.clientX-rect.left)*scaleX,y=(e.clientY-rect.top)*scaleY;
+  const st=valgoBiState[side]; if(!st.mode)return;
+  st.points.push({mode:st.mode,x,y});
+  const l1=st.points.filter(p=>p.mode==='linea1').slice(-2),l2=st.points.filter(p=>p.mode==='linea2').slice(-2);
+  if(l1.length>=2&&l2.length>=2){
+    const v1={x:l1[1].x-l1[0].x,y:l1[1].y-l1[0].y},v2={x:l2[1].x-l2[0].x,y:l2[1].y-l2[0].y};
+    const dot=v1.x*v2.x+v1.y*v2.y,mag1=Math.sqrt(v1.x**2+v1.y**2),mag2=Math.sqrt(v2.x**2+v2.y**2);
+    st.angle=Math.abs(180-Math.acos(Math.max(-1,Math.min(1,dot/(mag1*mag2))))*180/Math.PI);
+    showValgoBiResult(side,st.angle); updateValgoBiComparison();
+  }
+  redrawValgoBiCanvas(side);
+}
+
+function redrawValgoBiCanvas(side) {
+  const canvas=document.getElementById(`valgo-${side}-canvas`);if(!canvas)return;
+  const ctx=canvas.getContext('2d'),vid=document.getElementById(`valgo-${side}-video`);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  try{if(vid)ctx.drawImage(vid,0,0,canvas.width,canvas.height);}catch(e){}
+  const st=valgoBiState[side],colors={linea1:'#39FF7A',linea2:side==='d'?'#39FF7A':'#4D9EFF'};
+  ['linea1','linea2'].forEach(mode=>{
+    const pts=st.points.filter(p=>p.mode===mode).slice(-2);if(!pts.length)return;
+    ctx.strokeStyle=colors[mode];ctx.lineWidth=2.5;ctx.lineCap='round';
+    ctx.beginPath();pts.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));if(pts.length>=2)ctx.stroke();
+    pts.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,5,0,Math.PI*2);ctx.fillStyle=colors[mode];ctx.fill();});
+  });
+  if(st.angle!==null){const c=st.angle<5?'#39FF7A':st.angle<10?'#FFB020':'#FF3B3B';ctx.font='bold 22px JetBrains Mono';ctx.fillStyle=c;ctx.fillText(st.angle.toFixed(1)+'°',16,38);}
+}
+
+function showValgoBiResult(side,angle) {
+  const card=document.getElementById(`valgo-${side}-result-card`),angleEl=document.getElementById(`valgo-${side}-angle`),badgeEl=document.getElementById(`valgo-${side}-badge`);
+  if(!card||!angleEl)return;
+  card.style.display='block';
+  const color=angle<5?'var(--neon)':angle<10?'var(--amber)':'var(--red)',cls=angle<5?'tag-g':angle<10?'tag-y':'tag-r',lbl=angle<5?'Normal':angle<10?'Valgo leve':'Crítico';
+  angleEl.textContent=angle.toFixed(1)+'°'; angleEl.style.color=color;
+  if(badgeEl)badgeEl.innerHTML=`<span class="tag ${cls}">${lbl}</span>`;
+}
+
+function updateValgoBiComparison() {
+  const ad=valgoBiState.d.angle,ai=valgoBiState.i.angle,card=document.getElementById('valgo-bi-compare-card');
+  if(!card||(ad===null&&ai===null))return;
+  card.style.display='block';
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  set('valgo-bi-d-val',ad!==null?ad.toFixed(1)+'°':'—°'); set('valgo-bi-i-val',ai!==null?ai.toFixed(1)+'°':'—°');
+  if(ad!==null&&ai!==null){
+    const asim=Math.abs(ad-ai),badge=document.getElementById('valgo-bi-asim-badge'),interp=document.getElementById('valgo-bi-interp');
+    const cls=asim<3?'tag-g':asim<6?'tag-y':'tag-r';
+    if(badge)badge.innerHTML=`<span class="tag ${cls}">Δ ${asim.toFixed(1)}°</span>`;
+    if(interp)interp.textContent=asim<3?`✅ Asimetría mínima (Δ${asim.toFixed(1)}°).`:asim<6?`🟡 Asimetría moderada (Δ${asim.toFixed(1)}°). Trabajar unilateralmente.`:`🔴 Asimetría crítica (Δ${asim.toFixed(1)}°). Riesgo LCA pierna ${ad>ai?'derecha':'izquierda'}.`;
+  }
+}
+
+function captureValgoBiImage(side) {
+  const canvas=document.getElementById(`valgo-${side}-canvas`),vid=document.getElementById(`valgo-${side}-video`);if(!canvas)return;
+  const tmp=document.createElement('canvas');tmp.width=canvas.width;tmp.height=canvas.height;
+  const ctx=tmp.getContext('2d');try{if(vid)ctx.drawImage(vid,0,0,tmp.width,tmp.height);}catch(e){}
+  const st=valgoBiState[side],colors={linea1:'#39FF7A',linea2:side==='d'?'#39FF7A':'#4D9EFF'};
+  ['linea1','linea2'].forEach(mode=>{const pts=st.points.filter(p=>p.mode===mode).slice(-2);if(pts.length<2)return;ctx.strokeStyle=colors[mode];ctx.lineWidth=2.5;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);ctx.lineTo(pts[1].x,pts[1].y);ctx.stroke();pts.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,5,0,Math.PI*2);ctx.fillStyle=colors[mode];ctx.fill();});});
+  if(st.angle!==null){const c=st.angle<5?'#39FF7A':st.angle<10?'#FFB020':'#FF3B3B';ctx.font='bold 24px JetBrains Mono';ctx.fillStyle=c;ctx.fillText(st.angle.toFixed(1)+'°',16,42);ctx.font='13px DM Sans';ctx.fillStyle='rgba(255,255,255,.7)';ctx.fillText('Valgo '+(side==='d'?'Derecho':'Izquierdo'),16,60);}
+  const dataUrl=tmp.toDataURL('image/png');st.imageData=dataUrl;
+  const imgEl=document.getElementById(`valgo-${side}-img`),wrap=document.getElementById(`valgo-${side}-img-wrap`);
+  if(imgEl&&wrap){imgEl.src=dataUrl;wrap.style.display='block';}
+  const pv=document.getElementById(`valgo-bi-preview-${side}`),pw=document.getElementById('valgo-bi-imgs-preview');
+  if(pv)pv.src=dataUrl;if(pw&&(valgoBiState.d.imageData||valgoBiState.i.imageData))pw.style.display='block';
+  showToast('Imagen capturada ✓');
+}
+
+function saveValgoBilateral() {
+  if(!cur){showToast('Seleccioná un atleta');return;}
+  if(!cur.valgoBilateral)cur.valgoBilateral=[];
+  cur.valgoBilateral.push({fecha:new Date().toISOString().slice(0,10),angleD:valgoBiState.d.angle,angleI:valgoBiState.i.angle,imgD:valgoBiState.d.imageData,imgI:valgoBiState.i.imageData});
+  if(!cur.evals)cur.evals={};
+  cur.evals['valgo_bi_'+Date.now()]={tipo:'valgo-bilateral',fecha:new Date().toISOString().slice(0,10),angleD:valgoBiState.d.angle,angleI:valgoBiState.i.angle};
+  saveAtletaData(cur); showToast('Análisis bilateral guardado ✓');
+}
