@@ -662,6 +662,37 @@ function renderDashboard() {
   renderDashFV();
   renderDashFatiga();
   renderDashTimeline();
+  renderDashWellnessMini();
+}
+
+function renderDashWellnessMini() {
+  const area = document.getElementById('dash-wellness-mini');
+  if (!area || !cur) return;
+  const last = (cur.wellnessData || []).slice(-1)[0];
+  if (!last) { area.innerHTML = '<p style="font-size:12px;color:var(--white20)">Sin registros de Wellness.</p>'; return; }
+  const c = last.score >= 8 ? 'var(--neon)' : last.score >= 6 ? 'var(--blue)' : last.score >= 4 ? 'var(--amber)' : 'var(--red)';
+  const lbl = last.score >= 8 ? 'Óptimo' : last.score >= 6 ? 'Bueno' : last.score >= 4 ? 'Regular' : 'Bajo';
+  const zonas = last.zonas?.length ? last.zonas.join(', ') : 'Sin molestias';
+  area.innerHTML = `
+    <div class="flex-b mb-8">
+      <div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--white20);text-transform:uppercase;margin-bottom:3px">${last.fecha}</div>
+        <div style="font-size:13px;font-weight:700;color:${c}">${lbl}</div>
+        <div style="font-size:10px;color:var(--white50);margin-top:2px">${zonas}</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-family:var(--mono);font-size:32px;font-weight:800;color:${c};line-height:1">${last.score}</div>
+        <div style="font-size:9px;color:var(--white20)">/10</div>
+      </div>
+    </div>
+    <div class="prog-wrap"><div class="prog-bar" style="width:${last.score*10}%;background:${c}"></div></div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:8px;font-size:9px;text-align:center;font-family:var(--mono)">
+      <div><div style="color:var(--white20)">SUEÑO</div><div style="color:var(--white);font-weight:700">${last.sueno}</div></div>
+      <div><div style="color:var(--white20)">DOLOR</div><div style="color:var(--white);font-weight:700">${last.dolor}</div></div>
+      <div><div style="color:var(--white20)">ENERGÍA</div><div style="color:var(--white);font-weight:700">${last.energia}</div></div>
+      <div><div style="color:var(--white20)">ÁNIMO</div><div style="color:var(--white);font-weight:700">${last.animo}</div></div>
+      <div><div style="color:var(--white20)">ESTRÉS</div><div style="color:var(--white);font-weight:700">${last.estres}</div></div>
+    </div>`;
 }
 
 function renderRadar() {
@@ -2233,6 +2264,54 @@ function exportarPDF(){
     else{doc.setFont('courier','normal');doc.setFontSize(8.5);doc.setTextColor(200,200,200);}
     doc.text(line,14,y);y+=isSec?6:5;
   });
+  // Página Valgo Bilateral — imágenes capturadas
+  const valgoRecs = (s.valgoBilateral || []).filter(r => r.imgD || r.imgI);
+  if (valgoRecs.length) {
+    doc.addPage(); doc.setFillColor(0,0,0); doc.rect(0,0,210,297,'F');
+    doc.setFillColor(8,8,8); doc.rect(0,0,210,34,'F');
+    doc.setDrawColor(57,255,122); doc.setLineWidth(0.4); doc.line(0,34,210,34);
+    doc.setTextColor(57,255,122); doc.setFontSize(13); doc.setFont('courier','bold');
+    doc.text('ANÁLISIS DE VALGO DE RODILLA — BILATERAL', 14, 20);
+    doc.setTextColor(100,100,100); doc.setFontSize(8); doc.setFont('courier','normal');
+    doc.text(`${s.nombre} · ${new Date().toLocaleDateString('es-AR')}`, 14, 28);
+    const last = valgoRecs[valgoRecs.length - 1];
+    let vy = 42;
+    // Imágenes D e I lado a lado
+    if (last.imgD && last.imgI) {
+      doc.addImage(last.imgD, 'PNG', 14, vy, 88, 66);
+      doc.addImage(last.imgI, 'PNG', 108, vy, 88, 66);
+      doc.setTextColor(57,255,122); doc.setFontSize(9); doc.setFont('courier','bold');
+      doc.text('PIERNA DERECHA', 14, vy + 70);
+      doc.text('PIERNA IZQUIERDA', 108, vy + 70);
+      if (last.angleD !== null) { doc.setTextColor(200,200,200); doc.setFontSize(8); doc.setFont('courier','normal'); doc.text(`Ángulo: ${last.angleD.toFixed(1)}°`, 14, vy + 77); }
+      if (last.angleI !== null) { doc.text(`Ángulo: ${last.angleI.toFixed(1)}°`, 108, vy + 77); }
+      vy += 86;
+    } else if (last.imgD) {
+      doc.addImage(last.imgD, 'PNG', 60, vy, 90, 68);
+      doc.setTextColor(57,255,122); doc.setFontSize(9); doc.setFont('courier','bold');
+      doc.text('PIERNA DERECHA', 60, vy + 72);
+      if (last.angleD !== null) { doc.setTextColor(200,200,200); doc.setFontSize(8); doc.setFont('courier','normal'); doc.text(`Ángulo: ${last.angleD.toFixed(1)}°`, 60, vy + 79); }
+      vy += 88;
+    } else if (last.imgI) {
+      doc.addImage(last.imgI, 'PNG', 60, vy, 90, 68);
+      doc.setTextColor(57,255,122); doc.setFontSize(9); doc.setFont('courier','bold');
+      doc.text('PIERNA IZQUIERDA', 60, vy + 72);
+      if (last.angleI !== null) { doc.setTextColor(200,200,200); doc.setFontSize(8); doc.setFont('courier','normal'); doc.text(`Ángulo: ${last.angleI.toFixed(1)}°`, 60, vy + 79); }
+      vy += 88;
+    }
+    // Tabla comparativa
+    if (last.angleD !== null && last.angleI !== null) {
+      const asim = Math.abs(last.angleD - last.angleI);
+      const c = asim < 3 ? [57,255,122] : asim < 6 ? [255,176,32] : [255,59,59];
+      doc.setFillColor(12,12,12); doc.roundedRect(14, vy, 182, 28, 2, 2, 'F');
+      doc.setTextColor(...c); doc.setFontSize(9); doc.setFont('courier','bold');
+      doc.text('COMPARACIÓN BILATERAL', 18, vy + 8);
+      doc.setFont('courier','normal'); doc.setFontSize(8.5);
+      doc.text(`Derecha: ${last.angleD.toFixed(1)}°  |  Izquierda: ${last.angleI.toFixed(1)}°  |  Asimetría: Δ${asim.toFixed(1)}°`, 18, vy + 17);
+      const interp = asim < 3 ? 'Patrón simétrico — sin asimetría significativa.' : asim < 6 ? 'Asimetría moderada — monitorear y trabajar unilateralmente.' : `Asimetría crítica — riesgo LCA en pierna ${last.angleD > last.angleI ? 'derecha' : 'izquierda'}.`;
+      doc.setTextColor(180,180,180); doc.text(interp, 18, vy + 24);
+    }
+  }
   // Página Kinesio
   if(s.kinesio&&(Object.keys(s.kinesio.bodyZones||{}).length||Object.values(s.kinesio.tests||{}).some(t=>t.result==='pos'))){
     doc.addPage();doc.setFillColor(0,0,0);doc.rect(0,0,210,297,'F');
