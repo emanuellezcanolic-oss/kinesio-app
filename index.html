@@ -1648,7 +1648,7 @@
     </div>
   </div>
 
- <!-- ══ TAB: HISTORIAL ══ -->
+<!-- ══ TAB: HISTORIAL ══ -->
 <div id="ptab-historial" class="hidden">
   <div class="flex-b mb-16">
     <div>
@@ -1656,8 +1656,7 @@
       <div style="font-size:12px;color:var(--text2)">🔴 Déficit → 🟡 Límite → 🟢 Óptimo — Evolución del atleta</div>
     </div>
     <div class="flex" style="gap:8px">
-      <button class="btn btn-neon" onclick="mostrarConfiguracionInforme()">📄 Informe Personalizado</button>
-      <button class="btn btn-neon" onclick="generarInformeProfesional()" style="background: #39FF7A; color:#000">📄 Informe Profesional (con gráficos)</button>
+      <button class="btn btn-neon" onclick="generarInformeProfesional()" style="background:#39FF7A; color:#000">📄 Generar Informe Profesional</button>
       <button class="btn btn-outline" onclick="exportAllData()">📤 Exportar JSON</button>
     </div>
   </div>
@@ -2691,6 +2690,7 @@
   </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="js/informe-profesional.js"></script>
+<script src="assets/script.js"></script>
+<script src="js/informe-profesional.js"></script>
 </body>
 </html>
