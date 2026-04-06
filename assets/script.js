@@ -5156,7 +5156,16 @@ async function generarInformePersonalizado() {
   }
   
   const contenido = construirInformeTexto(datosPrevios);
-  
+  function obtenerDatosPorFecha(fecha) {
+  if (!cur || !cur.evalsByDate || !cur.evalsByDate[fecha]) return null;
+  const data = cur.evalsByDate[fecha];
+  return {
+    fecha,
+    saltos: data.saltos || null,
+    movilidad: data.movilidad || null,
+    fuerza: Object.values(cur.evals || {}).find(e => e.fecha === fecha && (e.ejercicio || e.oneRM)) || null
+  };
+}
   // Crear un modal simple para mostrar el resultado
   const modal = document.createElement('div');
   modal.id = 'modal-informe-resultado';
