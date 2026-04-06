@@ -4980,7 +4980,16 @@ const REFERENCIAS_INFORME = {
 // ========================================================
 
 function mostrarConfiguracionInforme() {
-  if (!cur) { alert('Seleccioná un atleta primero'); return; }
+  console.log("🟢 Abriendo configuración de informe");
+  
+  if (!cur) { 
+    alert('Seleccioná un atleta primero'); 
+    return; 
+  }
+  
+  // Cerrar modal existente si hay
+  const modalExistente = document.getElementById('modal-config-informe');
+  if (modalExistente) modalExistente.remove();
   
   const modal = document.createElement('div');
   modal.id = 'modal-config-informe';
@@ -5051,6 +5060,7 @@ function mostrarConfiguracionInforme() {
   `;
   
   document.body.appendChild(modal);
+  console.log("✅ Modal agregado al DOM");
   
   // Bind eventos
   document.getElementById('audiencia-paciente')?.addEventListener('click', () => {
@@ -5078,18 +5088,23 @@ function mostrarConfiguracionInforme() {
   });
   
   const chkComparar = document.getElementById('comparar-evolutivo');
-  chkComparar?.addEventListener('change', (e) => {
-    const selectDiv = document.getElementById('select-fecha-evolutivo');
-    selectDiv.style.display = e.target.checked ? 'block' : 'none';
-    if (!e.target.checked) informeConfig.compararCon = null;
-  });
+  if (chkComparar) {
+    chkComparar.addEventListener('change', (e) => {
+      const selectDiv = document.getElementById('select-fecha-evolutivo');
+      if (selectDiv) selectDiv.style.display = e.target.checked ? 'block' : 'none';
+      if (!e.target.checked) informeConfig.compararCon = null;
+    });
+  }
   
   const selectFecha = document.getElementById('fecha-evolutiva');
-  selectFecha?.addEventListener('change', (e) => {
-    informeConfig.compararCon = e.target.value || null;
-  });
+  if (selectFecha) {
+    selectFecha.addEventListener('change', (e) => {
+      informeConfig.compararCon = e.target.value || null;
+    });
+  }
   
   document.getElementById('btn-generar-informe')?.addEventListener('click', () => {
+    console.log("🟢 Generando informe...");
     modal.remove();
     generarInformePersonalizado();
   });
@@ -5098,7 +5113,6 @@ function mostrarConfiguracionInforme() {
     modal.remove();
   });
 }
-
 // ── OBTENER FECHAS DE EVALUACIONES ──
 function obtenerFechasEvaluacionesParaComparativa() {
   if (!cur) return [];
