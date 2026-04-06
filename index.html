@@ -1653,16 +1653,16 @@
 
   <!-- ══ TAB: HISTORIAL ══ -->
   <div id="ptab-historial" class="hidden">
-    <div class="flex-b mb-16">
-      <div>
-        <div style="font-size:15px;font-weight:700">Historial — Timeline visual</div>
-        <div style="font-size:12px;color:var(--text2)">🔴 Déficit → 🟡 Límite → 🟢 Óptimo — Evolución del atleta</div>
-      </div>
-      <div class="flex" style="gap:8px">
-        <button class="btn btn-ai" onclick="openInformeIA()">🤖 Generar Informe IA</button>
-        <button class="btn btn-outline" onclick="exportAllData()">📤 Exportar JSON</button>
-      </div>
+  <div class="flex-b mb-16">
+    <div>
+      <div style="font-size:15px;font-weight:700">Historial — Timeline visual</div>
+      <div style="font-size:12px;color:var(--text2)">🔴 Déficit → 🟡 Límite → 🟢 Óptimo — Evolución del atleta</div>
     </div>
+    <div class="flex" style="gap:8px">
+      <button class="btn btn-neon" onclick="mostrarConfiguracionInforme()">📄 Informe Personalizado</button>
+      <button class="btn btn-outline" onclick="exportAllData()">📤 Exportar JSON</button>
+    </div>
+  </div>
     <div style="padding:12px 14px;background:linear-gradient(135deg,rgba(57,255,122,.04),rgba(77,158,255,.04));border:1px solid var(--border2);border-radius:var(--r2);margin-bottom:16px;font-size:12px;color:var(--text2)">
       <b style="color:var(--neon)">📈 Evolución visual del atleta.</b> Los puntos de color muestran el estado en cada fecha registrada.
     </div>
