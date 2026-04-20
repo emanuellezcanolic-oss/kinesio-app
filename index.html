@@ -7,7 +7,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<link rel="stylesheet" href="assets/styles.css">
+<link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/kine.css">
+  <link rel="stylesheet" href="css/saltos.css">
 </head>
 <body>
 
@@ -108,8 +111,7 @@
       <div id="fuerza-rel-kpi"></div>
     </div>
     <div id="profile-stats-row" class="grid-4"></div>
-    
-<!-- BOTONES DE INFORMES -->
+  </div>
 
   <!-- TABS -->
   <div class="profile-tabs" id="profile-tab-bar">
@@ -130,11 +132,6 @@
   <div id="ptab-dashboard">
     <div class="grid-2 mb-16" style="gap:16px">
       <div class="card card-glow">
-        <div style="display: flex; justify-content: flex-end; margin-top: 16px; gap: 12px;">
-  <button class="btn btn-ai" onclick="openInformeIA()" style="font-size: 12px; padding: 8px 16px;">
-    🤖 Informe IA (Groq)
-  </button>
-</div>
         <div class="card-header"><h3>Radar — Perfil de rendimiento</h3><span id="radar-obj-tag" class="tag tag-g">—</span></div>
         <div class="card-body">
           <canvas id="radar-chart" height="230"></canvas>
@@ -1152,6 +1149,63 @@
     <div id="sprint-bench-area"></div>
   </div>
 
+
+    <!-- TRINEO F-V HORIZONTAL -->
+    <div class="card mt-16">
+      <div class="card-header">
+        <h3>🛷 Trineo — Perfil F-V Horizontal</h3>
+        <span class="tag tag-y">Carga óptima · Vel. máx · Pendiente</span>
+      </div>
+      <div class="card-body">
+        <div style="font-size:11px;color:var(--text2);margin-bottom:12px;padding:8px;background:rgba(255,179,71,.05);border-radius:8px">
+          Ingresá la velocidad máxima sin carga (0 kg) y con cada carga. El sistema calcula F0, V0, Pmax y la carga óptima.
+        </div>
+        <div class="grid-2" style="gap:10px;margin-bottom:12px">
+          <div class="ig">
+            <label class="il">Distancia test (m)</label>
+            <select class="inp" id="trineo-dist">
+              <option value="10">10 m</option>
+              <option value="20">20 m</option>
+              <option value="30">30 m</option>
+            </select>
+          </div>
+          <div class="ig">
+            <label class="il">Masa corporal (kg)</label>
+            <input class="inp inp-mono" type="number" step=".1" id="trineo-mc" placeholder="80" oninput="calcTrineo()">
+          </div>
+        </div>
+
+        <!-- Filas de carga -->
+        <div style="overflow-x:auto;margin-bottom:12px">
+          <table style="width:100%;border-collapse:collapse;font-size:12px" id="trineo-tabla">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border)">
+                <th style="text-align:left;padding:6px;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3)">Carga (kg)</th>
+                <th style="text-align:left;padding:6px;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3)">Tiempo (s)</th>
+                <th style="text-align:left;padding:6px;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--neon)">Vel (m/s)</th>
+                <th style="text-align:left;padding:6px;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--amber)">% Pér. vel</th>
+                <th style="text-align:left;padding:6px;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue)">Vel etto</th>
+              </tr>
+            </thead>
+            <tbody id="trineo-rows"></tbody>
+          </table>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="addTrineoCarga()" style="margin-bottom:12px">+ Agregar carga</button>
+
+        <!-- Resultados -->
+        <div id="trineo-results" style="display:none">
+          <div style="font-family:var(--mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--neon);margin-bottom:8px">
+            Perfil F-V Horizontal
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:12px" id="trineo-kpis"></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px" id="trineo-tabla-pct"></div>
+          <div style="font-size:10px;color:var(--text3);margin-top:8px;font-family:var(--mono)">
+            Pendiente: <span id="trineo-pendiente" style="color:var(--text2)">—</span> · Intersección: <span id="trineo-interseccion" style="color:var(--text2)">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
   <!-- ══ TAB: FMS ══ -->
   <div id="ptab-fms" class="hidden">
     <div class="flex-b mb-16">
@@ -1254,6 +1308,72 @@
       </div>
     </div>
   </div>
+
+    <!-- PRESCRIPCIÓN HIIT -->
+    <div class="card mt-16">
+      <div class="card-header">
+        <h3>⚡ Prescripción HIIT</h3>
+        <span class="tag tag-b">ASR · IFT · Vol · Densidad · Recuperación</span>
+      </div>
+      <div class="card-body">
+        <!-- Sub-tabs ASR / IFT -->
+        <div style="display:flex;gap:4px;background:var(--bg4);border-radius:8px;padding:3px;margin-bottom:14px;width:fit-content">
+          <button class="btn btn-neon btn-sm" id="hiit-tab-asr-btn" onclick="setHIITTab('asr',this)" style="font-size:11px">ASR (sprint)</button>
+          <button class="btn btn-ghost btn-sm" id="hiit-tab-ift-btn" onclick="setHIITTab('ift',this)" style="font-size:11px">IFT (aeróbico)</button>
+        </div>
+
+        <!-- ASR -->
+        <div id="hiit-asr">
+          <div style="font-size:11px;color:var(--text2);margin-bottom:12px;line-height:1.6;padding:8px;background:rgba(57,255,122,.04);border-radius:8px">
+            ASR = Velocidad anaeróbica de sprint. Ingresá el sprint test y el test de vVO2 para calcular la prescripción.
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:14px">
+            <div class="ig"><label class="il">Distancia sprint (m)</label><input class="inp inp-mono" type="number" id="asr-dist" value="10" oninput="calcASR()"></div>
+            <div class="ig"><label class="il">Tiempo sprint (s)</label><input class="inp inp-mono" type="number" step=".01" id="asr-tiempo" placeholder="1.10" oninput="calcASR()"></div>
+            <div class="ig"><label class="il">Dist. test vVO2 (m)</label><input class="inp inp-mono" type="number" id="asr-dist-vo2" placeholder="1500" oninput="calcASR()"></div>
+            <div class="ig"><label class="il">Tiempo vVO2 (s)</label><input class="inp inp-mono" type="number" id="asr-tiempo-vo2" placeholder="300" oninput="calcASR()"></div>
+            <div class="ig"><label class="il">% Pérdida vel. etto</label><input class="inp inp-mono" type="number" id="asr-pct-loss" value="35" oninput="calcASR()"></div>
+          </div>
+          <div id="asr-results" style="display:none">
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:12px" id="asr-kpis"></div>
+            <div style="font-family:var(--mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--text2);margin-bottom:8px">
+              Planilla de prescripción
+            </div>
+            <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px" id="asr-plan-table"></table></div>
+            <div style="margin-top:10px;padding:10px;background:var(--bg4);border-radius:8px">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--text2);text-transform:uppercase;margin-bottom:6px">Referencia de intensidades</div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px;font-size:10px" id="asr-ref-grid"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- IFT -->
+        <div id="hiit-ift" style="display:none">
+          <div style="font-size:11px;color:var(--text2);margin-bottom:12px;line-height:1.6;padding:8px;background:rgba(77,158,255,.04);border-radius:8px">
+            IFT = Intermittent Fitness Test. Ingresá el nivel para calcular velocidad de trabajo, volumen y tiempo de cada serie.
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:14px">
+            <div class="ig"><label class="il">Nivel IFT</label><input class="inp inp-mono" type="number" step=".5" id="ift-nivel" placeholder="17.5" oninput="calcIFT()"></div>
+            <div class="ig"><label class="il">% VIFT</label><input class="inp inp-mono" type="number" id="ift-pct" value="115" oninput="calcIFT()"></div>
+            <div class="ig"><label class="il">Tiempo trabajo (s)</label><input class="inp inp-mono" type="number" id="ift-tiempo" value="10" oninput="calcIFT()"></div>
+            <div class="ig"><label class="il">Pausa (s)</label><input class="inp inp-mono" type="number" id="ift-pausa" value="25" oninput="calcIFT()"></div>
+            <div class="ig"><label class="il">Rep / serie</label><input class="inp inp-mono" type="number" id="ift-reps" value="15" oninput="calcIFT()"></div>
+            <div class="ig"><label class="il">Nro series</label><input class="inp inp-mono" type="number" id="ift-series" value="1" oninput="calcIFT()"></div>
+          </div>
+          <div id="ift-results" style="display:none">
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:12px" id="ift-kpis"></div>
+            <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:6px" id="ift-macro"></div>
+          </div>
+          <!-- Tabla de referencia por nivel IFT -->
+          <div style="margin-top:12px">
+            <div style="font-family:var(--mono);font-size:9px;color:var(--text2);text-transform:uppercase;margin-bottom:6px">Tabla IFT al 115% VIFT (10s/25s, 15 rep, 1 serie)</div>
+            <div style="overflow-x:auto"><table style="border-collapse:collapse;font-size:11px;width:100%" id="ift-ref-table"></table></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
 
 
   <!-- ══ TAB: VIDEO SALTO ══ -->
@@ -1648,25 +1768,28 @@
     </div>
   </div>
 
-<!-- ══ TAB: HISTORIAL ══ -->
-<div id="ptab-historial" class="hidden">
-  <div class="flex-b mb-16">
-    <div>
-      <div style="font-size:15px;font-weight:700">Historial — Timeline visual</div>
-      <div style="font-size:12px;color:var(--text2)">🔴 Déficit → 🟡 Límite → 🟢 Óptimo — Evolución del atleta</div>
+  <!-- ══ TAB: HISTORIAL ══ -->
+  <div id="ptab-historial" class="hidden">
+    <div class="flex-b mb-16">
+      <div>
+        <div style="font-size:15px;font-weight:700">Historial — Timeline visual</div>
+        <div style="font-size:12px;color:var(--text2)">🔴 Déficit → 🟡 Límite → 🟢 Óptimo — Evolución del atleta</div>
+      </div>
+      <div class="flex" style="gap:8px">
+        <button class="btn btn-ai" onclick="openInformeIA()">🤖 Generar Informe IA</button>
+        <button class="btn btn-outline" onclick="exportAllData()">📤 Exportar JSON</button>
+      </div>
     </div>
-    <div class="flex" style="gap:8px">
-      <button class="btn btn-neon" onclick="generarInformeProfesional()" style="background:#39FF7A; color:#000">📄 Generar Informe Profesional</button>
-      <button class="btn btn-outline" onclick="exportAllData()">📤 Exportar JSON</button>
+    <div style="padding:12px 14px;background:linear-gradient(135deg,rgba(57,255,122,.04),rgba(77,158,255,.04));border:1px solid var(--border2);border-radius:var(--r2);margin-bottom:16px;font-size:12px;color:var(--text2)">
+      <b style="color:var(--neon)">📈 Evolución visual del atleta.</b> Los puntos de color muestran el estado en cada fecha registrada.
+    </div>
+    <div class="card">
+      <div class="card-body" id="historial-timeline" style="max-height:600px;overflow-y:auto"></div>
     </div>
   </div>
-  <div style="padding:12px 14px;background:linear-gradient(135deg,rgba(57,255,122,.04),rgba(77,158,255,.04));border:1px solid var(--border2);border-radius:var(--r2);margin-bottom:16px;font-size:12px;color:var(--text2)">
-    <b style="color:var(--neon)">📈 Evolución visual del atleta.</b> Los puntos de color muestran el estado en cada fecha registrada.
-  </div>
-  <div class="card">
-    <div class="card-body" id="historial-timeline" style="max-height:600px;overflow-y:auto"></div>
-  </div>
-</div>
+
+</div><!-- /page-tests -->
+
 <!-- ────────────────────────────────────────
      PAGE: AJUSTES (VMP + REFERENCIAS)
 ──────────────────────────────────────────── -->
@@ -1906,7 +2029,24 @@
 </div>
 
 <!-- ════════ SCRIPT ════════ -->
-<script src="assets/script.js"></script>
+  <!-- ══ JS MODULAR — orden de carga ══ -->
+  <script src="js/app.js"></script>
+  <script src="js/atletas.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/fv.js"></script>
+  <script src="js/saltos.js"></script>
+  <script src="js/movilidad.js"></script>
+  <script src="js/sprint.js"></script>
+  <script src="js/kine.js"></script>
+  <script src="js/informe.js"></script>
+  <script src="js/video.js"></script>
+  <script src="js/functools.js"></script>
+  <script src="js/vmp.js"></script>
+  <script src="js/videojump.js"></script>
+  <script src="js/valgo.js"></script>
+  <script src="js/lesion.js"></script>
+  <script src="js/klinical.js"></script>
+
 
 <!-- Modal Goniometro -->
 <div class="modal" id="modal-goniometro">
@@ -2689,8 +2829,6 @@
     <button class="btn btn-neon btn-full" onclick="saveKlinicalSheet('groin');closeModal('sheet-groin')">💾 Guardar evaluación</button>
   </div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="assets/script.js"></script>
-<script src="js/informe-profesional.js"></script>
+
 </body>
 </html>
