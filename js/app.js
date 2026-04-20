@@ -339,7 +339,9 @@ function showProfileTab(tab, btn) {
   if (tab === 'historial')  renderHistorial();
   if (tab === 'kinesio')    initKinesio();
   if (tab === 'fuerza')     renderFVHist();
-  if (tab === 'saltos')     renderSimetriasTabla();
+  if (tab === 'saltos')     { renderSimetriasTabla(); }
+  if (tab === 'velocidad')  { initTrineo(); }
+  if (tab === 'fatiga')     { buildIFTRefTable(); }
   if (tab === 'movilidad') {
     setTimeout(redrawGauges, 60);
     const amPanel = document.getElementById('adulto-mayor-tests');
