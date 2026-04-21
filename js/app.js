@@ -341,8 +341,8 @@ function showProfileTab(tab, btn) {
   if (tab === 'fuerza')     renderFVHist();
   if (tab === 'saltos')     { renderSimetriasTabla(); }
   if (tab === 'fuerza')     { initFVTools(); initSmith(); updatePrePostSelects(); }
-  if (tab === 'velocidad')  { initTrineo(); }
-  if (tab === 'fatiga')     { buildIFTRefTable(); }
+  if (tab === 'velocidad')  { initTrineo(); buildIFTRefTable(); }
+  if (tab === 'fatiga')     { }
   if (tab === 'movilidad') {
     setTimeout(redrawGauges, 60);
     const amPanel = document.getElementById('adulto-mayor-tests');
