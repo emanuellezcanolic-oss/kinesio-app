@@ -98,58 +98,352 @@ function exportarPDF(){
   const{jsPDF}=window.jspdf;if(!jsPDF){alert('Error al cargar jsPDF');return;}
   const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
   const s=cur;if(!s){alert('Sin atleta');return;}
-  const prof=document.getElementById('prof-nombre')?.value||'Lic. Emanuel Lezcano';
-  const inst=document.getElementById('prof-inst')?.value||'MOVE Centro de Evaluación';
-  const texto=document.getElementById('informe-text')?.value||'Sin informe';
-  const fecha=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'});
-  // Fondo negro
-  doc.setFillColor(0,0,0);doc.rect(0,0,210,297,'F');
-  // Header
-  doc.setFillColor(8,8,8);doc.rect(0,0,210,44,'F');
-  doc.setDrawColor(57,255,122);doc.setLineWidth(0.4);doc.line(0,44,210,44);
-  doc.setTextColor(57,255,122);doc.setFontSize(18);doc.setFont('courier','bold');doc.text('MOVEMETRICS',14,20);
-  doc.setTextColor(50,50,50);doc.setFontSize(7);doc.setFont('courier','normal');doc.text('PLATAFORMA DEPORTIVO-CLÍNICA v12',14,27);doc.text('INFORME ANALÍTICO PROFESIONAL',14,33);
-  doc.setTextColor(120,120,120);doc.setFontSize(8);doc.text(prof,196,18,{align:'right'});doc.text(inst,196,24,{align:'right'});doc.text(fecha,196,30,{align:'right'});
-  // Atleta box
-  doc.setFillColor(12,12,12);doc.roundedRect(14,50,182,36,2,2,'F');
-  doc.setDrawColor(57,255,122);doc.setLineWidth(0.3);doc.roundedRect(14,50,182,36,2,2,'S');
-  doc.setTextColor(57,255,122);doc.setFontSize(15);doc.setFont('courier','bold');doc.text(s.nombre,20,61);
-  doc.setTextColor(160,160,160);doc.setFontSize(8.5);doc.setFont('courier','normal');
-  doc.text(`${s.deporte||'--'}${s.puesto?' · '+s.puesto:''} · ${s.edad||'?'} años · ${s.peso||'?'}kg · ${s.talla||'?'}cm`,20,68);
-  doc.text(`Objetivo: ${s.objetivo||'--'} · Nivel: ${s.nivel||'--'} · ${s.servicio==='kinesio'?'Kinesiología':'Rendimiento'}`,20,74);
-  if(s.lesion){doc.setTextColor(255,176,32);doc.text(`Lesión: ${s.lesion}`,20,80);}
-  // KPIs
-  const kpis=[['CMJ',s.lastCMJ?s.lastCMJ.toFixed(1)+'cm':'--'],['1RM',s.lastFV?.oneRM?s.lastFV.oneRM.toFixed(0)+'kg':'--'],['Fza.Rel.',s.lastFV&&s.peso?(s.lastFV.oneRM/+s.peso).toFixed(2)+'×PC':'--'],['R²',s.lastFV?.r2?.toFixed(4)||'--']];
-  kpis.forEach(([lbl,val],i)=>{const x=14+i*46;doc.setFillColor(15,15,15);doc.roundedRect(x,92,42,20,1.5,1.5,'F');doc.setTextColor(50,50,50);doc.setFontSize(7);doc.setFont('courier','normal');doc.text(lbl.toUpperCase(),x+3,99);doc.setTextColor(57,255,122);doc.setFontSize(10);doc.setFont('courier','bold');doc.text(val,x+3,108);});
-  // Charts
-  const radarCanvas=document.getElementById('radar-chart');if(radarCanvas){try{const img=radarCanvas.toDataURL('image/png');doc.addImage(img,'PNG',14,118,86,70);}catch(e){}}
-  const fvCanvas=document.getElementById('fv-chart')||document.getElementById('dash-fv-chart');if(fvCanvas){try{const img=fvCanvas.toDataURL('image/png');doc.addImage(img,'PNG',106,118,90,70);}catch(e){}}
-  // Contenido
-  doc.setTextColor(210,210,210);const lines=doc.splitTextToSize(texto,182);
-  let y=198;
-  lines.forEach(line=>{
-    if(y>275){doc.addPage();doc.setFillColor(0,0,0);doc.rect(0,0,210,297,'F');y=20;}
-    const isSec=line.startsWith('📋')||line.startsWith('💪')||line.startsWith('⚠️')||line.startsWith('🎯')||line.startsWith('📅')||line.startsWith('🔁');
-    if(isSec){doc.setFont('courier','bold');doc.setFontSize(10);doc.setTextColor(57,255,122);y+=2;}
-    else{doc.setFont('courier','normal');doc.setFontSize(8.5);doc.setTextColor(200,200,200);}
-    doc.text(line,14,y);y+=isSec?6:5;
-  });
-  // Página Kinesio
-  if(s.kinesio&&(Object.keys(s.kinesio.bodyZones||{}).length||Object.values(s.kinesio.tests||{}).some(t=>t.result==='pos'))){
-    doc.addPage();doc.setFillColor(0,0,0);doc.rect(0,0,210,297,'F');
-    doc.setFillColor(8,8,8);doc.rect(0,0,210,34,'F');doc.setDrawColor(57,255,122);doc.setLineWidth(0.4);doc.line(0,34,210,34);
-    doc.setTextColor(57,255,122);doc.setFontSize(14);doc.setFont('courier','bold');doc.text('EVALUACIÓN KINESIOLÓGICA',14,18);
-    doc.setTextColor(100,100,100);doc.setFontSize(8);doc.setFont('courier','normal');doc.text(`${s.nombre} · ${new Date().toLocaleDateString('es-AR')}`,14,26);
-    let ky=44;
-    const zonas=Object.entries(s.kinesio.bodyZones||{}).filter(([,v])=>!v.recuperado);
-    if(zonas.length){doc.setFillColor(20,5,5);doc.roundedRect(14,ky,182,8+zonas.length*7,2,2,'F');doc.setDrawColor(255,68,68);doc.setLineWidth(0.3);doc.roundedRect(14,ky,182,8+zonas.length*7,2,2,'S');doc.setTextColor(255,68,68);doc.setFontSize(9);doc.setFont('courier','bold');doc.text('ZONAS LESIONADAS',18,ky+7);doc.setFont('courier','normal');doc.setFontSize(8.5);doc.setTextColor(200,150,150);zonas.forEach(([,z],i)=>{doc.text(`• ${z.label}  EVA: ${z.eva||'--'}/10`,22,ky+7+7*(i+1));});ky+=14+zonas.length*7;}
-    const posTests=Object.entries(s.kinesio.tests||{}).filter(([,v])=>v.result==='pos');
-    const allTests=[...ORTHO_TESTS.subacro,...ORTHO_TESTS.manguito,...ORTHO_TESTS.biceps,...ORTHO_TESTS.ligamentos,...ORTHO_TESTS.meniscos,...ORTHO_TESTS.funcionales,...ORTHO_TESTS.tobillo,...ORTHO_TESTS.lumbar,...ORTHO_TESTS.cadera,...ORTHO_TESTS.dohaAductores,...ORTHO_TESTS.dohaPsoas,...ORTHO_TESTS.dohaInguinal,...ORTHO_TESTS.dohaComplementarios,...ORTHO_TESTS.cervicalNeural,...ORTHO_TESTS.cervicalArticular,...ORTHO_TESTS.cervicalMuscular,...ORTHO_TESTS.codoLateral,...ORTHO_TESTS.codoMedial,...ORTHO_TESTS.codoLigamentos,...ORTHO_TESTS.patelo,...ORTHO_TESTS.tendonesRodilla,...ORTHO_TESTS.pie,...ORTHO_TESTS.muneca];
-    if(posTests.length){ky+=6;doc.setFillColor(20,5,5);doc.roundedRect(14,ky,182,10+posTests.length*9,2,2,'F');doc.setDrawColor(255,68,68);doc.setLineWidth(0.3);doc.roundedRect(14,ky,182,10+posTests.length*9,2,2,'S');doc.setTextColor(255,68,68);doc.setFontSize(9);doc.setFont('courier','bold');doc.text('TESTS ORTOPÉDICOS POSITIVOS',18,ky+8);ky+=12;posTests.forEach(([id,v])=>{const t=allTests.find(x=>x.id===id);if(!t)return;doc.setFont('courier','bold');doc.setFontSize(8.5);doc.setTextColor(255,100,100);doc.text(`+ ${t.name}`,18,ky);doc.setFont('courier','normal');doc.setTextColor(150,150,150);const subt=` -- ${t.sub}${v.obs?' -- '+v.obs:''}`;doc.text(subt,18+doc.getTextWidth(`+ ${t.name}`),ky);ky+=7;});}
+
+  const prof  = document.getElementById('prof-nombre')?.value||'Lic. Emanuel Lezcano';
+  const inst  = document.getElementById('prof-inst')?.value||'MOVE Centro de Evaluación';
+  const texto = document.getElementById('informe-text')?.value||'';
+  const fecha = new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'});
+
+  // ── Palette ──────────────────────────────────────────────
+  const BG    =[0,0,0];
+  const DARK  =[10,10,10];
+  const SURF  =[18,18,18];
+  const SURF2 =[26,26,26];
+  const GREEN =[57,255,122];
+  const WHITE =[255,255,255];
+  const LGRAY =[200,200,200];
+  const MGRAY =[110,110,110];
+  const DGRAY =[40,40,40];
+  const RED   =[255,60,60];
+  const AMBER =[255,176,32];
+  const W=210, ML=14, CW=182;
+
+  // ── Primitives ───────────────────────────────────────────
+  const fill =(c)=>doc.setFillColor(...c);
+  const draw =(c)=>doc.setDrawColor(...c);
+  const txt  =(c)=>doc.setTextColor(...c);
+  const F    =(x,y,w,h)=>{ doc.rect(x,y,w,h,'F'); };
+  const R    =(x,y,w,h,r=2)=>{ doc.roundedRect(x,y,w,h,r,r,'F'); };
+  const RS   =(x,y,w,h,r=2)=>{ doc.roundedRect(x,y,w,h,r,r,'S'); };
+  const lw   =(n)=>doc.setLineWidth(n);
+
+  const bgPage=()=>{ fill(BG); F(0,0,W,297); };
+
+  // Full-width section band — matches "EVALUACIONES REALIZADAS" style
+  const sectionBand=(title,y,h=20)=>{
+    fill(DARK); F(0,y,W,h);
+    fill(GREEN); F(0,y,4,h);                          // left accent bar
+    fill(SURF2); F(4,y,W-4,0.4);                      // top hairline
+    doc.setFont('helvetica','bolditalic');
+    doc.setFontSize(22);
+    txt(WHITE);
+    doc.text(title.toUpperCase(),ML+4,y+h-5);
+    return y+h;
+  };
+
+  // Numbered green badge (01, 02 …)
+  const badge=(n,x,y,size=11)=>{
+    fill(GREEN); R(x,y,size,size,1.5);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(7);
+    txt(BG);
+    doc.text(String(n).padStart(2,'0'),x+size/2,y+size/2+2.2,{align:'center'});
+  };
+
+  // Thin progress bar with fill %
+  const progressBar=(x,y,w,h,pct,color)=>{
+    fill(DGRAY); F(x,y,w,h);
+    if(pct>0){ fill(color); F(x,y,Math.min(w,w*pct/100),h); }
+  };
+
+  // Traffic-light trio
+  const trafficLight=(x,y,state)=>{
+    const r=2.5;
+    const cols=['red','amber','green'];
+    const on ={red:RED, amber:AMBER, green:GREEN};
+    const off={red:[50,20,20], amber:[50,40,10], green:[10,40,20]};
+    cols.forEach((c,i)=>{
+      fill(state===c?on[c]:off[c]);
+      doc.circle(x+i*8,y,r,'F');
+    });
+  };
+
+  // ── PAGE 1 ───────────────────────────────────────────────
+  bgPage();
+
+  // ---- HEADER BAND ----------------------------------------
+  fill(DARK); F(0,0,W,50);
+  fill(GREEN); F(0,48,W,0.6);
+
+  // Brand
+  doc.setFont('helvetica','bolditalic');
+  doc.setFontSize(30);
+  txt(WHITE);
+  doc.text('MOVEMETRICS',ML,26);
+
+  // Green square accent before brand
+  fill(GREEN); F(ML-5,18,3,3);
+
+  // Sub-brand
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(6.5);
+  txt(MGRAY);
+  doc.text('PLATAFORMA DEPORTIVO-CLÍNICA  ·  INFORME ANALÍTICO PROFESIONAL',ML,33);
+
+  // Pro info right
+  doc.setFontSize(7.5);
+  txt(MGRAY);
+  doc.text(prof ,W-ML,20,{align:'right'});
+  doc.text(inst ,W-ML,27,{align:'right'});
+  doc.text(fecha,W-ML,34,{align:'right'});
+
+  let y=56;
+
+  // ---- ATHLETE BLOCK --------------------------------------
+  fill(SURF); R(ML,y,CW,32,2);
+  draw(GREEN); lw(0.3); RS(ML,y,CW,32,2);
+
+  // Green left accent strip inside box
+  fill(GREEN); F(ML,y,3,32);
+
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(17);
+  txt(WHITE);
+  doc.text(s.nombre,ML+8,y+11);
+
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(8);
+  txt(LGRAY);
+  doc.text(`${s.deporte||'--'}${s.puesto?' · '+s.puesto:''} · ${s.edad||'?'} años · ${s.peso||'?'} kg · ${s.talla||'?'} cm`,ML+8,y+19);
+  doc.text(`Objetivo: ${s.objetivo||'--'}  ·  Nivel: ${s.nivel||'--'}  ·  ${s.servicio==='kinesio'?'Kinesiología':'Rendimiento'}`,ML+8,y+26);
+
+  if(s.lesion){
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(7.5);
+    txt(AMBER);
+    doc.text(`⚠  LESIÓN: ${s.lesion}`,W-ML-4,y+19,{align:'right'});
   }
-  // Footer
+  y+=38;
+
+  // ---- KPI STRIP ------------------------------------------
+  const cmjVal  = s.lastCMJ||0;
+  const oneRM   = s.lastFV?.oneRM||0;
+  const fzaRel  = (oneRM&&s.peso)?(oneRM/+s.peso):0;
+  const r2Val   = s.lastFV?.r2||0;
+
+  const kpiDefs=[
+    { lbl:'CMJ',     val: cmjVal?cmjVal.toFixed(1)+' cm':'--',  pct: Math.min(cmjVal/50*100,100),
+      st: cmjVal>=35?'green':cmjVal>=28?'amber':cmjVal?'red':'off' },
+    { lbl:'1RM',     val: oneRM?oneRM.toFixed(0)+' kg':'--',     pct: Math.min(oneRM/200*100,100),
+      st: oneRM?'green':'off' },
+    { lbl:'FZA REL', val: fzaRel?fzaRel.toFixed(2)+'×PC':'--', pct: Math.min(fzaRel/2*100,100),
+      st: fzaRel>=1.5?'green':fzaRel>=1.0?'amber':fzaRel?'red':'off' },
+    { lbl:'R²',      val: r2Val?r2Val.toFixed(4):'--',           pct: r2Val*100,
+      st: r2Val>=0.98?'green':r2Val>=0.95?'amber':r2Val?'red':'off' },
+  ];
+
+  const stColor={green:GREEN, amber:AMBER, red:RED, off:DGRAY};
+  const kW=43, kH=26, kGap=4;
+
+  kpiDefs.forEach(({lbl,val,pct,st},i)=>{
+    const kx=ML+i*(kW+kGap);
+    const sc=stColor[st];
+
+    fill(SURF); R(kx,y,kW,kH,2);
+    // status top border
+    fill(sc); F(kx,y,kW,1.8);
+
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(6.5);
+    txt(MGRAY);
+    doc.text(lbl,kx+4,y+7);
+
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(12);
+    txt(sc===DGRAY?MGRAY:sc);
+    doc.text(val,kx+4,y+16);
+
+    progressBar(kx+4,y+20,kW-8,1.8,pct,sc);
+
+    // Traffic light
+    if(st!=='off') trafficLight(kx+kW-13,y+8,st);
+  });
+  y+=kH+8;
+
+  // ---- CHARTS STRIP ---------------------------------------
+  const radarC = document.getElementById('radar-chart');
+  const fvC    = document.getElementById('fv-chart')||document.getElementById('dash-fv-chart');
+  if(radarC||fvC){
+    try{
+      if(radarC&&fvC){
+        doc.addImage(radarC.toDataURL('image/png'),'PNG',ML,y,88,68);
+        doc.addImage(fvC.toDataURL('image/png'),'PNG',ML+92,y,90,68);
+      } else if(radarC){
+        doc.addImage(radarC.toDataURL('image/png'),'PNG',ML,y,CW,68);
+      } else {
+        doc.addImage(fvC.toDataURL('image/png'),'PNG',ML,y,CW,68);
+      }
+      y+=74;
+    }catch(e){}
+  }
+
+  // ── AI TEXT PAGES ────────────────────────────────────────
+  if(texto.trim()){
+    doc.addPage(); bgPage();
+
+    // Page header
+    fill(DARK); F(0,0,W,30);
+    fill(GREEN); F(0,28,W,0.5);
+    doc.setFont('helvetica','bolditalic');
+    doc.setFontSize(20);
+    txt(WHITE);
+    doc.text('INFORME ANALÍTICO',ML,20);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(7.5);
+    txt(MGRAY);
+    doc.text(`${s.nombre}  ·  ${fecha}`,W-ML,20,{align:'right'});
+
+    // Parse emoji-headed sections
+    const SMAP={
+      '📋':'RESUMEN EJECUTIVO',
+      '📊':'ANÁLISIS COMPARATIVO',
+      '💪':'FORTALEZAS',
+      '⚠️':'ÁREAS DE MEJORA',
+      '📅':'PLAN DE ACCIÓN',
+      '🔁':'RE-EVALUACIÓN',
+      '🎯':'OBJETIVOS',
+    };
+    const sections=[];
+    let cur_sec=null, cur_lines=[];
+    texto.split('\n').forEach(line=>{
+      const key=Object.keys(SMAP).find(e=>line.trimStart().startsWith(e));
+      if(key){
+        if(cur_sec) sections.push({title:cur_sec,body:cur_lines.join('\n').trim()});
+        cur_sec=SMAP[key]; cur_lines=[];
+      } else {
+        cur_lines.push(line);
+      }
+    });
+    if(cur_sec) sections.push({title:cur_sec,body:cur_lines.join('\n').trim()});
+
+    let ay=36;
+
+    const ensureSpace=(need)=>{
+      if(ay+need>278){ doc.addPage(); bgPage(); ay=14; }
+    };
+
+    if(sections.length===0){
+      // plain text fallback
+      doc.setFont('helvetica','normal'); doc.setFontSize(8.5); txt(LGRAY);
+      doc.splitTextToSize(texto,CW).forEach(ln=>{
+        ensureSpace(6);
+        doc.text(ln,ML,ay); ay+=5.5;
+      });
+    } else {
+      sections.forEach((sec,idx)=>{
+        const bodyLines=doc.splitTextToSize(sec.body,CW-16);
+        const secH=22+bodyLines.length*5.4+10;
+        ensureSpace(secH);
+
+        // Section band
+        fill(DARK); F(0,ay,W,20);
+        fill(GREEN); F(0,ay,4,20);
+        badge(idx+1,ML+2,ay+4.5);
+        doc.setFont('helvetica','bolditalic');
+        doc.setFontSize(15);
+        txt(WHITE);
+        doc.text(sec.title.toUpperCase(),ML+16,ay+13);
+        ay+=20;
+
+        // Body box
+        const bH=bodyLines.length*5.4+8;
+        fill(SURF); R(ML,ay,CW,bH,2);
+        // left accent
+        fill(GREEN); F(ML,ay,2,bH);
+
+        doc.setFont('helvetica','normal');
+        doc.setFontSize(8.5);
+        let ty=ay+7;
+        bodyLines.forEach(ln=>{
+          const isBullet=ln.trim().startsWith('•')||ln.trim().startsWith('-')||ln.trim().match(/^\d+\./);
+          txt(isBullet?WHITE:LGRAY);
+          doc.text(ln,ML+6,ty);
+          ty+=5.4;
+        });
+        ay+=bH+6;
+      });
+    }
+  }
+
+  // ── KINESIO PAGE ─────────────────────────────────────────
+  const hasKinesio=s.kinesio&&(
+    Object.keys(s.kinesio.bodyZones||{}).length||
+    Object.values(s.kinesio.tests||{}).some(t=>t.result==='pos')
+  );
+  if(hasKinesio){
+    doc.addPage(); bgPage();
+    let ky=0;
+    ky=sectionBand('EVALUACIÓN KINESIOLÓGICA',ky,28);
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); txt(MGRAY);
+    doc.text(`${s.nombre}  ·  ${new Date().toLocaleDateString('es-AR')}`,ML,ky+6);
+    ky+=14;
+
+    const zonas=Object.entries(s.kinesio.bodyZones||{}).filter(([,v])=>!v.recuperado);
+    if(zonas.length){
+      ky=sectionBand('ZONAS COMPROMETIDAS',ky,18);
+      ky+=4;
+      zonas.forEach(([,z])=>{
+        fill(SURF); R(ML,ky,CW,12,1.5);
+        fill(RED); F(ML,ky,3,12);
+        doc.setFont('helvetica','bold'); doc.setFontSize(9); txt(WHITE);
+        doc.text(z.label,ML+7,ky+8);
+        const evaVal=z.eva||0;
+        const evaColor=evaVal>=7?RED:evaVal>=4?AMBER:GREEN;
+        txt(evaColor);
+        doc.text(`EVA ${evaVal}/10`,W-ML-4,ky+8,{align:'right'});
+        progressBar(ML+7,ky+10,CW-14,1.5,evaVal*10,evaColor);
+        ky+=16;
+      });
+      ky+=4;
+    }
+
+    const allTests=[...ORTHO_TESTS.subacro,...ORTHO_TESTS.manguito,...ORTHO_TESTS.biceps,...ORTHO_TESTS.ligamentos,...ORTHO_TESTS.meniscos,...ORTHO_TESTS.funcionales,...ORTHO_TESTS.tobillo,...ORTHO_TESTS.lumbar,...ORTHO_TESTS.cadera,...ORTHO_TESTS.dohaAductores,...ORTHO_TESTS.dohaPsoas,...ORTHO_TESTS.dohaInguinal,...ORTHO_TESTS.dohaComplementarios,...ORTHO_TESTS.cervicalNeural,...ORTHO_TESTS.cervicalArticular,...ORTHO_TESTS.cervicalMuscular,...ORTHO_TESTS.codoLateral,...ORTHO_TESTS.codoMedial,...ORTHO_TESTS.codoLigamentos,...ORTHO_TESTS.patelo,...ORTHO_TESTS.tendonesRodilla,...ORTHO_TESTS.pie,...ORTHO_TESTS.muneca];
+    const posTests=Object.entries(s.kinesio.tests||{}).filter(([,v])=>v.result==='pos');
+    if(posTests.length){
+      ky=sectionBand('TESTS ORTOPÉDICOS POSITIVOS',ky,18);
+      ky+=4;
+      posTests.forEach(([id,v],pi)=>{
+        const t=allTests.find(x=>x.id===id); if(!t)return;
+        if(ky>270){doc.addPage();bgPage();ky=14;}
+        fill(SURF); R(ML,ky,CW,14,1.5);
+        fill(RED); F(ML,ky,3,14);
+        badge(pi+1,ML+5,ky+1.5,11);
+        doc.setFont('helvetica','bold'); doc.setFontSize(8.5); txt(RED);
+        doc.text(`+ ${t.name}`,ML+20,ky+7);
+        if(t.sub||v.obs){
+          doc.setFont('helvetica','normal'); doc.setFontSize(7.5); txt(MGRAY);
+          const sub=`${t.sub||''}${v.obs?' — '+v.obs:''}`;
+          doc.text(sub,ML+20,ky+12);
+        }
+        ky+=18;
+      });
+    }
+  }
+
+  // ── FOOTER ALL PAGES ─────────────────────────────────────
   const total=doc.getNumberOfPages();
-  for(let i=1;i<=total;i++){doc.setPage(i);doc.setFillColor(6,6,6);doc.rect(0,286,210,11,'F');doc.setDrawColor(57,255,122);doc.setLineWidth(0.2);doc.line(0,286,210,286);doc.setTextColor(50,50,50);doc.setFontSize(7);doc.setFont('courier','normal');doc.text(`MOVEMETRICS v12 · ${prof} · ${inst}`,14,292);doc.text(`${i} / ${total}`,196,292,{align:'right'});}
+  for(let i=1;i<=total;i++){
+    doc.setPage(i);
+    fill(DARK); F(0,285,W,12);
+    fill(GREEN); F(0,285,W,0.4);
+    // Green dot before page num
+    fill(GREEN); doc.circle(W-ML-5,291,1.2,'F');
+    doc.setFont('helvetica','normal'); doc.setFontSize(6.5); txt(DGRAY);
+    doc.text(`MOVEMETRICS  ·  ${prof}  ·  ${inst}`,ML,291);
+    txt(GREEN);
+    doc.text(`${i} / ${total}`,W-ML,291,{align:'right'});
+  }
+
   doc.save(`MoveMetrics_${s.nombre.replace(/\s/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`);
 }
 
