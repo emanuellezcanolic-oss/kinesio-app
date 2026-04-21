@@ -189,8 +189,6 @@ function renderSmithPctTable() {
 // ════════════════════════════════════════
 
 let _preData = null, _postData = null;
-let _ppPreRows = [], _ppPreCount = 0;
-let _ppPostRows = [], _ppPostCount = 0;
 
 // Tabla %RM → VMP calculada como VMP = a + b * (RM * pct/100)
 // exactamente como la planilla Tecni: usa la pendiente e intersección de la regresión
@@ -209,17 +207,13 @@ function setPPTab(mode) {
 function addPPRow(side) {
   const wrap = document.getElementById('pp-' + side + '-rows');
   if (!wrap) return;
-  const count = side === 'pre' ? _ppPreCount++ : _ppPostCount++;
-  if (side === 'pre')  _ppPreRows.push(count);
-  if (side === 'post') _ppPostRows.push(count);
   const div = document.createElement('div');
-  div.id = 'pp-' + side + '-row-' + count;
   div.style.cssText = 'display:flex;gap:6px;margin-bottom:5px;align-items:center';
   div.innerHTML = `
     <input class="inp inp-mono" type="number" step=".5" placeholder="kg"
-      id="pp-${side}-kg-${count}" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
+      style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
     <input class="inp inp-mono" type="number" step=".001" placeholder="0.650"
-      id="pp-${side}-vmp-${count}" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
+      style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
     <button onclick="this.parentElement.remove();calcPPManual()"
       style="background:none;border:none;color:var(--text3);font-size:15px;cursor:pointer;padding:2px 4px;line-height:1">×</button>
   `;
@@ -229,7 +223,7 @@ function addPPRow(side) {
 function _ppGetPairs(side) {
   const wrap = document.getElementById('pp-' + side + '-rows');
   if (!wrap) return [];
-  return [...wrap.querySelectorAll('div[id]')].map(div => {
+  return [...wrap.children].map(div => {
     const inputs = div.querySelectorAll('input');
     if (inputs.length < 2) return null;
     const kg  = parseFloat(inputs[0].value);
@@ -257,52 +251,70 @@ function _linReg(pairs) {
 }
 
 function calcPPManual() {
-  const ejId    = document.getElementById('pp-ej-manual')?.value || 'sentadilla';
-  const vmpRef  = VMP_REF[ejId] || 0.32;
-  const prePairs  = _ppGetPairs('pre');
-  const postPairs = _ppGetPairs('post');
+  try {
+    const ejId   = document.getElementById('pp-ej-manual')?.value || 'sentadilla';
+    const vmpRef = (typeof VMP_REF !== 'undefined' ? VMP_REF[ejId] : null) || 0.32;
 
-  // Regresión PRE
-  const preReg  = _linReg(prePairs);
-  const postReg = _linReg(postPairs);
+    const prePairs  = _ppGetPairs('pre');
+    const postPairs = _ppGetPairs('post');
 
-  // Actualizar mini-stats inline
-  const preRM  = preReg  && preReg.b  < 0 ? +((vmpRef - preReg.a)  / preReg.b).toFixed(1)  : null;
-  const postRM = postReg && postReg.b < 0 ? +((vmpRef - postReg.a) / postReg.b).toFixed(1) : null;
+    const preRmEl  = document.getElementById('pp-pre-rm');
+    const postRmEl = document.getElementById('pp-post-rm');
+    const preR2El  = document.getElementById('pp-pre-r2');
+    const postR2El = document.getElementById('pp-post-r2');
 
-  const preRmEl  = document.getElementById('pp-pre-rm');
-  const postRmEl = document.getElementById('pp-post-rm');
-  const preR2El  = document.getElementById('pp-pre-r2');
-  const postR2El = document.getElementById('pp-post-r2');
-  if (preRmEl)  preRmEl.textContent  = preRM  ? preRM  + ' kg' : '— (mín 3 pares)';
-  if (postRmEl) postRmEl.textContent = postRM ? postRM + ' kg' : '— (mín 3 pares)';
-  if (preR2El)  preR2El.textContent  = preReg  ? preReg.r2  : '—';
-  if (postR2El) postR2El.textContent = postReg ? postReg.r2 : '—';
+    // Feedback inmediato de cuántos pares válidos hay
+    if (preRmEl)  preRmEl.textContent  = prePairs.length  + ' par(es) válidos' + (prePairs.length  < 3 ? ' — mín 3' : '');
+    if (postRmEl) postRmEl.textContent = postPairs.length + ' par(es) válidos' + (postPairs.length < 3 ? ' — mín 3' : '');
 
-  if (!preReg || !postReg || !preRM || !postRM) return;
+    if (prePairs.length < 2 || postPairs.length < 2) {
+      document.getElementById('prepost-output').style.display = 'none';
+      return;
+    }
 
-  _preData  = { ...preReg,  oneRM: preRM,  cargas: prePairs.map(p=>p.kg),  vmps: prePairs.map(p=>p.vmp) };
-  _postData = { ...postReg, oneRM: postRM, cargas: postPairs.map(p=>p.kg), vmps: postPairs.map(p=>p.vmp) };
+    // Regresión
+    const preReg  = _linReg(prePairs);
+    const postReg = _linReg(postPairs);
 
-  // Mostrar tabla raw de datos medidos
-  const rawSection = document.getElementById('prepost-raw-section');
-  const rawTbody   = document.getElementById('prepost-raw-tbody');
-  if (rawSection && rawTbody) {
-    rawSection.style.display = '';
-    const maxLen = Math.max(prePairs.length, postPairs.length);
-    rawTbody.innerHTML = Array.from({ length: maxLen }, (_, i) => {
-      const pre  = prePairs[i];
-      const post = postPairs[i];
-      return `<tr>
-        <td class="mono-cell" style="color:#4D9EFF">${pre  ? pre.kg  : '—'}</td>
-        <td class="mono-cell" style="color:#4D9EFF">${pre  ? pre.vmp : '—'}</td>
-        <td class="mono-cell" style="color:#39FF7A">${post ? post.kg  : '—'}</td>
-        <td class="mono-cell" style="color:#39FF7A">${post ? post.vmp : '—'}</td>
-      </tr>`;
-    }).join('');
+    const preRM  = preReg  && preReg.b  < 0 ? +((vmpRef - preReg.a)  / preReg.b).toFixed(1)  : null;
+    const postRM = postReg && postReg.b < 0 ? +((vmpRef - postReg.a) / postReg.b).toFixed(1) : null;
+
+    if (preRmEl)  preRmEl.textContent  = preRM  ? preRM  + ' kg' : '— (pendiente positiva?)';
+    if (postRmEl) postRmEl.textContent = postRM ? postRM + ' kg' : '— (pendiente positiva?)';
+    if (preR2El)  preR2El.textContent  = preReg  ? preReg.r2  : '—';
+    if (postR2El) postR2El.textContent = postReg ? postReg.r2 : '—';
+
+    if (!preReg || !postReg || !preRM || !postRM) {
+      document.getElementById('prepost-output').style.display = 'none';
+      return;
+    }
+
+    _preData  = { ...preReg,  oneRM: preRM,  cargas: prePairs.map(p=>p.kg),  vmps: prePairs.map(p=>p.vmp) };
+    _postData = { ...postReg, oneRM: postRM, cargas: postPairs.map(p=>p.kg), vmps: postPairs.map(p=>p.vmp) };
+
+    // Tabla raw de datos medidos
+    const rawSection = document.getElementById('prepost-raw-section');
+    const rawTbody   = document.getElementById('prepost-raw-tbody');
+    if (rawSection && rawTbody) {
+      rawSection.style.display = '';
+      const maxLen = Math.max(prePairs.length, postPairs.length);
+      rawTbody.innerHTML = Array.from({ length: maxLen }, (_, i) => {
+        const pre  = prePairs[i];
+        const post = postPairs[i];
+        return `<tr>
+          <td class="mono-cell" style="color:#4D9EFF">${pre  ? pre.kg  : '—'}</td>
+          <td class="mono-cell" style="color:#4D9EFF">${pre  ? pre.vmp : '—'}</td>
+          <td class="mono-cell" style="color:#39FF7A">${post ? post.kg  : '—'}</td>
+          <td class="mono-cell" style="color:#39FF7A">${post ? post.vmp : '—'}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    _renderPrePostOutput(_preData, _postData);
+
+  } catch(e) {
+    console.error('calcPPManual error:', e);
   }
-
-  _renderPrePostOutput(_preData, _postData);
 }
 
 // ── MODO HISTORIAL ────────────────────────────────────────────
@@ -758,7 +770,7 @@ function renderAsiResumen() {
 }
 
 // ════════════════════════════════════════
-//  INIT — lazy, se llaman al abrir cada tab
+//  INIT — corre inmediatamente después de que el DOM esté listo
 // ════════════════════════════════════════
 
 let _planillasInitDone = false;
@@ -781,4 +793,13 @@ function initPlanillas() {
   // PrePost manual: 5 filas por lado + modo manual activo
   for (let i = 0; i < 5; i++) { addPPRow('pre'); addPPRow('post'); }
   setPPTab('manual');
+}
+
+// Ejecutar después de que el DOM esté completamente cargado
+// Usar setTimeout(0) garantiza que corre después del parser HTML
+// incluso si DOMContentLoaded ya disparó
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initPlanillas);
+} else {
+  setTimeout(initPlanillas, 0);
 }
