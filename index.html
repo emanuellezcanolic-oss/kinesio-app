@@ -1011,7 +1011,28 @@
                 <span style="flex:1;font-size:9px;color:var(--text3);text-align:center">VMP (m/s)</span>
                 <span style="width:20px"></span>
               </div>
-              <div id="pp-pre-rows"></div>
+              <div id="pp-pre-rows">
+                <div style="display:flex;gap:6px;margin-bottom:5px;align-items:center">
+                  <input class="inp inp-mono" type="number" step=".5" placeholder="kg" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
+                  <input class="inp inp-mono" type="number" step=".001" placeholder="0.841" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
+                  <button onclick="this.parentElement.remove();calcPPManual()" style="background:none;border:none;color:var(--text3);font-size:15px;cursor:pointer;padding:2px 4px;line-height:1">×</button>
+                </div>
+                <div style="display:flex;gap:6px;margin-bottom:5px;align-items:center">
+                  <input class="inp inp-mono" type="number" step=".5" placeholder="kg" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
+                  <input class="inp inp-mono" type="number" step=".001" placeholder="0.719" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
+                  <button onclick="this.parentElement.remove();calcPPManual()" style="background:none;border:none;color:var(--text3);font-size:15px;cursor:pointer;padding:2px 4px;line-height:1">×</button>
+                </div>
+                <div style="display:flex;gap:6px;margin-bottom:5px;align-items:center">
+                  <input class="inp inp-mono" type="number" step=".5" placeholder="kg" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
+                  <input class="inp inp-mono" type="number" step=".001" placeholder="0.659" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
+                  <button onclick="this.parentElement.remove();calcPPManual()" style="background:none;border:none;color:var(--text3);font-size:15px;cursor:pointer;padding:2px 4px;line-height:1">×</button>
+                </div>
+                <div style="display:flex;gap:6px;margin-bottom:5px;align-items:center">
+                  <input class="inp inp-mono" type="number" step=".5" placeholder="kg" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
+                  <input class="inp inp-mono" type="number" step=".001" placeholder="0.497" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
+                  <button onclick="this.parentElement.remove();calcPPManual()" style="background:none;border:none;color:var(--text3);font-size:15px;cursor:pointer;padding:2px 4px;line-height:1">×</button>
+                </div>
+              </div>
               <button class="btn btn-ghost btn-sm" onclick="addPPRow('pre')" style="width:100%;margin-top:4px;font-size:10px">+ Fila</button>
               <div style="margin-top:8px;padding:6px 8px;background:var(--bg4);border-radius:6px;font-size:11px">
                 <span style="color:var(--text3)">1RM est: </span><span id="pp-pre-rm" style="font-family:var(--mono);color:var(--blue);font-weight:700">—</span>
@@ -1026,7 +1047,28 @@
                 <span style="flex:1;font-size:9px;color:var(--text3);text-align:center">VMP (m/s)</span>
                 <span style="width:20px"></span>
               </div>
-              <div id="pp-post-rows"></div>
+              <div id="pp-post-rows">
+                <div style="display:flex;gap:6px;margin-bottom:5px;align-items:center">
+                  <input class="inp inp-mono" type="number" step=".5" placeholder="kg" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
+                  <input class="inp inp-mono" type="number" step=".001" placeholder="0.900" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
+                  <button onclick="this.parentElement.remove();calcPPManual()" style="background:none;border:none;color:var(--text3);font-size:15px;cursor:pointer;padding:2px 4px;line-height:1">×</button>
+                </div>
+                <div style="display:flex;gap:6px;margin-bottom:5px;align-items:center">
+                  <input class="inp inp-mono" type="number" step=".5" placeholder="kg" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
+                  <input class="inp inp-mono" type="number" step=".001" placeholder="0.800" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
+                  <button onclick="this.parentElement.remove();calcPPManual()" style="background:none;border:none;color:var(--text3);font-size:15px;cursor:pointer;padding:2px 4px;line-height:1">×</button>
+                </div>
+                <div style="display:flex;gap:6px;margin-bottom:5px;align-items:center">
+                  <input class="inp inp-mono" type="number" step=".5" placeholder="kg" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
+                  <input class="inp inp-mono" type="number" step=".001" placeholder="0.700" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
+                  <button onclick="this.parentElement.remove();calcPPManual()" style="background:none;border:none;color:var(--text3);font-size:15px;cursor:pointer;padding:2px 4px;line-height:1">×</button>
+                </div>
+                <div style="display:flex;gap:6px;margin-bottom:5px;align-items:center">
+                  <input class="inp inp-mono" type="number" step=".5" placeholder="kg" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
+                  <input class="inp inp-mono" type="number" step=".001" placeholder="0.550" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
+                  <button onclick="this.parentElement.remove();calcPPManual()" style="background:none;border:none;color:var(--text3);font-size:15px;cursor:pointer;padding:2px 4px;line-height:1">×</button>
+                </div>
+              </div>
               <button class="btn btn-ghost btn-sm" onclick="addPPRow('post')" style="width:100%;margin-top:4px;font-size:10px">+ Fila</button>
               <div style="margin-top:8px;padding:6px 8px;background:var(--bg4);border-radius:6px;font-size:11px">
                 <span style="color:var(--text3)">1RM est: </span><span id="pp-post-rm" style="font-family:var(--mono);color:var(--neon);font-weight:700">—</span>
