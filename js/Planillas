@@ -758,19 +758,27 @@ function renderAsiResumen() {
 }
 
 // ════════════════════════════════════════
-//  INIT — llamar cuando el DOM esté listo
+//  INIT — lazy, se llaman al abrir cada tab
 // ════════════════════════════════════════
 
-document.addEventListener('DOMContentLoaded', () => {
+let _planillasInitDone = false;
+
+function initPlanillas() {
+  if (_planillasInitDone) return;
+  _planillasInitDone = true;
+
   initSmith();
-  // Inicializar DJ con 4 alturas por defecto
+
+  // DJ: 4 alturas por defecto
   for (let i = 0; i < 4; i++) addDJRow();
-  // CMJ TV con 4 cargas por defecto
+
+  // CMJ TV: 4 cargas por defecto
   for (let i = 0; i < 4; i++) addCMJTVRow();
-  // Asimetrías con 8 jugadores por defecto
+
+  // Asimetrías: 8 jugadores por defecto
   initAsiRows(8);
-  // PrePost manual: 5 filas por lado
+
+  // PrePost manual: 5 filas por lado + modo manual activo
   for (let i = 0; i < 5; i++) { addPPRow('pre'); addPPRow('post'); }
-  // Modo manual activo por defecto
   setPPTab('manual');
-});
+}
