@@ -1634,6 +1634,71 @@
       </div>
     </div>
 
+    <!-- PRESCRIPCIÓN HIIT -->
+    <div class="card mt-16">
+      <div class="card-header">
+        <h3>⚡ Prescripción HIIT</h3>
+        <span class="tag tag-b">ASR · IFT · Vol · Densidad · Recuperación</span>
+      </div>
+      <div class="card-body">
+        <!-- Sub-tabs ASR / IFT -->
+        <div style="display:flex;gap:4px;background:var(--bg4);border-radius:8px;padding:3px;margin-bottom:14px;width:fit-content">
+          <button class="btn btn-neon btn-sm" id="hiit-tab-asr-btn" onclick="setHIITTab('asr',this)" style="font-size:11px">ASR (sprint)</button>
+          <button class="btn btn-ghost btn-sm" id="hiit-tab-ift-btn" onclick="setHIITTab('ift',this)" style="font-size:11px">IFT (aeróbico)</button>
+        </div>
+
+        <!-- ASR -->
+        <div id="hiit-asr">
+          <div style="font-size:11px;color:var(--text2);margin-bottom:12px;line-height:1.6;padding:8px;background:rgba(57,255,122,.04);border-radius:8px">
+            ASR = Velocidad anaeróbica de sprint. Ingresá el sprint test y el test de vVO2 para calcular la prescripción.
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:14px">
+            <div class="ig"><label class="il">Distancia sprint (m)</label><input class="inp inp-mono" type="number" id="asr-dist" value="10" oninput="calcASR()"></div>
+            <div class="ig"><label class="il">Tiempo sprint (s)</label><input class="inp inp-mono" type="number" step=".01" id="asr-tiempo" placeholder="1.10" oninput="calcASR()"></div>
+            <div class="ig"><label class="il">Dist. test vVO2 (m)</label><input class="inp inp-mono" type="number" id="asr-dist-vo2" placeholder="1500" oninput="calcASR()"></div>
+            <div class="ig"><label class="il">Tiempo vVO2 (s)</label><input class="inp inp-mono" type="number" id="asr-tiempo-vo2" placeholder="300" oninput="calcASR()"></div>
+            <div class="ig"><label class="il">% Pérdida vel. etto</label><input class="inp inp-mono" type="number" id="asr-pct-loss" value="35" oninput="calcASR()"></div>
+          </div>
+          <div id="asr-results" style="display:none">
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:12px" id="asr-kpis"></div>
+            <div style="font-family:var(--mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--text2);margin-bottom:8px">
+              Planilla de prescripción
+            </div>
+            <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px" id="asr-plan-table"></table></div>
+            <div style="margin-top:10px;padding:10px;background:var(--bg4);border-radius:8px">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--text2);text-transform:uppercase;margin-bottom:6px">Referencia de intensidades</div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px;font-size:10px" id="asr-ref-grid"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- IFT -->
+        <div id="hiit-ift" style="display:none">
+          <div style="font-size:11px;color:var(--text2);margin-bottom:12px;line-height:1.6;padding:8px;background:rgba(77,158,255,.04);border-radius:8px">
+            IFT = Intermittent Fitness Test. Ingresá el nivel para calcular velocidad de trabajo, volumen y tiempo de cada serie.
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:14px">
+            <div class="ig"><label class="il">Nivel IFT</label><input class="inp inp-mono" type="number" step=".5" id="ift-nivel" placeholder="17.5" oninput="calcIFT()"></div>
+            <div class="ig"><label class="il">% VIFT</label><input class="inp inp-mono" type="number" id="ift-pct" value="115" oninput="calcIFT()"></div>
+            <div class="ig"><label class="il">Tiempo trabajo (s)</label><input class="inp inp-mono" type="number" id="ift-tiempo" value="10" oninput="calcIFT()"></div>
+            <div class="ig"><label class="il">Pausa (s)</label><input class="inp inp-mono" type="number" id="ift-pausa" value="25" oninput="calcIFT()"></div>
+            <div class="ig"><label class="il">Rep / serie</label><input class="inp inp-mono" type="number" id="ift-reps" value="15" oninput="calcIFT()"></div>
+            <div class="ig"><label class="il">Nro series</label><input class="inp inp-mono" type="number" id="ift-series" value="1" oninput="calcIFT()"></div>
+          </div>
+          <div id="ift-results" style="display:none">
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:12px" id="ift-kpis"></div>
+            <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:6px" id="ift-macro"></div>
+          </div>
+          <!-- Tabla de referencia por nivel IFT -->
+          <div style="margin-top:12px">
+            <div style="font-family:var(--mono);font-size:9px;color:var(--text2);text-transform:uppercase;margin-bottom:6px">Tabla IFT al 115% VIFT (10s/25s, 15 rep, 1 serie)</div>
+            <div style="overflow-x:auto"><table style="border-collapse:collapse;font-size:11px;width:100%" id="ift-ref-table"></table></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
   </div>
 
   <!-- ══ TAB: FMS ══ -->
@@ -1738,70 +1803,6 @@
       </div>
     </div>
 
-    <!-- PRESCRIPCIÓN HIIT -->
-    <div class="card mt-16">
-      <div class="card-header">
-        <h3>⚡ Prescripción HIIT</h3>
-        <span class="tag tag-b">ASR · IFT · Vol · Densidad · Recuperación</span>
-      </div>
-      <div class="card-body">
-        <!-- Sub-tabs ASR / IFT -->
-        <div style="display:flex;gap:4px;background:var(--bg4);border-radius:8px;padding:3px;margin-bottom:14px;width:fit-content">
-          <button class="btn btn-neon btn-sm" id="hiit-tab-asr-btn" onclick="setHIITTab('asr',this)" style="font-size:11px">ASR (sprint)</button>
-          <button class="btn btn-ghost btn-sm" id="hiit-tab-ift-btn" onclick="setHIITTab('ift',this)" style="font-size:11px">IFT (aeróbico)</button>
-        </div>
-
-        <!-- ASR -->
-        <div id="hiit-asr">
-          <div style="font-size:11px;color:var(--text2);margin-bottom:12px;line-height:1.6;padding:8px;background:rgba(57,255,122,.04);border-radius:8px">
-            ASR = Velocidad anaeróbica de sprint. Ingresá el sprint test y el test de vVO2 para calcular la prescripción.
-          </div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:14px">
-            <div class="ig"><label class="il">Distancia sprint (m)</label><input class="inp inp-mono" type="number" id="asr-dist" value="10" oninput="calcASR()"></div>
-            <div class="ig"><label class="il">Tiempo sprint (s)</label><input class="inp inp-mono" type="number" step=".01" id="asr-tiempo" placeholder="1.10" oninput="calcASR()"></div>
-            <div class="ig"><label class="il">Dist. test vVO2 (m)</label><input class="inp inp-mono" type="number" id="asr-dist-vo2" placeholder="1500" oninput="calcASR()"></div>
-            <div class="ig"><label class="il">Tiempo vVO2 (s)</label><input class="inp inp-mono" type="number" id="asr-tiempo-vo2" placeholder="300" oninput="calcASR()"></div>
-            <div class="ig"><label class="il">% Pérdida vel. etto</label><input class="inp inp-mono" type="number" id="asr-pct-loss" value="35" oninput="calcASR()"></div>
-          </div>
-          <div id="asr-results" style="display:none">
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:12px" id="asr-kpis"></div>
-            <div style="font-family:var(--mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--text2);margin-bottom:8px">
-              Planilla de prescripción
-            </div>
-            <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px" id="asr-plan-table"></table></div>
-            <div style="margin-top:10px;padding:10px;background:var(--bg4);border-radius:8px">
-              <div style="font-family:var(--mono);font-size:9px;color:var(--text2);text-transform:uppercase;margin-bottom:6px">Referencia de intensidades</div>
-              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px;font-size:10px" id="asr-ref-grid"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- IFT -->
-        <div id="hiit-ift" style="display:none">
-          <div style="font-size:11px;color:var(--text2);margin-bottom:12px;line-height:1.6;padding:8px;background:rgba(77,158,255,.04);border-radius:8px">
-            IFT = Intermittent Fitness Test. Ingresá el nivel para calcular velocidad de trabajo, volumen y tiempo de cada serie.
-          </div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:14px">
-            <div class="ig"><label class="il">Nivel IFT</label><input class="inp inp-mono" type="number" step=".5" id="ift-nivel" placeholder="17.5" oninput="calcIFT()"></div>
-            <div class="ig"><label class="il">% VIFT</label><input class="inp inp-mono" type="number" id="ift-pct" value="115" oninput="calcIFT()"></div>
-            <div class="ig"><label class="il">Tiempo trabajo (s)</label><input class="inp inp-mono" type="number" id="ift-tiempo" value="10" oninput="calcIFT()"></div>
-            <div class="ig"><label class="il">Pausa (s)</label><input class="inp inp-mono" type="number" id="ift-pausa" value="25" oninput="calcIFT()"></div>
-            <div class="ig"><label class="il">Rep / serie</label><input class="inp inp-mono" type="number" id="ift-reps" value="15" oninput="calcIFT()"></div>
-            <div class="ig"><label class="il">Nro series</label><input class="inp inp-mono" type="number" id="ift-series" value="1" oninput="calcIFT()"></div>
-          </div>
-          <div id="ift-results" style="display:none">
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:12px" id="ift-kpis"></div>
-            <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:6px" id="ift-macro"></div>
-          </div>
-          <!-- Tabla de referencia por nivel IFT -->
-          <div style="margin-top:12px">
-            <div style="font-family:var(--mono);font-size:9px;color:var(--text2);text-transform:uppercase;margin-bottom:6px">Tabla IFT al 115% VIFT (10s/25s, 15 rep, 1 serie)</div>
-            <div style="overflow-x:auto"><table style="border-collapse:collapse;font-size:11px;width:100%" id="ift-ref-table"></table></div>
-          </div>
-        </div>
-
-      </div>
-    </div>
 
   </div>
 
