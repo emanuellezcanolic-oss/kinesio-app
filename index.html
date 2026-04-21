@@ -990,168 +990,113 @@
         <span class="tag tag-g">Δ% VMP · Δ% 1RM · cam%</span>
       </div>
       <div class="card-body">
-
-        <!-- Tabs: Historial / Manual -->
-        <div style="display:flex;gap:6px;margin-bottom:14px">
-          <button class="btn btn-neon btn-sm" id="pp-tab-manual-btn" onclick="setPPTab('manual')">✏️ Ingreso manual</button>
-          <button class="btn btn-ghost btn-sm" id="pp-tab-hist-btn"   onclick="setPPTab('hist')">💾 Desde historial</button>
+        <div style="font-size:11px;color:var(--text2);margin-bottom:14px;padding:8px;background:rgba(57,255,122,.05);border-radius:8px;line-height:1.6">
+          Ingresá los pares <b style="color:var(--text2)">Carga (kg) / VMP (m/s)</b> de cada evaluación. Mínimo 3 pares por lado. El sistema hace la regresión lineal y genera la tabla exactamente como la planilla Tecni.
         </div>
 
-        <!-- MODO MANUAL -->
-        <div id="pp-mode-manual">
-          <div style="font-size:11px;color:var(--text2);margin-bottom:10px;padding:8px;background:rgba(57,255,122,.05);border-radius:8px">
-            Ingresá las cargas y VMPs medidos en cada evaluación. Mínimo 3 pares por eval. El sistema calcula la regresión, el 1RM y la tabla % RM → VMP exactamente como la planilla Tecni.
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px">
-            <!-- PRE -->
-            <div>
-              <div style="font-family:var(--mono);font-size:10px;font-weight:700;text-transform:uppercase;color:var(--blue);margin-bottom:6px;letter-spacing:.1em">Evaluación PRE</div>
-              <div style="display:flex;gap:6px;margin-bottom:4px">
-                <span style="flex:1;font-size:9px;color:var(--text3);text-align:center">Carga (kg)</span>
-                <span style="flex:1;font-size:9px;color:var(--text3);text-align:center">VMP (m/s)</span>
-                <span style="width:20px"></span>
+        <!-- Ejercicio -->
+        <div class="ig" style="max-width:260px;margin-bottom:14px">
+          <label class="il">Ejercicio</label>
+          <select class="inp inp-mono" id="pp-ej-manual" style="font-size:12px">
+            <option value="sentadilla">Sentadilla / Back Squat</option>
+            <option value="press-banca">Press de Banca</option>
+            <option value="peso-muerto">Peso Muerto</option>
+            <option value="bench-pull">Bench Pull / Remo</option>
+            <option value="hip-thrust">Hip Thrust</option>
+            <option value="media-sent">Media Sentadilla</option>
+            <option value="military-press">Military Press</option>
+            <option value="dominadas">Dominadas</option>
+          </select>
+        </div>
+
+        <!-- Grid PRE / POST -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px">
+
+          <!-- PRE -->
+          <div style="background:var(--bg4);border:1px solid rgba(77,158,255,.25);border-radius:10px;padding:12px">
+            <div style="font-family:var(--mono);font-size:10px;font-weight:700;text-transform:uppercase;color:#4D9EFF;margin-bottom:8px;letter-spacing:.1em">● Evaluación PRE</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 20px;gap:4px;margin-bottom:4px">
+              <span style="font-size:9px;color:var(--text3);text-align:center">Carga kg</span>
+              <span style="font-size:9px;color:var(--text3);text-align:center">VMP m/s</span>
+              <span></span>
+            </div>
+            <div id="pp-pre-rows">
+              <div style="display:grid;grid-template-columns:1fr 1fr 20px;gap:4px;margin-bottom:4px">
+                <input class="inp inp-mono" type="number" step=".5" placeholder="90" style="font-size:12px;padding:5px 7px">
+                <input class="inp inp-mono" type="number" step=".001" placeholder="0.841" style="font-size:12px;padding:5px 7px">
+                <button onclick="this.closest('div').remove()" style="background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;padding:0">×</button>
               </div>
-              <div id="pp-pre-rows">
-                <div style="display:flex;gap:6px;margin-bottom:5px;align-items:center">
-                  <input class="inp inp-mono" type="number" step=".5" placeholder="kg" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
-                  <input class="inp inp-mono" type="number" step=".001" placeholder="0.841" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
-                  <button onclick="this.parentElement.remove();calcPPManual()" style="background:none;border:none;color:var(--text3);font-size:15px;cursor:pointer;padding:2px 4px;line-height:1">×</button>
-                </div>
-                <div style="display:flex;gap:6px;margin-bottom:5px;align-items:center">
-                  <input class="inp inp-mono" type="number" step=".5" placeholder="kg" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
-                  <input class="inp inp-mono" type="number" step=".001" placeholder="0.719" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
-                  <button onclick="this.parentElement.remove();calcPPManual()" style="background:none;border:none;color:var(--text3);font-size:15px;cursor:pointer;padding:2px 4px;line-height:1">×</button>
-                </div>
-                <div style="display:flex;gap:6px;margin-bottom:5px;align-items:center">
-                  <input class="inp inp-mono" type="number" step=".5" placeholder="kg" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
-                  <input class="inp inp-mono" type="number" step=".001" placeholder="0.659" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
-                  <button onclick="this.parentElement.remove();calcPPManual()" style="background:none;border:none;color:var(--text3);font-size:15px;cursor:pointer;padding:2px 4px;line-height:1">×</button>
-                </div>
-                <div style="display:flex;gap:6px;margin-bottom:5px;align-items:center">
-                  <input class="inp inp-mono" type="number" step=".5" placeholder="kg" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
-                  <input class="inp inp-mono" type="number" step=".001" placeholder="0.497" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
-                  <button onclick="this.parentElement.remove();calcPPManual()" style="background:none;border:none;color:var(--text3);font-size:15px;cursor:pointer;padding:2px 4px;line-height:1">×</button>
-                </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 20px;gap:4px;margin-bottom:4px">
+                <input class="inp inp-mono" type="number" step=".5" placeholder="110" style="font-size:12px;padding:5px 7px">
+                <input class="inp inp-mono" type="number" step=".001" placeholder="0.719" style="font-size:12px;padding:5px 7px">
+                <button onclick="this.closest('div').remove()" style="background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;padding:0">×</button>
               </div>
-              <button class="btn btn-ghost btn-sm" onclick="addPPRow('pre')" style="width:100%;margin-top:4px;font-size:10px">+ Fila</button>
-              <div style="margin-top:8px;padding:6px 8px;background:var(--bg4);border-radius:6px;font-size:11px">
-                <span style="color:var(--text3)">1RM est: </span><span id="pp-pre-rm" style="font-family:var(--mono);color:var(--blue);font-weight:700">—</span>
-                <span style="color:var(--text3);margin-left:8px">R²: </span><span id="pp-pre-r2" style="font-family:var(--mono);color:var(--text2)">—</span>
+              <div style="display:grid;grid-template-columns:1fr 1fr 20px;gap:4px;margin-bottom:4px">
+                <input class="inp inp-mono" type="number" step=".5" placeholder="130" style="font-size:12px;padding:5px 7px">
+                <input class="inp inp-mono" type="number" step=".001" placeholder="0.659" style="font-size:12px;padding:5px 7px">
+                <button onclick="this.closest('div').remove()" style="background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;padding:0">×</button>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 20px;gap:4px;margin-bottom:4px">
+                <input class="inp inp-mono" type="number" step=".5" placeholder="150" style="font-size:12px;padding:5px 7px">
+                <input class="inp inp-mono" type="number" step=".001" placeholder="0.497" style="font-size:12px;padding:5px 7px">
+                <button onclick="this.closest('div').remove()" style="background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;padding:0">×</button>
               </div>
             </div>
-            <!-- POST -->
-            <div>
-              <div style="font-family:var(--mono);font-size:10px;font-weight:700;text-transform:uppercase;color:var(--neon);margin-bottom:6px;letter-spacing:.1em">Evaluación POST</div>
-              <div style="display:flex;gap:6px;margin-bottom:4px">
-                <span style="flex:1;font-size:9px;color:var(--text3);text-align:center">Carga (kg)</span>
-                <span style="flex:1;font-size:9px;color:var(--text3);text-align:center">VMP (m/s)</span>
-                <span style="width:20px"></span>
-              </div>
-              <div id="pp-post-rows">
-                <div style="display:flex;gap:6px;margin-bottom:5px;align-items:center">
-                  <input class="inp inp-mono" type="number" step=".5" placeholder="kg" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
-                  <input class="inp inp-mono" type="number" step=".001" placeholder="0.900" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
-                  <button onclick="this.parentElement.remove();calcPPManual()" style="background:none;border:none;color:var(--text3);font-size:15px;cursor:pointer;padding:2px 4px;line-height:1">×</button>
-                </div>
-                <div style="display:flex;gap:6px;margin-bottom:5px;align-items:center">
-                  <input class="inp inp-mono" type="number" step=".5" placeholder="kg" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
-                  <input class="inp inp-mono" type="number" step=".001" placeholder="0.800" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
-                  <button onclick="this.parentElement.remove();calcPPManual()" style="background:none;border:none;color:var(--text3);font-size:15px;cursor:pointer;padding:2px 4px;line-height:1">×</button>
-                </div>
-                <div style="display:flex;gap:6px;margin-bottom:5px;align-items:center">
-                  <input class="inp inp-mono" type="number" step=".5" placeholder="kg" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
-                  <input class="inp inp-mono" type="number" step=".001" placeholder="0.700" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
-                  <button onclick="this.parentElement.remove();calcPPManual()" style="background:none;border:none;color:var(--text3);font-size:15px;cursor:pointer;padding:2px 4px;line-height:1">×</button>
-                </div>
-                <div style="display:flex;gap:6px;margin-bottom:5px;align-items:center">
-                  <input class="inp inp-mono" type="number" step=".5" placeholder="kg" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
-                  <input class="inp inp-mono" type="number" step=".001" placeholder="0.550" style="flex:1;font-size:12px;padding:5px 7px" oninput="calcPPManual()">
-                  <button onclick="this.parentElement.remove();calcPPManual()" style="background:none;border:none;color:var(--text3);font-size:15px;cursor:pointer;padding:2px 4px;line-height:1">×</button>
-                </div>
-              </div>
-              <button class="btn btn-ghost btn-sm" onclick="addPPRow('post')" style="width:100%;margin-top:4px;font-size:10px">+ Fila</button>
-              <div style="margin-top:8px;padding:6px 8px;background:var(--bg4);border-radius:6px;font-size:11px">
-                <span style="color:var(--text3)">1RM est: </span><span id="pp-post-rm" style="font-family:var(--mono);color:var(--neon);font-weight:700">—</span>
-                <span style="color:var(--text3);margin-left:8px">R²: </span><span id="pp-post-r2" style="font-family:var(--mono);color:var(--text2)">—</span>
-              </div>
+            <button onclick="ppAddRow('pre')" style="width:100%;margin-top:6px;background:rgba(77,158,255,.08);border:1px solid rgba(77,158,255,.2);color:#4D9EFF;border-radius:6px;padding:5px;font-size:11px;cursor:pointer">+ Fila PRE</button>
+            <div style="margin-top:8px;font-size:11px;font-family:var(--mono)">
+              1RM: <span id="pp-pre-rm" style="color:#4D9EFF;font-weight:700">—</span>
+              &nbsp;R²: <span id="pp-pre-r2" style="color:var(--text2)">—</span>
             </div>
           </div>
-          <div class="grid-2" style="gap:10px;margin-bottom:12px">
-            <div class="ig">
-              <label class="il">Ejercicio</label>
-              <select class="inp inp-mono" id="pp-ej-manual" style="font-size:11px" onchange="calcPPManual()">
-                <option value="sentadilla">Sentadilla</option>
-                <option value="press-banca">Press de Banca</option>
-                <option value="peso-muerto">Peso Muerto</option>
-                <option value="bench-pull">Bench Pull / Remo</option>
-                <option value="hip-thrust">Hip Thrust</option>
-                <option value="media-sent">Media Sentadilla</option>
-                <option value="military-press">Military Press</option>
-                <option value="dominadas">Dominadas</option>
-              </select>
+
+          <!-- POST -->
+          <div style="background:var(--bg4);border:1px solid rgba(57,255,122,.25);border-radius:10px;padding:12px">
+            <div style="font-family:var(--mono);font-size:10px;font-weight:700;text-transform:uppercase;color:#39FF7A;margin-bottom:8px;letter-spacing:.1em">● Evaluación POST</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 20px;gap:4px;margin-bottom:4px">
+              <span style="font-size:9px;color:var(--text3);text-align:center">Carga kg</span>
+              <span style="font-size:9px;color:var(--text3);text-align:center">VMP m/s</span>
+              <span></span>
             </div>
-            <div style="display:flex;align-items:flex-end">
-              <button class="btn btn-neon btn-full" onclick="calcPPManual()">📊 Calcular comparativa</button>
+            <div id="pp-post-rows">
+              <div style="display:grid;grid-template-columns:1fr 1fr 20px;gap:4px;margin-bottom:4px">
+                <input class="inp inp-mono" type="number" step=".5" placeholder="90" style="font-size:12px;padding:5px 7px">
+                <input class="inp inp-mono" type="number" step=".001" placeholder="0.900" style="font-size:12px;padding:5px 7px">
+                <button onclick="this.closest('div').remove()" style="background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;padding:0">×</button>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 20px;gap:4px;margin-bottom:4px">
+                <input class="inp inp-mono" type="number" step=".5" placeholder="110" style="font-size:12px;padding:5px 7px">
+                <input class="inp inp-mono" type="number" step=".001" placeholder="0.800" style="font-size:12px;padding:5px 7px">
+                <button onclick="this.closest('div').remove()" style="background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;padding:0">×</button>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 20px;gap:4px;margin-bottom:4px">
+                <input class="inp inp-mono" type="number" step=".5" placeholder="130" style="font-size:12px;padding:5px 7px">
+                <input class="inp inp-mono" type="number" step=".001" placeholder="0.700" style="font-size:12px;padding:5px 7px">
+                <button onclick="this.closest('div').remove()" style="background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;padding:0">×</button>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 20px;gap:4px;margin-bottom:4px">
+                <input class="inp inp-mono" type="number" step=".5" placeholder="150" style="font-size:12px;padding:5px 7px">
+                <input class="inp inp-mono" type="number" step=".001" placeholder="0.550" style="font-size:12px;padding:5px 7px">
+                <button onclick="this.closest('div').remove()" style="background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;padding:0">×</button>
+              </div>
+            </div>
+            <button onclick="ppAddRow('post')" style="width:100%;margin-top:6px;background:rgba(57,255,122,.08);border:1px solid rgba(57,255,122,.2);color:#39FF7A;border-radius:6px;padding:5px;font-size:11px;cursor:pointer">+ Fila POST</button>
+            <div style="margin-top:8px;font-size:11px;font-family:var(--mono)">
+              1RM: <span id="pp-post-rm" style="color:#39FF7A;font-weight:700">—</span>
+              &nbsp;R²: <span id="pp-post-r2" style="color:var(--text2)">—</span>
             </div>
           </div>
         </div>
 
-        <!-- MODO HISTORIAL -->
-        <div id="pp-mode-hist" style="display:none">
-          <div style="font-size:11px;color:var(--text2);margin-bottom:10px;padding:8px;background:rgba(57,255,122,.05);border-radius:8px">
-            Compará dos evaluaciones F-V ya guardadas del atleta. Requiere al menos 2 perfiles guardados del mismo ejercicio.
-          </div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
-            <div class="ig" style="flex:1;min-width:140px">
-              <label class="il">Ejercicio</label>
-              <select class="inp inp-mono" id="prepost-ej" style="font-size:11px" onchange="updatePrePostSelects()">
-                <option value="sentadilla">Sentadilla</option>
-                <option value="press-banca">Press de Banca</option>
-                <option value="peso-muerto">Peso Muerto</option>
-                <option value="bench-pull">Bench Pull / Remo</option>
-                <option value="hip-thrust">Hip Thrust</option>
-                <option value="media-sent">Media Sentadilla</option>
-                <option value="military-press">Military Press</option>
-                <option value="dominadas">Dominadas</option>
-              </select>
-            </div>
-            <div class="ig" style="flex:1;min-width:120px">
-              <label class="il">Eval PRE</label>
-              <select class="inp inp-mono" id="prepost-pre" style="font-size:11px"></select>
-            </div>
-            <div class="ig" style="flex:1;min-width:120px">
-              <label class="il">Eval POST</label>
-              <select class="inp inp-mono" id="prepost-post" style="font-size:11px"></select>
-            </div>
-            <div style="display:flex;align-items:flex-end">
-              <button class="btn btn-neon btn-sm" onclick="updatePrePostSelects();calcFVPrePost()">Comparar</button>
-            </div>
-          </div>
-          <div id="prepost-msg" style="font-size:12px;color:var(--text3);margin-bottom:8px"></div>
-        </div>
+        <button onclick="ppCalcular()" style="width:100%;background:var(--neon);color:#000;border:none;border-radius:8px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:14px">
+          📊 Calcular comparativa
+        </button>
 
-        <!-- OUTPUT COMPARTIDO -->
+        <div id="pp-msg" style="font-size:12px;color:var(--red);margin-bottom:8px;display:none"></div>
+
+        <!-- OUTPUT -->
         <div id="prepost-output" style="display:none">
           <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;margin-bottom:14px" id="prepost-kpis"></div>
-          <!-- Tabla raw VMP ingresados -->
-          <div id="prepost-raw-section" style="margin-bottom:14px;display:none">
-            <div style="font-family:var(--mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--text2);margin-bottom:6px">
-              Datos medidos
-            </div>
-            <div style="overflow-x:auto">
-              <table class="data-table" id="prepost-raw-table">
-                <thead><tr>
-                  <th>Carga PRE (kg)</th><th>VMP PRE</th>
-                  <th>Carga POST (kg)</th><th>VMP POST</th>
-                </tr></thead>
-                <tbody id="prepost-raw-tbody"></tbody>
-              </table>
-            </div>
-          </div>
-          <!-- Tabla % RM → VMP (referencia planilla Tecni) -->
-          <div style="font-family:var(--mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--text2);margin-bottom:6px">
-            % RM → kg → VMP pre/post → cam%
-          </div>
+          <div style="font-family:var(--mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--text2);margin-bottom:6px">% RM → kg → VMP pre/post → cam%</div>
           <div style="overflow-x:auto">
             <table class="data-table">
               <thead>
