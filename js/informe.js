@@ -93,6 +93,64 @@ Generá el informe con ESTE FORMATO EXACTO (usá los emojis como encabezados, si
   }
 }
 
+// ── Helper: generate athletic dark background via HTML Canvas ────────────────
+function _genBg(variant='page'){
+  const PW=630,PH=891; // A4 at ~72dpi×3
+  const cv=document.createElement('canvas');cv.width=PW;cv.height=PH;
+  const ctx=cv.getContext('2d');
+
+  // Base: pure black
+  ctx.fillStyle='#000000';ctx.fillRect(0,0,PW,PH);
+
+  if(variant==='cover'){
+    // Dramatic radial gradient - dark center, black edges
+    const g=ctx.createRadialGradient(PW*0.5,PH*0.28,0,PW*0.5,PH*0.3,PW*0.85);
+    g.addColorStop(0,'rgba(22,22,22,1)');
+    g.addColorStop(0.45,'rgba(10,10,10,1)');
+    g.addColorStop(1,'rgba(0,0,0,1)');
+    ctx.fillStyle=g;ctx.fillRect(0,0,PW,PH);
+
+    // Green top glow strip
+    const gg=ctx.createLinearGradient(0,0,0,PH*0.22);
+    gg.addColorStop(0,'rgba(57,255,122,0.06)');
+    gg.addColorStop(1,'rgba(57,255,122,0)');
+    ctx.fillStyle=gg;ctx.fillRect(0,0,PW,PH*0.22);
+
+    // Diagonal speed lines (athletic feel)
+    ctx.save();ctx.globalAlpha=0.035;ctx.strokeStyle='#39FF7A';ctx.lineWidth=1;
+    for(let i=-PH;i<PW+PH;i+=38){
+      ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i+PH*0.5,PH);ctx.stroke();
+    }
+    ctx.restore();
+
+    // Bottom fade to black
+    const bf=ctx.createLinearGradient(0,PH*0.72,0,PH);
+    bf.addColorStop(0,'rgba(0,0,0,0)');bf.addColorStop(1,'rgba(0,0,0,0.7)');
+    ctx.fillStyle=bf;ctx.fillRect(0,PH*0.72,PW,PH*0.28);
+
+  } else {
+    // Content pages: subtle dark radial + barely-visible grid
+    const g=ctx.createRadialGradient(PW*0.5,PH*0.4,0,PW*0.5,PH*0.4,PW*0.75);
+    g.addColorStop(0,'rgba(14,14,14,1)');
+    g.addColorStop(1,'rgba(0,0,0,1)');
+    ctx.fillStyle=g;ctx.fillRect(0,0,PW,PH);
+
+    // Very faint diagonal lines
+    ctx.save();ctx.globalAlpha=0.018;ctx.strokeStyle='#39FF7A';ctx.lineWidth=1;
+    for(let i=-PH;i<PW+PH;i+=52){
+      ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i+PH*0.4,PH);ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // Vignette
+  const vg=ctx.createRadialGradient(PW/2,PH/2,PH*0.3,PW/2,PH/2,PH*0.8);
+  vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,0.55)');
+  ctx.fillStyle=vg;ctx.fillRect(0,0,PW,PH);
+
+  return cv.toDataURL('image/jpeg',0.88);
+}
+
 // ── Helper: render a markdown pipe-table as a real visual table ──────────────
 function _pdfRenderTable(doc,lines,x,y,w,colors){
   const {BG,SURF,SURF2,GREEN,WHITE,LGRAY,MGRAY,DGRAY}=colors;
@@ -163,17 +221,24 @@ function exportarPDF(){
   const F    =(x,y,w,h)=>doc.rect(x,y,w,h,'F');
   const R    =(x,y,w,h,r=2)=>doc.roundedRect(x,y,w,h,r,r,'F');
   const lw   =(n)=>doc.setLineWidth(n);
-  const bgPage=()=>{fill(BG);F(0,0,W,297);};
 
-  // SECTION BAND — like "CALIDAD DE MOVIMIENTO" in the target
-  const sectionBand=(title,y,h=25)=>{
-    fill(DARK); F(0,y,W,h);
-    fill(GREEN); F(0,y,10,h);                   // 10mm green bar — thick like original
-    fill(SURF2); F(10,y,W-10,0.5);              // hairline top
+  // Pre-render backgrounds once
+  const _bgCover=_genBg('cover');
+  const _bgPage =_genBg('page');
+  const bgPage=(cover=false)=>{
+    doc.addImage(cover?_bgCover:_bgPage,'JPEG',0,0,W,297);
+  };
+
+  // SECTION BAND — full-width dark band with thick green left bar
+  const sectionBand=(title,y,h=28)=>{
+    fill([6,6,6]); F(0,y,W,h);
+    fill(GREEN); F(0,y,10,h);                   // 10mm green left bar
+    fill(GREEN); F(10,y,W-10,0.4);              // hairline top
+    fill(GREEN); F(10,y+h-0.4,W-10,0.4);       // hairline bottom
     doc.setFont('helvetica','bolditalic');
-    doc.setFontSize(26);
+    doc.setFontSize(22);
     txt(WHITE);
-    doc.text(title.toUpperCase(),ML+8,y+h-6);
+    doc.text(title.toUpperCase(),ML+8,y+h-8);
     return y+h;
   };
 
@@ -199,22 +264,22 @@ function exportarPDF(){
   };
 
   // ── PAGE 1 ───────────────────────────────────────────────
-  bgPage();
+  bgPage(true);
 
-  // HEADER
-  fill(DARK);F(0,0,W,52);
-  fill(GREEN);F(0,50,W,0.7);
-  fill(GREEN);F(ML-6,15,4,4);         // small green square accent
-  doc.setFont('helvetica','bolditalic');doc.setFontSize(32);txt(WHITE);
-  doc.text('MOVEMETRICS',ML,30);
+  // HEADER — left green mega bar + branding
+  fill(GREEN);F(0,0,8,60);                       // thick left green bar
+  fill([6,6,6]);F(8,0,W-8,60);                  // dark header bg (right of bar)
+  fill(GREEN);F(8,58,W-8,0.8);                  // bottom green line
+  doc.setFont('helvetica','bolditalic');doc.setFontSize(36);txt(WHITE);
+  doc.text('MOVEMETRICS',ML+4,36);
   doc.setFont('helvetica','normal');doc.setFontSize(6.5);txt(MGRAY);
-  doc.text('PLATAFORMA DEPORTIVO-CLÍNICA  ·  INFORME ANALÍTICO PROFESIONAL',ML,38);
-  doc.setFontSize(7.5);
-  doc.text(prof ,W-ML,20,{align:'right'});
-  doc.text(inst ,W-ML,27,{align:'right'});
-  doc.text(fecha,W-ML,34,{align:'right'});
+  doc.text('PLATAFORMA DEPORTIVO-CLÍNICA  ·  INFORME ANALÍTICO PROFESIONAL',ML+4,46);
+  doc.setFontSize(7.5);txt([80,80,80]);
+  doc.text(prof ,W-ML,22,{align:'right'});
+  doc.text(inst ,W-ML,30,{align:'right'});
+  doc.text(fecha,W-ML,38,{align:'right'});
 
-  let y=58;
+  let y=66;
 
   // ATHLETE BLOCK
   fill(SURF);R(ML,y,CW,30,2);
