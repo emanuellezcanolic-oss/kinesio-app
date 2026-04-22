@@ -328,7 +328,59 @@ function ppCalcular() {
     mkKPI('V₀ (intersec.)', rPre.a.toFixed(4), rPost.a.toFixed(4), dV0,   ' m/s', false) +
     mkKPI('Pendiente (b)',  rPre.b.toFixed(5),  rPost.b.toFixed(5), dPend, '',     true);
 
-  // Tabla % RM → kg → VMP → cam%
+  // ── TABLA 1: cargas absolutas coincidentes ──────────────────
+  const absBodyEl = document.getElementById('prepost-abs-tbody');
+  const absPromEl = document.getElementById('prepost-abs-prom');
+  if (absBodyEl) {
+    // Cargas que aparecen en ambos lados (coincidencia exacta de kg)
+    const preMap  = new Map(pre.map(p  => [p.kg,  p.vmp]));
+    const postMap = new Map(post.map(p => [p.kg,  p.vmp]));
+    const common  = [...preMap.keys()].filter(kg => postMap.has(kg)).sort((a,b)=>a-b);
+
+    if (common.length === 0) {
+      // Si no hay cargas coincidentes, usar regresión para predecir VMP en cargas de PRE
+      const allKgs = [...new Set([...pre.map(p=>p.kg), ...post.map(p=>p.kg)])].sort((a,b)=>a-b);
+      absBodyEl.innerHTML = allKgs.map(kg => {
+        const vPre  = +(rPre.a  + rPre.b  * kg).toFixed(3);
+        const vPost = +(rPost.a + rPost.b * kg).toFixed(3);
+        const cam   = vPre > 0 ? +((vPost - vPre) / Math.abs(vPre) * 100).toFixed(1) : null;
+        const cc    = cam == null ? 'var(--text3)' : cam > 0 ? 'var(--neon)' : 'var(--red)';
+        return `<tr>
+          <td class="mono-cell" style="font-weight:700;color:var(--text2)">${kg} kg <span style="font-size:9px;color:var(--text3)">(pred)</span></td>
+          <td class="mono-cell" style="color:#4D9EFF">${vPre > 0 ? vPre : '—'}</td>
+          <td class="mono-cell" style="color:#39FF7A">${vPost > 0 ? vPost : '—'}</td>
+          <td class="mono-cell" style="color:${cc};font-weight:700">${cam != null ? (cam>0?'+':'')+cam+'%' : '—'}</td>
+        </tr>`;
+      }).join('');
+      const cams = allKgs.map(kg => {
+        const vp = rPre.a + rPre.b * kg, vpo = rPost.a + rPost.b * kg;
+        return vp > 0 ? (vpo - vp) / Math.abs(vp) * 100 : null;
+      }).filter(v => v != null);
+      const prom = cams.length ? (cams.reduce((a,b)=>a+b,0)/cams.length).toFixed(1) : null;
+      if (absPromEl) absPromEl.innerHTML = prom ? `Promedio Δ% VMP (regresión): <span style="color:${+prom>0?'var(--neon)':'var(--red)'};font-weight:700">${+prom>0?'+':''}${prom}%</span>` : '';
+    } else {
+      absBodyEl.innerHTML = common.map(kg => {
+        const vPre  = preMap.get(kg);
+        const vPost = postMap.get(kg);
+        const cam   = vPre > 0 ? +((vPost - vPre) / Math.abs(vPre) * 100).toFixed(1) : null;
+        const cc    = cam == null ? 'var(--text3)' : cam > 0 ? 'var(--neon)' : 'var(--red)';
+        return `<tr>
+          <td class="mono-cell" style="font-weight:700;color:var(--text2)">${kg} kg</td>
+          <td class="mono-cell" style="color:#4D9EFF">${vPre}</td>
+          <td class="mono-cell" style="color:#39FF7A">${vPost}</td>
+          <td class="mono-cell" style="color:${cc};font-weight:700">${cam != null ? (cam>0?'+':'')+cam+'%' : '—'}</td>
+        </tr>`;
+      }).join('');
+      const cams = common.map(kg => {
+        const vp = preMap.get(kg), vpo = postMap.get(kg);
+        return vp > 0 ? (vpo - vp) / Math.abs(vp) * 100 : null;
+      }).filter(v => v != null);
+      const prom = cams.length ? (cams.reduce((a,b)=>a+b,0)/cams.length).toFixed(1) : null;
+      if (absPromEl) absPromEl.innerHTML = prom ? `Promedio Δ% VMP: <span style="color:${+prom>0?'var(--neon)':'var(--red)'};font-weight:700">${+prom>0?'+':''}${prom}%</span>` : '';
+    }
+  }
+
+  // ── TABLA 2: % RM → kg → VMP → cam% ────────────────────────
   document.getElementById('prepost-tbody').innerHTML = PP_PCTS.map(pct => {
     const kgPre  = +(rm1Pre  * pct / 100).toFixed(1);
     const kgPost = +(rm1Post * pct / 100).toFixed(1);

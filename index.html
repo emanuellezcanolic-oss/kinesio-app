@@ -1096,7 +1096,25 @@
         <!-- OUTPUT -->
         <div id="prepost-output" style="display:none">
           <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;margin-bottom:14px" id="prepost-kpis"></div>
-          <div style="font-family:var(--mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--text2);margin-bottom:6px">% RM → kg → VMP pre/post → cam%</div>
+          <!-- TABLA 1: cargas absolutas coincidentes -->
+          <div style="font-family:var(--mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--text2);margin-bottom:6px;margin-top:4px">Comparativa cargas absolutas · Δ% VMP</div>
+          <div style="overflow-x:auto;margin-bottom:14px">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Carga kg</th>
+                  <th style="color:#4D9EFF">VMP PRE</th>
+                  <th style="color:#39FF7A">VMP POST</th>
+                  <th>Δ% VMP</th>
+                </tr>
+              </thead>
+              <tbody id="prepost-abs-tbody"></tbody>
+            </table>
+          </div>
+          <div id="prepost-abs-prom" style="font-family:var(--mono);font-size:11px;color:var(--text2);margin-bottom:14px;text-align:right"></div>
+
+          <!-- TABLA 2: % RM -->
+          <div style="font-family:var(--mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--text2);margin-bottom:6px">Comparativa % RM → kg → VMP pre/post → cam%</div>
           <div style="overflow-x:auto">
             <table class="data-table">
               <thead>
