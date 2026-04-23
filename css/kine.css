@@ -1,0 +1,150 @@
+/* MoveMetrics — kine.css */
+
+/* ─── HOOPER SLIDER ─── */
+.hooper-slider {
+  -webkit-appearance: none; width: 100%; height: 3px;
+  border-radius: 2px; background: #2a2a2a; outline: none; margin: 10px 0;
+}
+.hooper-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--neon); cursor: pointer; border: 2px solid var(--black);
+  box-shadow: 0 0 10px rgba(57,255,122,.5);
+}
+
+/* ─── EVA SLIDER ─── */
+.eva-slider {
+  -webkit-appearance: none; width: 100%; height: 6px;
+  border-radius: 3px; outline: none; margin: 10px 0 4px;
+  background: linear-gradient(90deg, #4fc3f7 0%, #81c784 30%, #ffeb3b 55%, #ff9800 75%, #f44336 100%);
+}
+.eva-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%;
+  background: var(--white); cursor: pointer; border: 2px solid var(--neon);
+  box-shadow: 0 2px 12px rgba(57,255,122,.4);
+}
+.eva-display {
+  font-family: var(--display); font-size: 52px; font-weight: 400;
+  text-align: center; line-height: 1; letter-spacing: .02em;
+}
+.eva-0-3  { color: #4fc3f7; }
+.eva-4-6  { color: var(--amber); }
+.eva-7-10 { color: var(--red); }
+
+/* ─── PDF EDITOR ─── */
+.pdf-editor {
+  width: 100%; min-height: 280px;
+  background: #1a1a1a; border: 1px solid var(--white10);
+  border-radius: var(--r); color: var(--white);
+  padding: 16px; font-size: 12px; line-height: 1.9;
+  resize: vertical; font-family: var(--body);
+}
+
+/* ─── IA DOTS ─── */
+.dots { display: flex; gap: 5px; padding: 8px; }
+.dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--neon); animation: blink 1.2s ease-in-out infinite;
+}
+.dot:nth-child(2) { animation-delay: .2s; }
+.dot:nth-child(3) { animation-delay: .4s; }
+@keyframes blink { 0%,100%{ opacity:.2; transform:scale(.8); } 50%{ opacity:1; transform:scale(1.1); } }
+
+/* ─── BODY CHART ─── */
+.body-chart-container {
+  display: flex; justify-content: center; padding: 10px;
+  background: #1a1a1a; border-radius: var(--r);
+  border: 1px solid var(--white05);
+}
+.body-zone { cursor: pointer; transition: fill .2s, filter .2s; }
+.body-zone:hover {
+  fill: rgba(57,255,122,.2) !important;
+  filter: drop-shadow(0 0 6px rgba(57,255,122,.5));
+}
+.body-zone.lesionada {
+  fill: rgba(255,59,59,.25) !important;
+  filter: drop-shadow(0 0 10px rgba(255,59,59,.6));
+  animation: pulse-red 2s ease-in-out infinite;
+}
+.body-zone.recuperado {
+  fill: rgba(57,255,122,.18) !important;
+  filter: drop-shadow(0 0 5px rgba(57,255,122,.4));
+}
+@keyframes pulse-red {
+  0%,100% { filter: drop-shadow(0 0 6px rgba(255,59,59,.5)); }
+  50%      { filter: drop-shadow(0 0 16px rgba(255,59,59,.9)); }
+}
+.zone-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 20px;
+  font-family: var(--mono); font-size: 9px; font-weight: 700;
+  margin: 2px; cursor: pointer; border: 1px solid;
+  transition: all .15s; text-transform: uppercase; letter-spacing: .06em;
+}
+.zone-chip.lesion  { background: rgba(255,59,59,.1);  color: var(--red);  border-color: rgba(255,59,59,.25); }
+.zone-chip.recup   { background: var(--neon08);         color: var(--neon); border-color: var(--neon15); }
+.zone-chip:hover   { transform: scale(1.04); }
+
+/* ─── ORTHO TESTS ─── */
+.ortho-test {
+  display: flex; align-items: flex-start;
+  justify-content: space-between;
+  padding: 12px 0; border-bottom: 1px solid var(--white05); gap: 12px;
+}
+.ortho-test:last-child { border-bottom: none; }
+.ortho-name  { font-size: 13px; font-weight: 600; color: var(--white); }
+.ortho-sub   { font-size: 10px; color: var(--white30, var(--white20)); font-family: var(--mono); margin-top: 2px; }
+.ortho-ref   { font-size: 9px; color: var(--white20); font-style: italic; margin-top: 2px; }
+.ortho-btns  { display: flex; gap: 5px; flex-shrink: 0; }
+.ot-btn {
+  padding: 4px 14px; border-radius: 6px;
+  border: 1px solid var(--white10); background: #242424;
+  color: var(--white20); font-size: 10px; font-weight: 800;
+  font-family: var(--mono); cursor: pointer; transition: all .15s;
+  text-transform: uppercase; letter-spacing: .06em;
+}
+.ot-btn.pos { background: rgba(255,59,59,.1); color: var(--red); border-color: rgba(255,59,59,.3); }
+.ot-btn.neg { background: var(--neon08); color: var(--neon); border-color: var(--neon40); }
+.ortho-obs-row { display: none; padding: 4px 0 10px; }
+.ortho-obs-row.visible { display: block; }
+
+/* ─── TOAST ─── */
+#save-toast {
+  position: fixed; bottom: 24px; left: 50%;
+  transform: translateX(-50%);
+  background: #1c1c1c;
+  border: none; color: var(--neon);
+  font-family: var(--mono); font-size: 11px; font-weight: 700;
+  padding: 10px 24px; border-radius: 20px;
+  z-index: 9999; pointer-events: none; opacity: 0;
+  transition: opacity .3s; letter-spacing: .08em;
+  box-shadow: 6px 6px 14px rgba(0,0,0,.9), -3px -3px 8px rgba(255,255,255,.04), 0 0 20px rgba(57,255,122,.15);
+}
+
+/* ─── SEARCH INPUT SPECIAL ─── */
+#search-atletas {
+  background: #1a1a1a;
+  border: 1px solid var(--white10);
+  border-radius: 10px; padding: 10px 16px;
+  font-size: 13px; color: var(--white);
+  transition: all .2s;
+}
+#search-atletas:focus {
+  border-color: var(--neon40);
+  box-shadow: 0 0 0 3px var(--neon08);
+  background: #1c1c1c;
+}
+
+/* ─── STAGGER ANIMATION FOR CARDS ─── */
+#atletas-grid .athlete-card {
+  animation: cardIn .4s cubic-bezier(.4,0,.2,1) both;
+}
+#atletas-grid .athlete-card:nth-child(1) { animation-delay: .05s; }
+#atletas-grid .athlete-card:nth-child(2) { animation-delay: .10s; }
+#atletas-grid .athlete-card:nth-child(3) { animation-delay: .15s; }
+#atletas-grid .athlete-card:nth-child(4) { animation-delay: .20s; }
+#atletas-grid .athlete-card:nth-child(5) { animation-delay: .25s; }
+#atletas-grid .athlete-card:nth-child(6) { animation-delay: .30s; }
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
