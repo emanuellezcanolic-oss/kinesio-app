@@ -2477,23 +2477,23 @@
 
 <!-- ════════ SCRIPT ════════ -->
   <!-- ══ JS MODULAR — orden de carga ══ -->
-  <script src="js/app.js"></script>
-  <script src="js/atletas.js"></script>
-  <script src="js/dashboard.js"></script>
-  <script src="js/fv.js"></script>
-  <script src="js/saltos.js"></script>
-  <script src="js/movilidad.js"></script>
-  <script src="js/sprint.js"></script>
-  <script src="js/kine.js"></script>
-  <script src="js/informe.js"></script>
-  <script src="js/video.js"></script>
-  <script src="js/functools.js"></script>
-  <script src="js/vmp.js"></script>
-  <script src="js/videojump.js"></script>
-  <script src="js/valgo.js"></script>
-  <script src="js/lesion.js"></script>
-  <script src="js/klinical.js"></script>
-  <script src="js/planillas.js"></script>
+  <script src="js/app.js?v=2"></script>
+  <script src="js/atletas.js?v=2"></script>
+  <script src="js/dashboard.js?v=2"></script>
+  <script src="js/fv.js?v=2"></script>
+  <script src="js/saltos.js?v=2"></script>
+  <script src="js/movilidad.js?v=2"></script>
+  <script src="js/sprint.js?v=2"></script>
+  <script src="js/kine.js?v=2"></script>
+  <script src="js/informe.js?v=2"></script>
+  <script src="js/video.js?v=2"></script>
+  <script src="js/functools.js?v=2"></script>
+  <script src="js/vmp.js?v=2"></script>
+  <script src="js/videojump.js?v=2"></script>
+  <script src="js/valgo.js?v=2"></script>
+  <script src="js/lesion.js?v=2"></script>
+  <script src="js/klinical.js?v=2"></script>
+  <script src="js/planillas.js?v=2"></script>
 
 
 <!-- Modal Goniometro -->
@@ -2859,6 +2859,189 @@
 
     <div class="divider"></div>
     <button class="btn btn-neon btn-full" onclick="saveKlinicalSheet('hombro');closeModal('sheet-hombro')">💾 Guardar evaluación hombro</button>
+  </div>
+</div>
+
+<!-- SHEET: CODO -->
+<div class="modal" id="sheet-codo">
+  <div class="modal-sheet" style="max-width:600px">
+    <div class="modal-handle"></div>
+    <div class="flex-b mb-12">
+      <div><div class="modal-title" style="font-size:18px">💪 Codo</div>
+        <div style="font-size:12px;color:var(--text2)">Epicondilalgia lateral · CPG 2022 · Lucado et al. (JOSPT)</div></div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('sheet-codo')">✕</button>
+    </div>
+    <!-- Tab strip -->
+    <div style="display:flex;gap:3px;background:var(--bg4);border-radius:8px;padding:3px;margin-bottom:16px;overflow-x:auto">
+      <button class="btn btn-neon btn-sm" id="ctab-obs-btn" onclick="showCTab('obs',this)" style="white-space:nowrap;font-size:10px">Observación</button>
+      <button class="btn btn-ghost btn-sm" id="ctab-rom-btn" onclick="showCTab('rom',this)" style="white-space:nowrap;font-size:10px">ROM</button>
+      <button class="btn btn-ghost btn-sm" id="ctab-tests-btn" onclick="showCTab('tests',this)" style="white-space:nowrap;font-size:10px">Tests</button>
+      <button class="btn btn-ghost btn-sm" id="ctab-fuerza-btn" onclick="showCTab('fuerza',this)" style="white-space:nowrap;font-size:10px">Fuerza</button>
+      <button class="btn btn-ghost btn-sm" id="ctab-esc-btn" onclick="showCTab('esc',this)" style="white-space:nowrap;font-size:10px">Escalas</button>
+    </div>
+
+    <!-- TAB: OBSERVACIÓN -->
+    <div id="ctab-obs">
+      <div class="card card-danger mb-12">
+        <div class="card-header"><h3 style="color:var(--red)">🚨 Banderas rojas — Derivación urgente</h3></div>
+        <div class="card-body">
+          <div style="font-size:11px;color:var(--text2);margin-bottom:8px">Marcar si presente → derivar a médico</div>
+          <label style="display:flex;gap:8px;align-items:flex-start;padding:5px 0;cursor:pointer"><input type="checkbox" class="codo-redflag" onchange="checkCodoRedFlags()"> <span style="font-size:11px">Trauma reciente (fractura, luxación)</span></label>
+          <label style="display:flex;gap:8px;align-items:flex-start;padding:5px 0;cursor:pointer"><input type="checkbox" class="codo-redflag" onchange="checkCodoRedFlags()"> <span style="font-size:11px">Bloqueo articular (cuerpo libre intraarticular)</span></label>
+          <label style="display:flex;gap:8px;align-items:flex-start;padding:5px 0;cursor:pointer"><input type="checkbox" class="codo-redflag" onchange="checkCodoRedFlags()"> <span style="font-size:11px">Parestesias 4-5 dedo (N. cubital) — compresión</span></label>
+          <label style="display:flex;gap:8px;align-items:flex-start;padding:5px 0;cursor:pointer"><input type="checkbox" class="codo-redflag" onchange="checkCodoRedFlags()"> <span style="font-size:11px">Síntomas nocturnos / en reposo (tumor, infección)</span></label>
+          <label style="display:flex;gap:8px;align-items:flex-start;padding:5px 0;cursor:pointer"><input type="checkbox" class="codo-redflag" onchange="checkCodoRedFlags()"> <span style="font-size:11px">Inestabilidad franca de codo</span></label>
+          <div id="codo-redflag-alert" style="display:none;margin-top:8px;padding:6px;background:rgba(255,68,68,.12);border:1px solid rgba(255,68,68,.3);border-radius:6px;font-size:11px;color:var(--red)">
+            ⚠️ Derivar a médico antes de continuar rehabilitación
+          </div>
+        </div>
+      </div>
+      <div class="card mb-12">
+        <div class="card-header"><h3>Anamnesis</h3></div>
+        <div class="card-body">
+          <div class="grid-2" style="gap:8px;margin-bottom:8px">
+            <div class="ig"><label class="il">Lado dominante</label>
+              <select class="inp inp-mono" id="codo-dominancia"><option>D</option><option>I</option><option>Ambidiestro</option></select></div>
+            <div class="ig"><label class="il">Lado afectado</label>
+              <select class="inp inp-mono" id="codo-lado"><option>D</option><option>I</option><option>Bilateral</option></select></div>
+          </div>
+          <div class="ig mb-8"><label class="il">Tiempo de evolución</label>
+            <select class="inp inp-mono" id="codo-tiempo">
+              <option>&lt; 1 semana</option><option>1–4 semanas</option><option>1–3 meses</option><option>3–6 meses (crónico)</option><option>&gt; 6 meses</option>
+            </select></div>
+          <div class="ig mb-8"><label class="il">Actividad desencadenante</label>
+            <select class="inp inp-mono" id="codo-actividad">
+              <option>Gesto repetitivo laboral</option><option>Tenis / raqueta</option><option>Halterofilia / press</option><option>Trabajo manual (herramientas)</option><option>Sin causa identificada</option><option>Otro</option>
+            </select></div>
+          <div class="ig"><label class="il">Observaciones</label>
+            <textarea class="inp inp-mono" rows="2" id="codo-obs-text" style="resize:none;font-size:11px" placeholder="Inicio, factores agravantes, alivio..."></textarea></div>
+        </div>
+      </div>
+      <div class="card mb-12">
+        <div class="card-header"><h3>NPRS — Dolor actual</h3><span class="tag tag-b">MCID 1–2 pts</span></div>
+        <div class="card-body">
+          <div class="ig"><label class="il">Reposo (0–10)</label>
+            <input type="range" class="eva-slider" min="0" max="10" value="0" id="codo-nprs-reposo" oninput="this.nextElementSibling.textContent=this.value"><span style="font-family:var(--mono);font-size:14px;display:block;text-align:center">0</span></div>
+          <div class="ig mt-8"><label class="il">Movimiento activo (0–10)</label>
+            <input type="range" class="eva-slider" min="0" max="10" value="0" id="codo-nprs-mov" oninput="this.nextElementSibling.textContent=this.value"><span style="font-family:var(--mono);font-size:14px;display:block;text-align:center">0</span></div>
+          <div class="ig mt-8"><label class="il">Actividad funcional (0–10)</label>
+            <input type="range" class="eva-slider" min="0" max="10" value="0" id="codo-nprs-func" oninput="this.nextElementSibling.textContent=this.value"><span style="font-family:var(--mono);font-size:14px;display:block;text-align:center">0</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: ROM -->
+    <div id="ctab-rom" style="display:none">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:10px;padding:8px;background:rgba(77,158,255,.08);border-radius:8px">
+        Lucado 2022 — ICC antebrazo: 0.86–0.98 · ICC muñeca: 0.95–0.97 · MDC90 muñeca: ~5° · Asimetría &gt;10° = clínicamente relevante
+      </div>
+      <div id="codo-rom-fields"></div>
+    </div>
+
+    <!-- TAB: TESTS CLÍNICOS -->
+    <div id="ctab-tests" style="display:none">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:10px;padding:8px;background:rgba(77,158,255,.08);border-radius:8px">
+        Lucado 2022 — PFGS es el mejor predictor (Sn 65% / Sp 97%). Tests provocativos confirman diagnóstico en contexto clínico.
+      </div>
+      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:6px">Epicondilalgia Lateral (LET)</div>
+      <div id="codo-tests-lateral"></div>
+      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin:14px 0 6px">Epicondilalgia Medial / Inestabilidad</div>
+      <div id="codo-tests-medial"></div>
+      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin:14px 0 6px">Nervio Cubital / Inestabilidad Lateral</div>
+      <div id="codo-tests-neural"></div>
+    </div>
+
+    <!-- TAB: FUERZA -->
+    <div id="ctab-fuerza" style="display:none">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:10px;padding:8px;background:rgba(57,255,122,.05);border-radius:8px">
+        Lucado 2022 — <strong style="color:var(--neon)">PFGS Sn 65% / Sp 97%</strong> para LET · MDC entre-sesiones = 9.4 kg · MCID = 7 kg
+      </div>
+      <div class="card mb-12">
+        <div class="card-header">
+          <h3>Pain-Free Grip Strength (PFGS)</h3>
+          <span class="tag" style="background:rgba(57,255,122,.15);color:var(--neon);font-size:9px">Sn 65% · Sp 97%</span>
+        </div>
+        <div class="card-body">
+          <div style="font-size:10px;color:var(--text3);margin-bottom:8px">Codo extendido · antebrazo pronado · leve extensión muñeca · 2° posición mango · media de 3 intentos</div>
+          <div class="grid-2" style="gap:8px;margin-bottom:8px">
+            <div class="ig"><label class="il">PFGS Derecho (kg)</label><input class="inp inp-mono" type="number" step="0.1" id="pfgs-d" placeholder="0.0" oninput="calcCodoFuerza()"></div>
+            <div class="ig"><label class="il">PFGS Izquierdo (kg)</label><input class="inp inp-mono" type="number" step="0.1" id="pfgs-i" placeholder="0.0" oninput="calcCodoFuerza()"></div>
+          </div>
+          <div id="pfgs-result" style="font-family:var(--mono);font-size:12px;padding:8px;background:var(--bg4);border-radius:6px;text-align:center;color:var(--text3)">Ingresá valores para ver asimetría</div>
+        </div>
+      </div>
+      <div class="card mb-12">
+        <div class="card-header">
+          <h3>Prensión Máxima (Grip Strength)</h3>
+          <span class="tag tag-b" style="font-size:9px">Sin restricción dolorosa</span>
+        </div>
+        <div class="card-body">
+          <div style="font-size:10px;color:var(--text3);margin-bottom:8px">Hombro aducido · codo extendido · antebrazo y muñeca neutros · 2° posición mango · media de 3 intentos</div>
+          <div class="grid-2" style="gap:8px;margin-bottom:8px">
+            <div class="ig"><label class="il">Prensión máx. Derecha (kg)</label><input class="inp inp-mono" type="number" step="0.1" id="grip-max-d" placeholder="0.0" oninput="calcCodoFuerza()"></div>
+            <div class="ig"><label class="il">Prensión máx. Izquierda (kg)</label><input class="inp inp-mono" type="number" step="0.1" id="grip-max-i" placeholder="0.0" oninput="calcCodoFuerza()"></div>
+          </div>
+          <div id="grip-max-result" style="font-family:var(--mono);font-size:12px;padding:8px;background:var(--bg4);border-radius:6px;text-align:center;color:var(--text3)">Ingresá valores para ver asimetría</div>
+        </div>
+      </div>
+      <div class="card mb-12">
+        <div class="card-header">
+          <h3>Umbral de Dolor a la Presión (PPT)</h3>
+          <span class="tag tag-b" style="font-size:9px">ICC interobs 0.77</span>
+        </div>
+        <div class="card-body">
+          <div style="font-size:10px;color:var(--text3);margin-bottom:8px">Algómetro perpendicular al tendón extensor común · aumentar 0.5 kg/s hasta primer dolor · media de 3</div>
+          <div class="grid-2" style="gap:8px;margin-bottom:8px">
+            <div class="ig"><label class="il">PPT Epicóndilo D (kg/cm²)</label><input class="inp inp-mono" type="number" step="0.1" id="ppt-d" placeholder="0.0" oninput="calcCodoFuerza()"></div>
+            <div class="ig"><label class="il">PPT Epicóndilo I (kg/cm²)</label><input class="inp inp-mono" type="number" step="0.1" id="ppt-i" placeholder="0.0" oninput="calcCodoFuerza()"></div>
+          </div>
+          <div id="ppt-result" style="font-family:var(--mono);font-size:12px;padding:8px;background:var(--bg4);border-radius:6px;text-align:center;color:var(--text3)">PPT reducido bilateralmente → sensibilización central</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: ESCALAS -->
+    <div id="ctab-esc" style="display:none">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:12px;padding:8px;background:rgba(57,255,122,.05);border-radius:8px">
+        Lucado 2022 Rec. — PRTEE gold standard para LET · MCID = 7 pts · ICC 0.96 · Completar al inicio y alta
+      </div>
+      <div class="card mb-12">
+        <div class="card-header">
+          <h3>PRTEE — Patient-Rated Tennis Elbow Evaluation</h3>
+          <span class="tag tag-b" style="font-size:9px">MCID 7 pts · ICC 0.96</span>
+        </div>
+        <div class="card-body">
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:6px">Subescala Dolor (5 ítems · 0–10 cada uno)</div>
+          <div id="prtee-dolor-list"></div>
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin:10px 0 6px">Actividades Específicas (6 ítems · 0–10)</div>
+          <div id="prtee-activ-list"></div>
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin:10px 0 6px">Actividades Habituales (4 ítems · 0–10)</div>
+          <div id="prtee-usual-list"></div>
+          <div style="margin-top:10px;padding:10px;background:var(--bg4);border-radius:8px;text-align:center">
+            <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Puntaje PRTEE Total (0–100, menor = mejor)</div>
+            <div id="prtee-total" style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--neon)">—</div>
+            <div id="prtee-breakdown" style="font-size:10px;color:var(--text3);margin-top:4px">Dolor: — · Función: —</div>
+            <div id="prtee-interp" style="font-size:10px;margin-top:6px;color:var(--text3)">MCID = 7 pts de mejora es clínicamente significativo</div>
+          </div>
+        </div>
+      </div>
+      <div class="card mb-12">
+        <div class="card-header">
+          <h3>QuickDASH (11 ítems)</h3>
+          <span class="tag tag-b" style="font-size:9px">MCID 10.2 · MDC90 12.2</span>
+        </div>
+        <div class="card-body">
+          <div id="codo-qdash-list"></div>
+          <div style="margin-top:10px;padding:10px;background:var(--bg4);border-radius:8px;text-align:center">
+            <div style="font-size:10px;color:var(--text3);margin-bottom:4px">QuickDASH Score (0–100)</div>
+            <div id="codo-qdash-total" style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--neon)">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <button class="btn btn-neon btn-full" onclick="saveKlinicalSheet('codo');closeModal('sheet-codo')">💾 Guardar evaluación codo</button>
   </div>
 </div>
 

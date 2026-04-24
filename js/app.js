@@ -267,10 +267,10 @@ const ORTHO_TESTS = {
     { id:'fuerza-cx-lat',     name:'Fuerza lateral cervical',    sub:'HHD o escala manual',                 ref:'Asimetria > 10% = significativa' }
   ],
   codoLateral: [
-    { id:'cozen',             name:'Cozen',                      sub:'Epicondilalgia lateral',              ref:'Sn 0.84 / Sp 0.75 -- extension muneca resist.' },
-    { id:'mill',              name:'Mill',                       sub:'Epicondilalgia lateral',              ref:'Sn 0.53 / Sp 0.69 -- estiramiento extensores' },
-    { id:'maudsley',          name:'Maudsley (dedo medio)',      sub:'ECRB -- epicondilo lateral',          ref:'Extension dedo medio con resistencia' },
-    { id:'chair-test',        name:'Chair lifting test',         sub:'Epicondilalgia lateral funcional',    ref:'Dolor al levantar silla con carga' }
+    { id:'cozen',             name:'Cozen',                      sub:'Epicondilalgia lateral · ECRB',       ref:'Sn 0.84 / Sp 0.75 -- Lucado 2022 -- extensión muñeca resistida' },
+    { id:'mill',              name:'Mill (estiramiento)',         sub:'Epicondilalgia lateral · extensores', ref:'Sn 0.53 / Sp 0.69 -- Lucado 2022 -- estiramiento extensores + pron' },
+    { id:'maudsley',          name:'Maudsley (dedo medio)',      sub:'ECRB -- epicóndilo lateral',          ref:'Sn 0.52 / Sp 0.48 -- extensión 3° dedo resistida -- alta Sn cluster' },
+    { id:'chair-test',        name:'Chair lifting test',         sub:'Epicondilalgia lateral funcional',    ref:'Dolor/debilidad al levantar silla con palma abajo' }
   ],
   codoMedial: [
     { id:'golfer-elbow',      name:'Golfer elbow test',          sub:'Epicondilalgia medial',               ref:'Sn 0.64 / Sp 0.69 -- flexion muneca resist.' },

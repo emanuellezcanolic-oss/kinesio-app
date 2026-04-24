@@ -106,6 +106,23 @@ const HOMBRO_TESTS = [
   { id:'obrien',  name:"O'Brien (SLAP)", sub:'Labrum superior · Sn 0.47', tag:'tag-y' },
   { id:'apprehension', name:'Apprehension / Relocation', sub:'Inestabilidad GH anterior · Sn 0.72', tag:'tag-y' },
 ];
+
+const CODO_TESTS_LATERAL = [
+  { id:'cozen',      name:'Cozen',                   sub:'Epicondilalgia lateral · Sn 0.84 / Sp 0.75', tag:'tag-r',  ref:'Extensión muñeca resistida con codo extendido' },
+  { id:'mill',       name:'Mill (estiramiento)',      sub:'Extensores epicóndilo · Sn 0.53 / Sp 0.69',  tag:'tag-b',  ref:'Pronación + flexión muñeca + extensión codo' },
+  { id:'maudsley',   name:'Maudsley (3° dedo)',       sub:'ECRB · Sn 0.52 — extensión resistida',       tag:'tag-b',  ref:'Extensión del dedo medio contra resistencia' },
+  { id:'chair-test', name:'Chair lifting test',       sub:'Funcional LET · Lucado 2022',                tag:'tag-b',  ref:'Levantar silla con palma hacia abajo — dolor = positivo' },
+];
+const CODO_TESTS_MEDIAL = [
+  { id:'golfer-elbow',  name:'Golfer elbow test',      sub:'Epicondilalgia medial · Sn 0.64 / Sp 0.69',  tag:'tag-y',  ref:'Flexión muñeca resistida + palpación epicóndilo medial' },
+  { id:'valgus-codo',   name:'Estrés en valgo codo',   sub:'LCU (lig. cubital colateral) · lanzadores',   tag:'tag-y',  ref:'Valgus con codo en 20–30° flexión — apertura medial' },
+  { id:'milking',       name:'Milking maneuver',        sub:'LCU · atletas overhead · Sn 0.76',            tag:'tag-y',  ref:'Tirón del pulgar en abducción con codo en flexión' },
+];
+const CODO_TESTS_NEURAL = [
+  { id:'tinel-cubital',      name:'Tinel cubital tunnel',   sub:'N. cubital · parestesias 4–5 dedo',           tag:'tag-b',  ref:'Percusión sobre canal cubital — parestesias distales' },
+  { id:'elbow-flex-test',    name:'Elbow flexion test',     sub:'N. cubital compresión · Sn 0.75 / Sp 0.99',   tag:'tag-b',  ref:'Flexión máx. codo + muñeca extendida 3 minutos' },
+  { id:'lateral-pivot-codo', name:'Lateral pivot shift',    sub:'LUCL · inestabilidad lateral · Sp 1.0',       tag:'tag-r',  ref:'Resupinación en decúbito — clunk/aprensión = positivo' },
+];
 const ROM_HOMBRO = [
   { id:'flex', label:'Flexión', ref:'170–180°' },
   { id:'abd', label:'Abducción', ref:'170–180°' },

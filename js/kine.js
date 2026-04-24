@@ -253,7 +253,7 @@ function showKinePanel(panel,label){
     'ingle': 'sheet-groin',
     'pantorrilla': 'sheet-tobillo',
     'pie': 'sheet-tobillo',
-    'codo': 'sheet-hombro',
+    'codo': 'sheet-codo',
     'munieca': 'sheet-hombro'
   };
   const sheetId = SHEET_MAP[panel];
