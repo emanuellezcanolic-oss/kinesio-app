@@ -247,7 +247,7 @@ function showKinePanel(panel,label){
     'lumbar': 'sheet-lbp',
     'lumbar-post': 'sheet-lbp',
     'dorsal': 'sheet-lbp',
-    'cervical': 'sheet-lbp',
+    'cervical': 'sheet-cervical',
     'cadera': 'sheet-rodilla',
     'gluteo': 'sheet-rodilla',
     'ingle': 'sheet-groin',
