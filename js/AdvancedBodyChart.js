@@ -242,10 +242,10 @@ const SHEET_MAP = {
 // ─────────────────────────────────────────────────────────────────────────────
 // REAL ANATOMY OVERRIDE — replaces front/back zone arrays with rnbh SVG paths
 // ─────────────────────────────────────────────────────────────────────────────
-(function injectAnatomy(){
+function injectAnatomy(sex){
   const A = window.ANATOMY_ZONES;
   if (!A) { console.warn('[ABC] ANATOMY_ZONES missing — falling back to geometric'); return; }
-  const NEON_BY_LAYER = { art:'#39FF7A', mus:'#ff8a40', neu:'#4fc3f7' };
+  const src = (sex === 'f' && A.female) ? A.female : A;
   function toShape(z){
     return {
       id: z.id, label: z.label, panel: z.panel,
@@ -253,23 +253,27 @@ const SHEET_MAP = {
       view: z.view
     };
   }
-  // ARTICULAR: only zones with 'art' layer
-  ART_ZONES.front = A.front.filter(z => z.layers.includes('art')).map(toShape);
-  ART_ZONES.back  = A.back .filter(z => z.layers.includes('art')).map(toShape);
-  // MUSCULAR: only zones with 'mus' layer
-  MUS_ZONES.front = A.front.filter(z => z.layers.includes('mus')).map(toShape);
-  MUS_ZONES.back  = A.back .filter(z => z.layers.includes('mus')).map(toShape);
-  // NEURAL stays geometric for now (rnbh has no nerve overlay)
-  // BODY_PATHS overlay disabled for new viewBox (anatomy paths form the body)
-  BODY_PATHS.front_anatomy = '';
-  BODY_PATHS.back_anatomy  = '';
-})();
+  ART_ZONES.front = src.front.filter(z => z.layers.includes('art')).map(toShape);
+  ART_ZONES.back  = src.back .filter(z => z.layers.includes('art')).map(toShape);
+  MUS_ZONES.front = src.front.filter(z => z.layers.includes('mus')).map(toShape);
+  MUS_ZONES.back  = src.back .filter(z => z.layers.includes('mus')).map(toShape);
+}
+injectAnatomy('m'); // default male
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ABC — main object
 // ─────────────────────────────────────────────────────────────────────────────
 const ABC = window.ABC = {
-  state: { view:'front', layer:'articular', neuralSub:'derma', hovered:null },
+  state: { view:'front', layer:'articular', neuralSub:'derma', hovered:null, sex:'m' },
+
+  setSex(sex, btn) {
+    this.state.sex = sex;
+    injectAnatomy(sex);
+    document.querySelectorAll('.abc-sex-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    this.render();
+  },
+
   _longPressTimer: null,
   _lastTap: 0,
 
@@ -292,6 +296,11 @@ const ABC = window.ABC = {
             <button class="abc-layer-btn active" data-layer="articular" onclick="ABC.setLayer('articular',this)">🦴 Articular</button>
             <button class="abc-layer-btn" data-layer="muscular"  onclick="ABC.setLayer('muscular',this)">💪 Muscular</button>
             <button class="abc-layer-btn" data-layer="neural"    onclick="ABC.setLayer('neural',this)">⚡ Neural</button>
+          </div>
+          <div class="abc-ctrl-group">
+            <span class="abc-ctrl-label">SEXO</span>
+            <button class="abc-sex-btn abc-layer-btn active" data-sex="m" onclick="ABC.setSex('m',this)">♂ M</button>
+            <button class="abc-sex-btn abc-layer-btn"        data-sex="f" onclick="ABC.setSex('f',this)">♀ F</button>
           </div>
           <div class="abc-ctrl-group">
             <span class="abc-ctrl-label">VISTA</span>
