@@ -22,6 +22,24 @@ function showKineTab(tab, btn) {
   }
 }
 
+// Toggle 2D ↔ 3D body chart
+function setBodyChartMode(mode, btn){
+  const d2 = document.getElementById('advanced-body-chart');
+  const d3 = document.getElementById('three-body-chart');
+  const b2 = document.getElementById('bc-mode-2d');
+  const b3 = document.getElementById('bc-mode-3d');
+  const is3D = mode === '3d';
+  if (d2) d2.style.display = is3D ? 'none' : '';
+  if (d3) d3.style.display = is3D ? '' : 'none';
+  [b2,b3].forEach(b => { if (!b) return;
+    const on = (b===btn);
+    b.style.background = on ? 'var(--neon)' : 'var(--bg2)';
+    b.style.color      = on ? '#000'        : 'var(--text2)';
+    b.style.border     = on ? 'none'        : '1px solid var(--border)';
+  });
+  if (is3D && typeof TBC !== 'undefined' && !TBC._started) TBC.init();
+}
+
 function buildHooperFields(){
   const c=document.getElementById('hooper-fields');if(!c||c.innerHTML)return;
   const items=[['fat-h-sueno','Calidad del sueño'],['fat-h-estres','Nivel de estrés'],['fat-h-fatiga','Fatiga general'],['fat-h-doms','Dolor muscular (DOMS)']];

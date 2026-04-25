@@ -182,9 +182,14 @@
       <button id="kstab-tests"     onclick="showKineTab('tests',this)"     style="flex:none;padding:6px 18px;font-size:11px;font-family:var(--mono);font-weight:700;text-transform:uppercase;letter-spacing:.07em;border-radius:4px;cursor:pointer;transition:all .15s;background:var(--bg2);color:var(--text2);border:1px solid var(--border)">🔬 Tests</button>
     </div>
 
-    <!-- KTAB: MAPA (AdvancedBodyChart) -->
+    <!-- KTAB: MAPA (AdvancedBodyChart 2D + ThreeBodyChart 3D) -->
     <div id="ktab-mapa" class="k-stab-panel">
+      <div style="display:flex;gap:6px;margin-bottom:10px">
+        <button id="bc-mode-2d" onclick="setBodyChartMode('2d',this)" style="flex:1;padding:8px 14px;font-size:11px;font-family:var(--mono);font-weight:700;text-transform:uppercase;letter-spacing:.07em;border-radius:6px;cursor:pointer;transition:all .15s;background:var(--neon);color:#000;border:none">🗺️ Mapa 2D</button>
+        <button id="bc-mode-3d" onclick="setBodyChartMode('3d',this)" style="flex:1;padding:8px 14px;font-size:11px;font-family:var(--mono);font-weight:700;text-transform:uppercase;letter-spacing:.07em;border-radius:6px;cursor:pointer;transition:all .15s;background:var(--bg2);color:var(--text2);border:1px solid var(--border)">🧬 Anatomía 3D</button>
+      </div>
       <div id="advanced-body-chart" style="width:100%;min-height:60vh"></div>
+      <div id="three-body-chart"    style="width:100%;min-height:60vh;display:none"></div>
     </div>
 
     <!-- KTAB: ANAMNESIS -->
@@ -2346,9 +2351,15 @@
   <script src="js/saltos.js?v=2"></script>
   <script src="js/movilidad.js?v=2"></script>
   <script src="js/sprint.js?v=2"></script>
+  <!-- Three.js para viewer 3D anatomía -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/loaders/GLTFLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/loaders/DRACOLoader.js"></script>
+  <script src="js/ThreeBodyChart.js?v=1"></script>
   <script src="js/anatomy-zones.js?v=2"></script>
   <script src="js/AdvancedBodyChart.js?v=3"></script>
-  <script src="js/kine.js?v=4"></script>
+  <script src="js/kine.js?v=5"></script>
   <script src="js/informe.js?v=2"></script>
   <script src="js/video.js?v=2"></script>
   <script src="js/functools.js?v=2"></script>
