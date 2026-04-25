@@ -171,12 +171,21 @@ const TBC = window.TBC = {
           const grp = gltf.scene;
           grp.traverse(o => {
             if (o.isMesh){
-              this._origMat.set(o, o.material);
-              if (o.material && o.material.transparent === undefined){
-                o.material.transparent = l.opacity < 1;
-                o.material.opacity = l.opacity;
-              }
+              // forzar material con color anatómico (Z-Anatomy viene sin color útil)
+              const mat = new THREE.MeshStandardMaterial({
+                color: l.color,
+                roughness: 0.55,
+                metalness: 0.05,
+                transparent: l.opacity < 1,
+                opacity: l.opacity,
+                side: THREE.DoubleSide,
+                flatShading: false,
+              });
+              o.material = mat;
+              this._origMat.set(o, mat);
               o.userData.layer = l.id;
+              o.castShadow = false;
+              o.receiveShadow = false;
             }
           });
           grp.visible = !!this.layerOn[l.id];
@@ -264,8 +273,12 @@ const TBC = window.TBC = {
       this._showInfo(name, panel);
       if (panel && SHEET_MAP_3D[panel]){
         const sheetId = SHEET_MAP_3D[panel];
-        if (typeof openModal === 'function') openModal(sheetId);
-        if (typeof initKlinicalSheet === 'function') initKlinicalSheet(panel);
+        if (document.getElementById(sheetId) && typeof openModal === 'function'){
+          try { openModal(sheetId); } catch(e){ console.warn('[TBC] openModal failed', e); }
+        }
+        if (typeof initKlinicalSheet === 'function'){
+          try { initKlinicalSheet(panel); } catch(e){}
+        }
       }
     } else {
       this._setHover(obj);

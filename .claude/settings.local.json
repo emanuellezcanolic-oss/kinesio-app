@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "mcp__90cb9b06-c90a-40cb-9a61-b19874583ee2__resolve-shortlink",
+      "mcp__90cb9b06-c90a-40cb-9a61-b19874583ee2__get-design-pages",
+      "mcp__90cb9b06-c90a-40cb-9a61-b19874583ee2__export-design",
+      "Bash(python -c ' *)",
+      "Bash(pip install *)",
+      "Bash(python -m pip install pypdf -q)",
+      "Bash(python3 -c ' *)",
+      "Bash(python3)",
+      "WebFetch(domain:github.com)",
+      "Bash(git clone *)",
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "Bash(python \"C:/Users/Usuario/Documents/Claude/rnbh-tmp/extract.py\")",
+      "Bash(python -c \"import json; d=json.load\\(open\\('C:/Users/Usuario/Documents/Claude/rnbh-tmp/anatomy.json'\\)\\); print\\('FRONT:', [m['slug'] for m in d['front']]\\); print\\('BACK:', [m['slug'] for m in d['back']]\\)\")",
+      "Bash(python \"C:/Users/Usuario/Documents/Claude/rnbh-tmp/build_zones.py\")",
+      "Bash(node -c \"C:/Users/Usuario/Documents/Claude/movemetrics/js/AdvancedBodyChart.js\")",
+      "Bash(node -c \"C:/Users/Usuario/Documents/Claude/movemetrics/js/anatomy-zones.js\")",
+      "Bash(python extract.py)",
+      "Bash(python build_zones.py)",
+      "Bash(python -c \"import json; d=json.load\\(open\\('C:/Users/Usuario/Documents/Claude/rnbh-tmp/anatomy.json'\\)\\); print\\('fFront:', len\\(d.get\\('fFront',[]\\)\\)\\); print\\('fBack:', len\\(d.get\\('fBack',[]\\)\\)\\)\")",
+      "Bash(mkdir -p unzipped)",
+      "Bash(unzip -q Z-Anatomy.zip -d unzipped/)",
+      "Bash(where blender *)",
+      "Read(//c/Program Files/**)",
+      "Bash(node -c \"C:/Users/Usuario/Documents/Claude/movemetrics/js/ThreeBodyChart.js\")",
+      "Bash(node -c \"C:/Users/Usuario/Documents/Claude/movemetrics/js/kine.js\")",
+      "Bash(rm assets/body_skin.glb)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
+    ]
+  }
+}
