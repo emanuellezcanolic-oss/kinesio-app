@@ -240,6 +240,32 @@ const SHEET_MAP = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// REAL ANATOMY OVERRIDE — replaces front/back zone arrays with rnbh SVG paths
+// ─────────────────────────────────────────────────────────────────────────────
+(function injectAnatomy(){
+  const A = window.ANATOMY_ZONES;
+  if (!A) { console.warn('[ABC] ANATOMY_ZONES missing — falling back to geometric'); return; }
+  const NEON_BY_LAYER = { art:'#39FF7A', mus:'#ff8a40', neu:'#4fc3f7' };
+  function toShape(z){
+    return {
+      id: z.id, label: z.label, panel: z.panel,
+      shape:'paths', paths: z.paths, slug: z.slug, side: z.side, layers: z.layers,
+      view: z.view
+    };
+  }
+  // ARTICULAR: only zones with 'art' layer
+  ART_ZONES.front = A.front.filter(z => z.layers.includes('art')).map(toShape);
+  ART_ZONES.back  = A.back .filter(z => z.layers.includes('art')).map(toShape);
+  // MUSCULAR: only zones with 'mus' layer
+  MUS_ZONES.front = A.front.filter(z => z.layers.includes('mus')).map(toShape);
+  MUS_ZONES.back  = A.back .filter(z => z.layers.includes('mus')).map(toShape);
+  // NEURAL stays geometric for now (rnbh has no nerve overlay)
+  // BODY_PATHS overlay disabled for new viewBox (anatomy paths form the body)
+  BODY_PATHS.front_anatomy = '';
+  BODY_PATHS.back_anatomy  = '';
+})();
+
+// ─────────────────────────────────────────────────────────────────────────────
 // ABC — main object
 // ─────────────────────────────────────────────────────────────────────────────
 const ABC = window.ABC = {
@@ -361,7 +387,26 @@ const ABC = window.ABC = {
   _renderBody() {
     const g = document.getElementById('abc-body');
     if (!g) return;
-    g.innerHTML = BODY_PATHS[this.state.view] || BODY_PATHS.front;
+    const svg = document.getElementById('abc-svg');
+    const v = this.state.view;
+    const useAnatomy = (v === 'front' || v === 'back') && window.ANATOMY_ZONES;
+    if (useAnatomy) {
+      svg.setAttribute('viewBox', window.ANATOMY_ZONES.viewBox); // 0 0 724 1448
+      g.innerHTML = ''; // anatomy paths are the body
+      // back: translate -724 0 on zones group
+      const zonesG = document.getElementById('abc-zones');
+      const histG  = document.getElementById('abc-history-markers');
+      const tx = (v === 'back') ? 'translate(-724 0)' : '';
+      if (zonesG) zonesG.setAttribute('transform', tx);
+      if (histG)  histG.setAttribute('transform', tx);
+    } else {
+      svg.setAttribute('viewBox', '0 0 200 440');
+      g.innerHTML = BODY_PATHS[v] || BODY_PATHS.front;
+      const zonesG = document.getElementById('abc-zones');
+      const histG  = document.getElementById('abc-history-markers');
+      if (zonesG) zonesG.removeAttribute('transform');
+      if (histG)  histG.removeAttribute('transform');
+    }
   },
 
   _renderZones() {
@@ -416,12 +461,20 @@ const ABC = window.ABC = {
       return `<rect x="${z.x}" y="${z.y}" width="${z.w}" height="${z.h}" rx="${z.rx||3}" ${base}/>`;
     if (z.shape === 'path')
       return `<path d="${z.d}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+    if (z.shape === 'paths') {
+      // anatomy multi-path zone — scale strokeW for big viewBox
+      const sw2 = Math.max(sw * 1.5, 1.2);
+      return (z.paths||[]).map(d =>
+        `<path d="${d}" fill="${fill}" stroke="${stroke}" stroke-width="${sw2}" vector-effect="non-scaling-stroke"/>`
+      ).join('');
+    }
     return '';
   },
 
   _histDotAttr(z) {
     if (z.shape === 'ellipse') return `cx="${z.cx}" cy="${z.cy}" rx="${z.rx}" ry="${z.ry}"`;
     if (z.shape === 'rect')    return `x="${z.x-1}" y="${z.y-1}" width="${z.w+2}" height="${z.h+2}" rx="${z.rx||3}"`;
+    if (z.shape === 'paths') return ''; // skip overlay; main shape already highlighted
     return '';
   },
 
@@ -436,9 +489,16 @@ const ABC = window.ABC = {
     zoneSet.forEach(z => {
       const h = hist[z.id];
       if (!h) return;
-      const cx = z.cx || (z.x + z.w/2) || 100;
-      const cy = z.cy || (z.y + z.h/2) || 220;
-      dots.push(`<circle cx="${cx}" cy="${cy}" r="3.5" fill="#FFB020" stroke="#000" stroke-width="1" opacity="0.85" title="${h.nota||''}"/>`);
+      let cx, cy, r = 3.5;
+      if (z.shape === 'paths' && z.paths && z.paths[0]) {
+        const m = z.paths[0].match(/^[Mm]\s*([\d.\-]+)[\s,]+([\d.\-]+)/);
+        if (m) { cx = parseFloat(m[1]); cy = parseFloat(m[2]); r = 10; }
+      }
+      if (cx == null) {
+        cx = z.cx || (z.x != null ? z.x + z.w/2 : 100);
+        cy = z.cy || (z.y != null ? z.y + z.h/2 : 220);
+      }
+      dots.push(`<circle cx="${cx}" cy="${cy}" r="${r}" fill="#FFB020" stroke="#000" stroke-width="1" opacity="0.85" title="${h.nota||''}"/>`);
     });
     g.innerHTML = dots.join('');
   },
