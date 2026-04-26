@@ -242,14 +242,15 @@ async function initPose(){
     );
     poseLandmarker = await PoseLandmarker.createFromOptions(vision, {
       baseOptions: {
-        modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task',
+        modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task',
         delegate: 'GPU'
       },
       runningMode: 'VIDEO',
       numPoses: 1,
-      minPoseDetectionConfidence: 0.5,
-      minPosePresenceConfidence: 0.5,
-      minTrackingConfidence: 0.5
+      minPoseDetectionConfidence: 0.6,
+      minPosePresenceConfidence: 0.6,
+      minTrackingConfidence: 0.6,
+      outputSegmentationMasks: false
     });
     poseReady = true;
     MA._setStatus('MediaPipe listo. Subí video y dale Analizar.');
@@ -552,9 +553,12 @@ const MA = window.MA = {
     });
     ctx.shadowBlur = 0;
 
-    // landmarks: pequeños y limpios
+    // landmarks: pequeños y limpios. Cara: solo nariz (skip 1-10).
+    const SKIP_FACE = new Set([1,2,3,4,5,6,7,8,9,10]);
     const editing = this._editMode;
-    lm.forEach((p,i) => { if(!p) return;
+    lm.forEach((p,i) => {
+      if(!p) return;
+      if (SKIP_FACE.has(i)) return; // ojos/orejas/boca fuera
       ctx.beginPath();
       ctx.arc(X(p), Y(p), editing ? 6.5 : 2.2, 0, Math.PI*2);
       ctx.fillStyle = editing ? (this._dragIdx === i ? '#ffb020' : '#fff') : 'rgba(255,255,255,.95)';
