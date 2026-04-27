@@ -34,7 +34,8 @@
       "Bash(git push *)",
       "Bash(node -c \"C:/Users/Usuario/Documents/Claude/movemetrics/js/LesionSheet.js\")",
       "Bash(node -c \"C:/Users/Usuario/Documents/Claude/movemetrics/js/MoveAnalysis.js\")",
-      "Bash(node -c \"C:/Users/Usuario/Documents/Claude/movemetrics/js/ExpertAnalysis.js\")"
+      "Bash(node -c \"C:/Users/Usuario/Documents/Claude/movemetrics/js/ExpertAnalysis.js\")",
+      "Bash(node -c \"C:/Users/Usuario/Documents/Claude/movemetrics/js/VideoCompare.js\")"
     ]
   }
 }

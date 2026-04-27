@@ -44,7 +44,7 @@ function allAngles(lm){
     // line-tilts (degrees from horizontal, signed)
     pelvis_tilt:    lineTilt(lm[L.L_HIP],      lm[L.R_HIP]),
     shoulder_tilt:  lineTilt(lm[L.L_SHOULDER], lm[L.R_SHOULDER]),
-    trunk_lean:     lineTilt(midpoint(lm[L.L_HIP],lm[L.R_HIP]), midpoint(lm[L.L_SHOULDER],lm[L.R_SHOULDER])) - 90,
+    trunk_lean:     trunkLeanLateral(midpoint(lm[L.L_HIP],lm[L.R_HIP]), midpoint(lm[L.L_SHOULDER],lm[L.R_SHOULDER])),
     // valgus index = knee X relative to hip-ankle line (signed, frontal view)
     valgus_l:  valgusIndex(lm[L.L_HIP], lm[L.L_KNEE], lm[L.L_ANKLE]),
     valgus_r:  valgusIndex(lm[L.R_HIP], lm[L.R_KNEE], lm[L.R_ANKLE])
@@ -52,9 +52,20 @@ function allAngles(lm){
 }
 
 function midpoint(a,b){ return a&&b ? {x:(a.x+b.x)/2, y:(a.y+b.y)/2, z:((a.z||0)+(b.z||0))/2} : null; }
+// desviación de la horizontal en grados, normalizada a -90..90 (sin importar dirección de la línea)
 function lineTilt(a,b){
   if (!a||!b) return null;
-  return Math.atan2(b.y-a.y, b.x-a.x) * 180 / Math.PI;
+  let t = Math.atan2(b.y-a.y, b.x-a.x) * 180 / Math.PI;
+  while (t >  90) t -= 180;
+  while (t < -90) t += 180;
+  return t;
+}
+// inclinación tronco lateral (frente/dorso): desviación lateral del eje vertical, signo +derecha/-izquierda
+function trunkLeanLateral(hip, shoulder){
+  if (!hip || !shoulder) return null;
+  const dx = shoulder.x - hip.x;
+  const dy = shoulder.y - hip.y; // canvas y aumenta hacia abajo
+  return Math.atan2(dx, -dy) * 180 / Math.PI;
 }
 // valgus: lateral deviation of knee from hip-ankle line (positive = medial = valgo)
 function valgusIndex(hip, knee, ankle){

@@ -1736,6 +1736,50 @@
     </div>
     </details>
 
+    <!-- ═════ COMPARACIÓN 2 VIDEOS (Kinovea Tier 2) ═════ -->
+    <details class="fms-accordion">
+      <summary>📊 Comparación de Videos (sync + tabla diferencias)</summary>
+    <div class="card" style="margin-bottom:18px;border:1px solid #c084fc;margin-top:10px">
+      <div class="card-header" style="background:rgba(192,132,252,.08)">
+        <h3 style="color:#c084fc">📊 Comparación 2 Videos</h3>
+        <span class="tag" style="background:#c084fc;color:#000">Sync · Tabla diferencias</span>
+      </div>
+      <div class="card-body">
+        <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;align-items:center">
+          <input type="file" id="vc-file-a" accept="video/*" style="display:none" onchange="VC.load('A',this.files[0])">
+          <input type="file" id="vc-file-b" accept="video/*" style="display:none" onchange="VC.load('B',this.files[0])">
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('vc-file-a').click()">📁 Video A</button>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('vc-file-b').click()">📁 Video B</button>
+          <span style="width:1px;height:18px;background:var(--border);margin:0 4px"></span>
+          <label style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:5px;cursor:pointer">
+            <input type="checkbox" id="vc-sync" checked> Sincronizar scrub
+          </label>
+          <span style="flex:1"></span>
+          <button class="btn btn-ghost btn-sm" onclick="VC.detect('A')">🔍 Detectar A</button>
+          <button class="btn btn-ghost btn-sm" onclick="VC.detect('B')">🔍 Detectar B</button>
+          <button class="btn btn-neon btn-sm" onclick="VC.compare()">📊 Comparar frame actual</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div>
+            <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:4px">Video A — antes / referencia</div>
+            <div style="position:relative;background:#000;border:1px solid var(--border);border-radius:6px;overflow:hidden">
+              <video id="vc-video-a" controls playsinline style="width:100%;display:block;max-height:340px;object-fit:contain"></video>
+              <canvas id="vc-canvas-a" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none"></canvas>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:4px">Video B — después / atleta</div>
+            <div style="position:relative;background:#000;border:1px solid var(--border);border-radius:6px;overflow:hidden">
+              <video id="vc-video-b" controls playsinline style="width:100%;display:block;max-height:340px;object-fit:contain"></video>
+              <canvas id="vc-canvas-b" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none"></canvas>
+            </div>
+          </div>
+        </div>
+        <div id="vc-table" style="margin-top:12px"></div>
+      </div>
+    </div>
+    </details>
+
     <!-- ═════ FMS MANUAL (legacy, fotos + checks) ═════ -->
     <div class="flex-b mb-16">
       <div><div style="font-size:15px;font-weight:700">Calidad de Movimiento — Manual</div><div style="font-size:12px;color:var(--text2)">OHS (2 fotos) · Step-Down (4 fotos) · Criterios SÍ/NO</div></div>
@@ -2513,7 +2557,23 @@
     details.fms-accordion > summary:hover { border-color:var(--neon) }
     details.fms-accordion { margin-bottom:10px }
     .snap-data-box { font-size:10px; font-family:var(--mono); color:var(--text2); background:rgba(0,0,0,.3); border-left:2px solid var(--neon); padding:5px 7px; margin-top:5px; border-radius:3px; line-height:1.5 }
-    .ex-tool { padding:7px 11px; background:var(--bg2); color:var(--text); border:1px solid var(--border); border-radius:5px; cursor:pointer; font-size:12px; font-family:var(--mono); font-weight:600; transition:all .15s; display:inline-flex; align-items:center; gap:4px; line-height:1 }
+    /* ── botones unificados global ──────────────────────────── */
+    .btn, button.btn, .ex-tool {
+      display:inline-flex; align-items:center; justify-content:center; gap:6px;
+      padding:8px 14px; font-size:12px; font-family:var(--mono); font-weight:700;
+      border-radius:6px; cursor:pointer; transition:all .15s ease;
+      border:1px solid var(--border); background:var(--bg2); color:var(--text);
+      letter-spacing:.02em; line-height:1;
+    }
+    .btn:hover, .ex-tool:hover { border-color:var(--neon); color:var(--neon); background:rgba(57,255,122,.06) }
+    .btn-neon, button.btn-neon { background:var(--neon); color:#000; border-color:var(--neon) }
+    .btn-neon:hover, button.btn-neon:hover { background:#52ff8a; color:#000; border-color:#52ff8a }
+    .btn-ghost, button.btn-ghost { background:transparent; color:var(--text2); border-color:var(--border) }
+    .btn-ghost:hover { color:var(--neon); border-color:var(--neon); background:rgba(57,255,122,.05) }
+    .btn-sm { padding:6px 10px; font-size:11px }
+    .btn:disabled, .ex-tool:disabled { opacity:.4; cursor:not-allowed }
+    .btn[onclick*="MEDIR"] { /* legacy support */ }
+    .ex-tool { padding:7px 11px; background:var(--bg2); color:var(--text); border:1px solid var(--border); border-radius:5px; cursor:pointer; font-size:12px; font-family:var(--mono); font-weight:600; transition:all .15s; line-height:1 }
     .ex-tool .ti { font-size:14px; line-height:1 }
     .ex-tool:hover { border-color:#5dd4ff; color:#5dd4ff; background:rgba(93,212,255,.06) }
     .ex-tool.active { background:#5dd4ff; color:#000; border-color:#5dd4ff }
@@ -2526,8 +2586,9 @@
   <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
   <script src="js/ThreeBodyChart.js?v=7"></script>
   <script src="js/LesionSheet.js?v=2"></script>
-  <script type="module" src="js/MoveAnalysis.js?v=7"></script>
+  <script type="module" src="js/MoveAnalysis.js?v=8"></script>
   <script src="js/ExpertAnalysis.js?v=2"></script>
+  <script type="module" src="js/VideoCompare.js?v=1"></script>
   <script src="js/anatomy-zones.js?v=2"></script>
   <script src="js/AdvancedBodyChart.js?v=4"></script>
   <script src="js/kine.js?v=7"></script>
