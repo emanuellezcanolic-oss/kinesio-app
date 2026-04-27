@@ -1608,6 +1608,16 @@
                 <option value="tuck_jump">Tuck Jump (Myer 2008)</option>
                 <option value="hop_test_l">Single Hop IZQ (Noyes LSI)</option>
                 <option value="hop_test_r">Single Hop DER (Noyes LSI)</option>
+                <option value="inline_lunge">In-Line Lunge (FMS)</option>
+                <option value="hurdle_step">Hurdle Step (FMS)</option>
+                <option value="aslr">Active Straight Leg Raise (FMS)</option>
+                <option value="shoulder_mob">Shoulder Mobility (FMS)</option>
+                <option value="pushup">Trunk Stability Push-up (FMS)</option>
+                <option value="ybalance">Y-Balance Test (Plisky)</option>
+                <option value="triple_hop_l">Triple Hop IZQ</option>
+                <option value="triple_hop_r">Triple Hop DER</option>
+                <option value="pistol_l">Pistol Squat IZQ</option>
+                <option value="pistol_r">Pistol Squat DER</option>
               </optgroup>
               <option value="free">Análisis libre (todos los ángulos)</option>
             </select>
@@ -1669,7 +1679,9 @@
       <div><div style="font-size:15px;font-weight:700">Calidad de Movimiento — Manual</div><div style="font-size:12px;color:var(--text2)">OHS (2 fotos) · Step-Down (4 fotos) · Criterios SÍ/NO</div></div>
       <button class="btn btn-neon btn-sm" onclick="saveFMS()">💾 Guardar FMS</button>
     </div>
-    <div class="grid-2" style="gap:14px">
+    <details class="fms-accordion">
+      <summary>📷 Capturas FMS — fotos + criterios manuales</summary>
+    <div class="grid-2" style="gap:14px;margin-top:12px">
       <div class="card">
         <div class="card-header"><h3>Overhead Squat</h3><span class="tag tag-y">2 slots</span></div>
         <div class="card-body">
@@ -1720,6 +1732,7 @@
         </div>
       </div>
     </div>
+    </details>
   </div>
 
   <!-- ══ TAB: FATIGA ══ -->
@@ -2429,6 +2442,16 @@
   <script src="js/saltos.js?v=2"></script>
   <script src="js/movilidad.js?v=2"></script>
   <script src="js/sprint.js?v=2"></script>
+  <style>
+    select option, select optgroup { background:#0f0f0f !important; color:#eaeaea !important; }
+    select optgroup { font-weight:700; color:#39FF7A !important; }
+    details.fms-accordion > summary { cursor:pointer; padding:10px 14px; background:var(--bg1); border:1px solid var(--border); border-radius:6px; font-weight:700; list-style:none; display:flex; justify-content:space-between; align-items:center; user-select:none }
+    details.fms-accordion > summary::after { content:'▼'; font-size:11px; color:var(--text3); transition:transform .2s }
+    details.fms-accordion[open] > summary::after { transform:rotate(180deg) }
+    details.fms-accordion > summary:hover { border-color:var(--neon) }
+    details.fms-accordion { margin-bottom:10px }
+    .snap-data-box { font-size:10px; font-family:var(--mono); color:var(--text2); background:rgba(0,0,0,.3); border-left:2px solid var(--neon); padding:5px 7px; margin-top:5px; border-radius:3px; line-height:1.5 }
+  </style>
   <!-- Three.js para viewer 3D anatomía -->
   <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
   <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -2436,7 +2459,7 @@
   <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
   <script src="js/ThreeBodyChart.js?v=7"></script>
   <script src="js/LesionSheet.js?v=2"></script>
-  <script type="module" src="js/MoveAnalysis.js?v=6"></script>
+  <script type="module" src="js/MoveAnalysis.js?v=7"></script>
   <script src="js/anatomy-zones.js?v=2"></script>
   <script src="js/AdvancedBodyChart.js?v=4"></script>
   <script src="js/kine.js?v=7"></script>

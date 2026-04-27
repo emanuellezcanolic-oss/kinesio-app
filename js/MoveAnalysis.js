@@ -399,6 +399,50 @@ const TEMPLATES = {
       return TEMPLATES._hop_analyze(frames, view, 'R');
     }
   },
+  // FMS items adicionales (Cook 2010, scoring 0-3)
+  inline_lunge: { name:'In-Line Lunge', analyze(frames,view){
+    const f={},k={};const lean=Math.max(...frames.map(x=>Math.abs(x.trunk_lean||0)));
+    const minK=Math.min(...frames.map(x=>Math.min(x.knee_l||180,x.knee_r||180)));
+    const asym=Math.abs(lower(frames.map(x=>x.knee_l),999)-lower(frames.map(x=>x.knee_r),999));
+    let s=3; if(lean>20)s--; if(minK>100)s--; if(asym>10)s--;
+    k['Score FMS']=Math.max(0,s)+'/3'; k['Tronco máx']=lean.toFixed(0)+'°'; k['Asim rodilla']=asym.toFixed(1)+'°';
+    return {kpis:k, flags:[{lvl:s>=2?'green':'amber',msg:`In-Line Lunge: ${Math.max(0,s)}/3`}]};
+  }},
+  hurdle_step: { name:'Hurdle Step', analyze(frames,view){
+    const k={};const maxHip=Math.max(...frames.map(x=>180-(x.hip_l||180)));
+    const lean=Math.max(...frames.map(x=>Math.abs(x.trunk_lean||0)));
+    let s=3; if(maxHip<60)s--; if(lean>15)s--;
+    k['Score FMS']=Math.max(0,s)+'/3'; k['Flex cadera máx']=maxHip.toFixed(0)+'°';
+    return {kpis:k, flags:[{lvl:s>=2?'green':'amber',msg:`Hurdle Step: ${Math.max(0,s)}/3`}]};
+  }},
+  aslr: { name:'Active SLR', analyze(frames,view){
+    const k={};const maxHip=Math.max(...frames.map(x=>180-Math.min(x.hip_l||180,x.hip_r||180)));
+    let s=3; if(maxHip<70)s--; if(maxHip<50)s--;
+    k['Score FMS']=Math.max(0,s)+'/3'; k['Flex cadera máx']=maxHip.toFixed(0)+'°';
+    return {kpis:k, flags:[{lvl:s>=2?'green':'amber',msg:`ASLR: ${Math.max(0,s)}/3`}]};
+  }},
+  shoulder_mob: { name:'Shoulder Mobility', analyze(frames,view){
+    const k={}; const sl=Math.min(...frames.map(x=>x.shoulder_l||180));
+    const sr=Math.min(...frames.map(x=>x.shoulder_r||180));
+    k['Hombro IZQ mín']=sl.toFixed(0)+'°'; k['Hombro DER mín']=sr.toFixed(0)+'°';
+    return {kpis:k, flags:[{lvl:'green',msg:'Distancia puños = medir manualmente con cinta'}]};
+  }},
+  pushup: { name:'Trunk Stab Push-up', analyze(frames,view){
+    const k={};const trunkRange=Math.max(...frames.map(x=>Math.abs(x.trunk_lean||0)))-Math.min(...frames.map(x=>Math.abs(x.trunk_lean||0)));
+    let s=3; if(trunkRange>10)s--; if(trunkRange>20)s--;
+    k['Score FMS']=Math.max(0,s)+'/3'; k['Variación tronco']=trunkRange.toFixed(0)+'°';
+    return {kpis:k, flags:[{lvl:s>=2?'green':'amber',msg:`Push-up estabilidad: ${Math.max(0,s)}/3`}]};
+  }},
+  ybalance: { name:'Y-Balance', analyze(frames,view){
+    const k={}; k['Anterior reach']='medir manual cm';
+    k['Posterolateral']='medir manual cm'; k['Posteromedial']='medir manual cm';
+    return {kpis:k, flags:[{lvl:'green',msg:'Y-Balance: distancias en cm. Composite = (A+PM+PL)/(3×leg_length)×100'}]};
+  }},
+  triple_hop_l: { name:'Triple Hop IZQ', analyze(f,v){return TEMPLATES._hop_analyze(f,v,'L');}},
+  triple_hop_r: { name:'Triple Hop DER', analyze(f,v){return TEMPLATES._hop_analyze(f,v,'R');}},
+  pistol_l: { name:'Pistol IZQ', analyze(f,v){return TEMPLATES.squat_unipodal_l.analyze(f,v);}},
+  pistol_r: { name:'Pistol DER', analyze(f,v){return TEMPLATES.squat_unipodal_r.analyze(f,v);}},
+
   _hop_analyze(frames, view, side){
     const kpis = {}, flags = [];
     const ksuf = side === 'L' ? 'knee_l' : 'knee_r';
@@ -570,8 +614,30 @@ const MA = window.MA = {
         ov.addEventListener('touchmove',  e => { e.preventDefault(); this._dragMove(e.touches[0]); }, {passive:false});
         ov.addEventListener('touchend',   e => this._dragEnd(e));
       }
+      // wheel scrub: mouse wheel sobre video = step ±1 frame
+      const wrap = v.parentElement;
+      wrap.addEventListener('wheel', e => {
+        if (!v.duration) return;
+        e.preventDefault();
+        v.pause();
+        const dir = Math.sign(e.deltaY);
+        v.currentTime = Math.max(0, Math.min(v.duration, v.currentTime + dir/30));
+      }, { passive:false });
+      // drag scrub horizontal sobre video (cuando NO está en edit mode)
+      let scrubbing = false, sx = 0, st = 0;
+      wrap.addEventListener('mousedown', e => {
+        if (this._editMode) return;
+        scrubbing = true; sx = e.clientX; st = v.currentTime; v.pause();
+      });
+      window.addEventListener('mousemove', e => {
+        if (!scrubbing || !v.duration) return;
+        const dx = e.clientX - sx;
+        const w = wrap.clientWidth || 1;
+        v.currentTime = Math.max(0, Math.min(v.duration, st + (dx / w) * v.duration));
+      });
+      window.addEventListener('mouseup', () => scrubbing = false);
+
       this._evtBound = true;
-      // step controls
       this._injectStepControls();
     }
   },
@@ -888,22 +954,72 @@ const MA = window.MA = {
     if (!v || !v.videoWidth){ alert('Cargá un video primero.'); return; }
     const dest = document.getElementById('ma-snap-dest').value;
     const overlay = document.getElementById('ma-snap-overlay').checked;
+    const view = document.getElementById('ma-view').value;
+    const ex = document.getElementById('ma-exercise').value;
 
     // composite a tamaño video real
     const tmp = document.createElement('canvas');
     tmp.width = v.videoWidth; tmp.height = v.videoHeight;
     const tx = tmp.getContext('2d');
     tx.drawImage(v, 0, 0, tmp.width, tmp.height);
-
     if (overlay && this._lastLm){
       this._drawSkeletonRaw(tx, this._lastLm, tmp.width, tmp.height);
     }
     const dataUrl = tmp.toDataURL('image/jpeg', 0.92);
     this._pasteToSlot(dest, dataUrl);
-    // scroll to FMS section
+
+    // calcular y mostrar data del frame actual
+    const a = this._lastLm ? allAngles(this._lastLm) : null;
+    const data = this._extractRelevantData(a, view);
+    this._renderSnapData(dest, data, view);
+    this._persistSnap(dest, ex, view, dataUrl, data);
+
     const slot = document.getElementById(dest);
     if (slot) slot.scrollIntoView({behavior:'smooth', block:'center'});
-    this._setStatus(`✓ Frame capturado a ${dest}`);
+    this._setStatus(`✓ Frame capturado a ${dest} con ${Object.keys(data).length} medidas`);
+  },
+
+  // según vista, qué métricas son relevantes
+  _extractRelevantData(a, view){
+    if (!a) return {};
+    const r = {};
+    const fix1 = x => x==null ? '—' : x.toFixed(1);
+    if (view === 'side_l' || view === 'side_r'){
+      r['Flex rodilla L']  = fix1(a.knee_l)+'°';
+      r['Flex rodilla R']  = fix1(a.knee_r)+'°';
+      r['Flex cadera L']   = fix1(a.hip_l)+'°';
+      r['Flex cadera R']   = fix1(a.hip_r)+'°';
+      r['Inclin. tronco']  = fix1(a.trunk_lean)+'°';
+      r['Flex tobillo L']  = fix1(a.ankle_l)+'°';
+      r['Flex tobillo R']  = fix1(a.ankle_r)+'°';
+    } else if (view === 'front' || view === 'back'){
+      r['Flex rodilla L']  = fix1(a.knee_l)+'°';
+      r['Flex rodilla R']  = fix1(a.knee_r)+'°';
+      r['Asim. rodillas']  = fix1(Math.abs((a.knee_l||0)-(a.knee_r||0)))+'°';
+      r['Valgo L']         = a.valgus_l!=null ? a.valgus_l.toFixed(3) : '—';
+      r['Valgo R']         = a.valgus_r!=null ? a.valgus_r.toFixed(3) : '—';
+      r['Tilt pélvico']    = fix1(a.pelvis_tilt)+'°';
+      r['Tilt hombros']    = fix1(a.shoulder_tilt)+'°';
+    }
+    return r;
+  },
+
+  _renderSnapData(slotId, data, view){
+    const slot = document.getElementById(slotId); if (!slot) return;
+    const parent = slot.parentElement;
+    let box = parent.querySelector('.snap-data-box');
+    if (!box){ box = document.createElement('div'); box.className='snap-data-box'; parent.appendChild(box); }
+    if (!Object.keys(data).length){ box.innerHTML = '<i>Sin pose detectada en este frame</i>'; return; }
+    box.innerHTML = `<b style="color:var(--neon)">📐 ${view.toUpperCase()}</b><br>` +
+      Object.entries(data).map(([k,v]) => `<span style="color:var(--text3)">${k}:</span> <b>${v}</b>`).join(' · ');
+  },
+
+  _persistSnap(slotId, ex, view, dataUrl, data){
+    if (typeof cur === 'undefined' || !cur) return;
+    if (!cur.fmsAI) cur.fmsAI = {};
+    if (!cur.fmsAI[slotId]) cur.fmsAI[slotId] = {};
+    cur.fmsAI[slotId] = { exercise: ex, view, ts: new Date().toISOString(), data, /* img omit por tamaño */ };
+    try { if (typeof saveAtletas === 'function') saveAtletas(); } catch(e){}
   },
 
   _pasteToSlot(slotId, dataUrl){
