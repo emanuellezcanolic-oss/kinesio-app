@@ -124,8 +124,25 @@ const EX = window.EX = {
     const cp = this._eventCoord(e);
     const vp = this._toVideoCoord(cp);
     const t = this._tool;
-    if (t === 'select'){ /* TODO: picking */ return; }
-    if (t === 'line' || t === 'rect' || t === 'circle' || t === 'calibrate'){
+    if (t === 'select'){
+      // intentar arrastrar landmark MediaPipe si MA tiene _lastLm en este frame
+      if (window.MA?._lastLm){
+        const o = this._off;
+        let best = -1, bestD = 30*30;
+        MA._lastLm.forEach((p,i) => {
+          if (!p) return;
+          const x = o.dx + p.x*o.dw, y = o.dy + p.y*o.dh;
+          const d = (cp.x-x)*(cp.x-x) + (cp.y-y)*(cp.y-y);
+          if (d < bestD){ bestD = d; best = i; }
+        });
+        if (best >= 0){
+          this._dragLm = { idx: best };
+          this._video.pause();
+        }
+      }
+      return;
+    }
+    if (t === 'line' || t === 'rect' || t === 'circle' || t === 'calibrate' || t === 'crop'){
       this._drawing = { type:t, points:[vp], color:this._selectedColor, frame:this._frameKey() };
     } else if (t === 'angle'){
       if (!this._drawing) this._drawing = { type:'angle', points:[vp], color:this._selectedColor, frame:this._frameKey() };
@@ -146,11 +163,18 @@ const EX = window.EX = {
   },
 
   _onMove(e){
+    if (this._dragLm && window.MA?._lastLm){
+      const cp = this._eventCoord(e);
+      const vp = this._toVideoCoord(cp);
+      MA._lastLm[this._dragLm.idx] = { ...MA._lastLm[this._dragLm.idx], x: vp.x, y: vp.y };
+      try { MA._draw(MA._lastLm); } catch(err){}
+      return;
+    }
     if (!this._drawing) return;
     const cp = this._eventCoord(e);
     const vp = this._toVideoCoord(cp);
     const d = this._drawing;
-    if (d.type === 'line' || d.type === 'rect' || d.type === 'circle' || d.type === 'calibrate'){
+    if (d.type === 'line' || d.type === 'rect' || d.type === 'circle' || d.type === 'calibrate' || d.type === 'crop'){
       d.points[1] = vp;
     } else if (d.type === 'angle' && d.points.length < 3){
       d.points[d.points.length] = vp;
@@ -163,7 +187,23 @@ const EX = window.EX = {
   },
 
   _onUp(e){
+    if (this._dragLm){
+      // persistir override en MA si existe
+      if (window.MA?._overrides){
+        const k = MA._frameKey ? MA._frameKey() : Math.round(this._video.currentTime*30);
+        MA._overrides[k] = MA._lastLm.map(p => p ? {...p} : p);
+      }
+      this._dragLm = null;
+      return;
+    }
     const d = this._drawing; if (!d) return;
+    if (d.type === 'crop'){
+      // pedir aplicar
+      if (d.points.length === 2 && confirm('Aplicar recorte y enviar al slot FMS seleccionado?')){
+        this._applyCrop(d.points[0], d.points[1]);
+      }
+      this._drawing = null; this._render(); return;
+    }
     if (d.type === 'line' || d.type === 'rect' || d.type === 'circle'){
       this._commitDrawing();
     } else if (d.type === 'calibrate'){
@@ -309,7 +349,21 @@ const EX = window.EX = {
       if (pts.length < 2){ this._drawDot(pts[0], col); ctx.globalAlpha=1; return; }
       const x = Math.min(pts[0].x,pts[1].x), y = Math.min(pts[0].y,pts[1].y);
       const w = Math.abs(pts[1].x-pts[0].x), h = Math.abs(pts[1].y-pts[0].y);
+      ctx.lineWidth = 2.5; ctx.strokeStyle = col;
       ctx.strokeRect(x,y,w,h);
+    } else if (a.type === 'crop'){
+      if (pts.length < 2){ this._drawDot(pts[0], col); ctx.globalAlpha=1; return; }
+      const x = Math.min(pts[0].x,pts[1].x), y = Math.min(pts[0].y,pts[1].y);
+      const w = Math.abs(pts[1].x-pts[0].x), h = Math.abs(pts[1].y-pts[0].y);
+      // overlay oscuro fuera del crop
+      ctx.fillStyle = 'rgba(0,0,0,.55)';
+      const cw = this._canvas.width, ch = this._canvas.height;
+      ctx.fillRect(0,0,cw,y); ctx.fillRect(0,y+h,cw,ch-(y+h));
+      ctx.fillRect(0,y,x,h); ctx.fillRect(x+w,y,cw-(x+w),h);
+      ctx.strokeStyle = '#ffb020'; ctx.lineWidth = 2; ctx.setLineDash([6,4]);
+      ctx.strokeRect(x,y,w,h);
+      ctx.setLineDash([]);
+      this._labelAt(x+w/2, y-14, `${Math.round(w)} × ${Math.round(h)} px · soltá para aplicar`, '#ffb020', 12);
     } else if (a.type === 'circle'){
       if (pts.length < 2){ this._drawDot(pts[0], col); ctx.globalAlpha=1; return; }
       const r = Math.hypot(pts[1].x-pts[0].x, pts[1].y-pts[0].y);
@@ -355,6 +409,47 @@ const EX = window.EX = {
   },
 
   // ── controles ──────────────────────────────────────────────────────────
+  _applyCrop(p1, p2){
+    const v = this._video; if (!v?.videoWidth) return;
+    const x1 = Math.min(p1.x, p2.x) * v.videoWidth;
+    const y1 = Math.min(p1.y, p2.y) * v.videoHeight;
+    const w  = Math.abs(p2.x-p1.x) * v.videoWidth;
+    const h  = Math.abs(p2.y-p1.y) * v.videoHeight;
+    if (w < 10 || h < 10) return;
+    const tmp = document.createElement('canvas');
+    tmp.width = Math.round(w); tmp.height = Math.round(h);
+    const tx = tmp.getContext('2d');
+    // draw video crop
+    tx.drawImage(v, x1, y1, w, h, 0, 0, w, h);
+    // overlay landmarks AI dentro del crop si hay
+    if (window.MA?._lastLm){
+      const SKIP = new Set([1,2,3,4,5,6,7,8,9,10]);
+      const PAIRS=[[11,13],[13,15],[12,14],[14,16],[11,12],[11,23],[12,24],[23,24],[23,25],[25,27],[24,26],[26,28],[27,31],[28,32],[27,29],[28,30]];
+      const X = pt => pt.x*v.videoWidth - x1;
+      const Y = pt => pt.y*v.videoHeight - y1;
+      tx.lineWidth = 2; tx.strokeStyle='#39FF7A'; tx.lineCap='round';
+      PAIRS.forEach(([a,b])=>{const A=MA._lastLm[a],B=MA._lastLm[b];if(!A||!B)return;
+        tx.beginPath();tx.moveTo(X(A),Y(A));tx.lineTo(X(B),Y(B));tx.stroke();});
+      tx.fillStyle='#fff';
+      MA._lastLm.forEach((p,i)=>{if(!p||SKIP.has(i))return;
+        tx.beginPath();tx.arc(X(p),Y(p),2.5,0,Math.PI*2);tx.fill();});
+    }
+    // mandar al slot FMS seleccionado
+    const dest = document.getElementById('suite-snap-dest')?.value;
+    if (!dest){ alert('Sin destino slot'); return; }
+    const url = tmp.toDataURL('image/jpeg', 0.92);
+    const slot = document.getElementById(dest);
+    if (slot){
+      let img = slot.querySelector('img');
+      if (!img){ img = document.createElement('img'); slot.appendChild(img); }
+      img.src = url;
+      img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit';
+      slot.style.border = '1px solid var(--neon)';
+      const txt = slot.querySelector('div'); if (txt) txt.style.display = 'none';
+      slot.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+  },
+
   togglePlay(){
     const v=this._video; if(v.paused) v.play(); else v.pause();
     setTimeout(()=>{ const ic=document.getElementById('ex-play-ic'); const btn=document.getElementById('ex-play-btn');

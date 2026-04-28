@@ -1618,23 +1618,24 @@
           <button class="btn btn-neon btn-sm" id="ma-analyze-btn" onclick="MA.analyze()" disabled>▶ Analizar IA</button>
           <span style="width:1px;height:22px;background:var(--border);margin:0 4px"></span>
           <span style="font-size:10px;color:#5dd4ff;text-transform:uppercase;letter-spacing:.08em;font-weight:700">🔬 Drawing</span>
-          <button class="ex-tool" data-tool="select"   onclick="EX.setTool(this)" title="Sin herramienta">🖱</button>
-          <button class="ex-tool" data-tool="line"     onclick="EX.setTool(this)">📏</button>
-          <button class="ex-tool" data-tool="angle"    onclick="EX.setTool(this)">📐</button>
-          <button class="ex-tool" data-tool="marker"   onclick="EX.setTool(this)">📍</button>
-          <button class="ex-tool" data-tool="rect"     onclick="EX.setTool(this)">⬜</button>
-          <button class="ex-tool" data-tool="circle"   onclick="EX.setTool(this)">⭕</button>
-          <button class="ex-tool" data-tool="calibrate" onclick="EX.setTool(this)" title="Calibrar px→cm">🎯</button>
+          <button class="ex-tool" data-tool="select"   onclick="EX.setTool(this)" title="Seleccionar / arrastrar landmarks">🖱️</button>
+          <button class="ex-tool" data-tool="line"     onclick="EX.setTool(this)" title="Línea / distancia (2 clicks)">📏</button>
+          <button class="ex-tool" data-tool="angle"    onclick="EX.setTool(this)" title="Ángulo manual (3 clicks)">📐</button>
+          <button class="ex-tool" data-tool="marker"   onclick="EX.setTool(this)" title="Marcador con texto (1 click + texto)">📍</button>
+          <button class="ex-tool" data-tool="rect"     onclick="EX.setTool(this)" title="Rectángulo (2 clicks)">⬜</button>
+          <button class="ex-tool" data-tool="circle"   onclick="EX.setTool(this)" title="Círculo (centro + radio)">⭕</button>
+          <button class="ex-tool" data-tool="calibrate" onclick="EX.setTool(this)" title="Calibrar pixels → cm con regla real">🎯</button>
+          <button class="ex-tool" data-tool="crop"     onclick="EX.setTool(this)" title="Recortar imagen (drag rectángulo + Aplicar)">✂️</button>
           <span style="width:1px;height:22px;background:var(--border);margin:0 4px"></span>
-          <button class="ex-tool" onclick="EX.toggleMirror()" title="Espejo">🔁</button>
-          <button class="ex-tool" onclick="EX.toggleGrid()" title="Grid">⊞</button>
-          <select id="ex-speed" onchange="EX.setSpeed(this.value)" style="padding:4px;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:4px;font-size:11px">
+          <button class="ex-tool" onclick="EX.toggleMirror()" title="Espejo horizontal del video">🔁</button>
+          <button class="ex-tool" onclick="EX.toggleGrid()" title="Activar grid postural">⊞</button>
+          <select id="ex-speed" onchange="EX.setSpeed(this.value)" title="Velocidad de reproducción" style="padding:6px 8px;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:5px;font-size:13px;font-weight:700;min-height:38px">
             <option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option>
           </select>
           <span style="flex:1"></span>
-          <button class="ex-tool" onclick="EX.undo()" title="Undo">↩️</button>
-          <button class="ex-tool" onclick="EX.clearFrame()" style="border-color:var(--amber);color:var(--amber)" title="Borrar frame">🧹</button>
-          <button class="ex-tool" onclick="EX.clearAll()" style="border-color:var(--red);color:var(--red)" title="Borrar todo">🗑️</button>
+          <button class="ex-tool" onclick="EX.undo()" title="Deshacer última anotación">↩️</button>
+          <button class="ex-tool" onclick="EX.clearFrame()" style="border-color:var(--amber);color:var(--amber)" title="Borrar anotaciones de este frame">🧹</button>
+          <button class="ex-tool" onclick="EX.clearAll()" style="border-color:var(--red);color:var(--red)" title="Borrar TODAS las anotaciones">🗑️</button>
         </div>
 
         <!-- VIEWPORT: video A (+ B opcional) -->
@@ -2702,7 +2703,17 @@
     .btn-sm { padding:6px 10px; font-size:11px }
     .btn:disabled, .ex-tool:disabled { opacity:.4; cursor:not-allowed }
     .btn[onclick*="MEDIR"] { /* legacy support */ }
-    .ex-tool { padding:7px 11px; background:var(--bg2); color:var(--text); border:1px solid var(--border); border-radius:5px; cursor:pointer; font-size:12px; font-family:var(--mono); font-weight:600; transition:all .15s; line-height:1 }
+    .ex-tool { padding:8px 11px; background:var(--bg2); color:var(--text); border:1px solid var(--border); border-radius:6px; cursor:pointer; font-size:18px; font-family:var(--mono); font-weight:600; transition:all .12s; line-height:1; min-width:42px; min-height:38px; position:relative }
+    .ex-tool[title]:hover::after {
+      content: attr(title); position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%);
+      background:#000; color:var(--neon); padding:5px 10px; border-radius:5px; font-size:11px; font-weight:600;
+      white-space:nowrap; border:1px solid var(--neon); z-index:9999; pointer-events:none;
+      font-family:ui-monospace,monospace; letter-spacing:.02em
+    }
+    .ex-tool[title]:hover::before {
+      content:''; position:absolute; bottom:100%; left:50%; transform:translateX(-50%);
+      border:5px solid transparent; border-top-color:var(--neon); pointer-events:none; z-index:9999
+    }
     .suite-tab { padding:9px 18px; font-size:12px; font-weight:700; background:var(--bg2); color:var(--text2); border:1px solid var(--border); border-radius:6px 6px 0 0 }
     .suite-tab.active { background:var(--neon); color:#000; border-color:var(--neon); border-bottom-color:var(--neon) }
     .suite-tab:hover:not(.active) { color:var(--neon); border-color:var(--neon) }
@@ -2719,7 +2730,7 @@
   <script src="js/ThreeBodyChart.js?v=7"></script>
   <script src="js/LesionSheet.js?v=2"></script>
   <script type="module" src="js/MoveAnalysis.js?v=9"></script>
-  <script src="js/ExpertAnalysis.js?v=2"></script>
+  <script src="js/ExpertAnalysis.js?v=3"></script>
   <script type="module" src="js/VideoCompare.js?v=2"></script>
   <script src="js/Suite.js?v=1"></script>
   <script src="js/Workspace.js?v=1"></script>
