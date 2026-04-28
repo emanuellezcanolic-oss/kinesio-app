@@ -1583,31 +1583,137 @@
   <!-- ══ TAB: FMS ══ -->
   <div id="ptab-fms" class="hidden">
 
-    <!-- ═════ SUITE UNIFICADA ANÁLISIS MOVIMIENTO ═════ -->
+    <!-- ═════ WORKSPACE UNIFICADO (Movement Suite) ═════ -->
     <div class="card" style="margin-bottom:18px;border:2px solid var(--neon);background:linear-gradient(180deg,rgba(57,255,122,.04),transparent 80px)">
       <div class="card-header" style="background:rgba(57,255,122,.1)">
-        <h3 style="color:var(--neon)">🎬 Suite Análisis Movimiento</h3>
-        <span class="tag" style="background:var(--neon);color:#000">AI · Experto · Comparativo</span>
+        <h3 style="color:var(--neon)">🎬 Workspace Análisis Movimiento</h3>
+        <span class="tag" style="background:var(--neon);color:#000">IA + Experto + Comparativo</span>
       </div>
-      <div class="card-body" style="padding:14px">
-        <!-- mode tabs -->
-        <div style="display:flex;gap:6px;margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px">
-          <button class="btn suite-tab active" data-suite="ai"      onclick="Suite.show('ai',this)">🎥 Análisis IA</button>
-          <button class="btn suite-tab"        data-suite="expert"  onclick="Suite.show('expert',this)">🔬 Experto (drawing)</button>
-          <button class="btn suite-tab"        data-suite="compare" onclick="Suite.show('compare',this)">📊 Comparar 2</button>
+      <div class="card-body" style="padding:12px">
+
+        <!-- BARRA SUPERIOR: cargar + snapshot a FMS -->
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px;background:var(--bg1);padding:8px;border-radius:6px">
+          <input type="file" id="ws-file-a" accept="video/*" style="display:none" onchange="WS.loadVideo('A',this.files[0])">
+          <input type="file" id="ws-file-b" accept="video/*" style="display:none" onchange="WS.loadVideo('B',this.files[0])">
+          <button class="btn btn-neon btn-sm" onclick="document.getElementById('ws-file-a').click()">📁 Cargar Video A</button>
+          <button class="btn btn-ghost btn-sm" id="ws-load-b-btn" onclick="document.getElementById('ws-file-b').click()" style="display:none">📁 Cargar Video B</button>
+          <button class="btn btn-ghost btn-sm" id="ws-compare-toggle" onclick="WS.toggleCompare()">📊 Activar Comparar</button>
           <span style="flex:1"></span>
-          <!-- snapshot/upload bar (siempre visible) -->
           <select id="suite-snap-dest" style="padding:6px 8px;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:5px;font-size:11px;font-weight:600">
             <optgroup label="OHS"><option value="slot-ohs-frente">OHS · Frente</option><option value="slot-ohs-perfil">OHS · Perfil</option></optgroup>
             <optgroup label="Step Down"><option value="slot-sd-fd">SD · Frente DER</option><option value="slot-sd-pd">SD · Perfil DER</option><option value="slot-sd-fi">SD · Frente IZQ</option><option value="slot-sd-pi">SD · Perfil IZQ</option></optgroup>
           </select>
-          <input type="file" id="suite-img-up" accept="image/*" style="display:none" onchange="Suite.uploadImage(this.files[0])">
-          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('suite-img-up').click()" title="Subir imagen al slot FMS">🖼️ Subir img</button>
-          <button class="btn btn-neon btn-sm" onclick="Suite.captureToFMS()" title="Capturar frame del modo activo">📸 → FMS</button>
+          <input type="file" id="suite-img-up" accept="image/*" style="display:none" onchange="WS.uploadImage(this.files[0])">
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('suite-img-up').click()" title="Subir imagen externa">🖼️ Subir img</button>
+          <button class="btn btn-neon btn-sm" onclick="WS.captureToFMS()" title="Capturar frame con todas las capas → FMS">📸 → FMS</button>
         </div>
 
-    <!-- ═════ MODO 1: AI ═════ -->
-    <div id="suite-pane-ai" class="suite-pane">
+        <!-- TOOLBAR: AI + Drawing tools (siempre disponibles juntos) -->
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px;background:var(--bg1);padding:8px;border-radius:6px">
+          <span style="font-size:10px;color:var(--neon);text-transform:uppercase;letter-spacing:.08em;font-weight:700">🎥 IA</span>
+          <select id="ma-exercise" style="padding:5px;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:4px;font-size:11px"></select>
+          <select id="ma-view" style="padding:5px;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:4px;font-size:11px">
+            <option value="front">Frontal</option><option value="side_l">Perfil IZQ</option><option value="side_r">Perfil DER</option><option value="back">Posterior</option>
+          </select>
+          <button class="btn btn-neon btn-sm" id="ma-analyze-btn" onclick="MA.analyze()" disabled>▶ Analizar IA</button>
+          <span style="width:1px;height:22px;background:var(--border);margin:0 4px"></span>
+          <span style="font-size:10px;color:#5dd4ff;text-transform:uppercase;letter-spacing:.08em;font-weight:700">🔬 Drawing</span>
+          <button class="ex-tool" data-tool="select"   onclick="EX.setTool(this)" title="Sin herramienta">🖱</button>
+          <button class="ex-tool" data-tool="line"     onclick="EX.setTool(this)">📏</button>
+          <button class="ex-tool" data-tool="angle"    onclick="EX.setTool(this)">📐</button>
+          <button class="ex-tool" data-tool="marker"   onclick="EX.setTool(this)">📍</button>
+          <button class="ex-tool" data-tool="rect"     onclick="EX.setTool(this)">⬜</button>
+          <button class="ex-tool" data-tool="circle"   onclick="EX.setTool(this)">⭕</button>
+          <button class="ex-tool" data-tool="calibrate" onclick="EX.setTool(this)" title="Calibrar px→cm">🎯</button>
+          <span style="width:1px;height:22px;background:var(--border);margin:0 4px"></span>
+          <button class="ex-tool" onclick="EX.toggleMirror()" title="Espejo">🔁</button>
+          <button class="ex-tool" onclick="EX.toggleGrid()" title="Grid">⊞</button>
+          <select id="ex-speed" onchange="EX.setSpeed(this.value)" style="padding:4px;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:4px;font-size:11px">
+            <option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option>
+          </select>
+          <span style="flex:1"></span>
+          <button class="ex-tool" onclick="EX.undo()" title="Undo">↩️</button>
+          <button class="ex-tool" onclick="EX.clearFrame()" style="border-color:var(--amber);color:var(--amber)" title="Borrar frame">🧹</button>
+          <button class="ex-tool" onclick="EX.clearAll()" style="border-color:var(--red);color:var(--red)" title="Borrar todo">🗑️</button>
+        </div>
+
+        <!-- VIEWPORT: video A (+ B opcional) -->
+        <div id="ws-viewport" style="display:grid;grid-template-columns:1fr;gap:10px">
+          <div>
+            <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:3px"><span id="ws-label-a">📹 Video A</span></div>
+            <div id="ws-stage-a" style="position:relative;background:#000;border:1px solid var(--border);border-radius:6px;overflow:hidden">
+              <video id="ws-video-a" controls playsinline style="width:100%;display:block;max-height:480px;object-fit:contain"></video>
+              <canvas id="ws-skel-a" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none"></canvas>
+              <canvas id="ws-draw-a" style="position:absolute;top:0;left:0;width:100%;height:100%;cursor:crosshair"></canvas>
+            </div>
+          </div>
+          <div id="ws-stage-b-wrap" style="display:none">
+            <div style="font-size:10px;color:#c084fc;font-family:var(--mono);margin-bottom:3px">📹 Video B</div>
+            <div id="ws-stage-b" style="position:relative;background:#000;border:1px solid #c084fc;border-radius:6px;overflow:hidden">
+              <video id="ws-video-b" controls playsinline style="width:100%;display:block;max-height:480px;object-fit:contain"></video>
+              <canvas id="ws-skel-b" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none"></canvas>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:6px">
+              <label style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:5px">
+                <input type="checkbox" id="ws-sync" checked> Sync scrub A↔B
+              </label>
+              <button class="btn btn-ghost btn-sm" onclick="WS.detectB()">🔍 Detectar pose B</button>
+              <button class="btn btn-neon btn-sm" onclick="WS.compareNow()">📊 Comparar frame actual</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- FRAME CONTROLS -->
+        <div style="display:flex;gap:6px;justify-content:center;align-items:center;padding:8px;background:var(--bg1);border-radius:6px;margin-top:8px">
+          <button class="ex-tool" onclick="WS.step(-5)">⏮ -5</button>
+          <button class="ex-tool" onclick="WS.step(-1)">◀ -1</button>
+          <button class="btn btn-neon btn-sm" onclick="WS.togglePlay()" id="ws-play-btn">▶ Play</button>
+          <button class="ex-tool" onclick="WS.step(1)">+1 ▶</button>
+          <button class="ex-tool" onclick="WS.step(5)">+5 ⏭</button>
+          <span style="flex:1"></span>
+          <span id="ws-frame-info" style="font-family:var(--mono);font-size:11px;color:var(--text2);background:var(--bg2);padding:4px 8px;border-radius:4px;border:1px solid var(--border)">—</span>
+        </div>
+
+        <!-- RESULTS PANELS (3 acordeones colapsables) -->
+        <details class="fms-accordion" style="margin-top:10px"><summary>📊 Resultados IA (KPIs + flags + chart)</summary>
+          <div id="ma-results" style="margin-top:8px;display:none">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:10px" id="ma-kpis"></div>
+            <div id="ma-flags" style="margin-bottom:10px"></div>
+            <canvas id="ma-chart" style="width:100%;height:160px;background:var(--bg1);border:1px solid var(--border);border-radius:5px"></canvas>
+            <div style="display:flex;gap:8px;margin-top:10px">
+              <button class="btn btn-neon btn-sm" onclick="MA.save()">💾 Guardar análisis</button>
+              <button class="btn btn-ghost btn-sm" onclick="MA.exportJSON()">📄 Export JSON</button>
+            </div>
+          </div>
+          <span id="ma-status" style="font-size:11px;color:var(--text3);font-family:var(--mono)">Cargá video y dale ▶ Analizar IA</span>
+        </details>
+        <details class="fms-accordion"><summary>🔬 Anotaciones experto (ángulos, líneas, marcadores)</summary>
+          <div style="font-size:11px;color:var(--text3);padding:6px;font-family:var(--mono)">Calibración: <b id="ex-cal-info" style="color:#5dd4ff">— sin calibrar (px)</b></div>
+          <div id="ex-anno-list"></div>
+        </details>
+        <details class="fms-accordion" id="ws-compare-results-acc" style="display:none"><summary>📊 Tabla comparativa A vs B</summary>
+          <div id="vc-table"></div>
+        </details>
+
+      </div><!-- /card-body -->
+    </div><!-- /Workspace card -->
+
+    <!-- LEGACY HIDDEN ELEMENTS (compat con MA/EX/VC viejos) -->
+    <div style="display:none">
+      <video id="ma-video"></video><canvas id="ma-canvas"></canvas>
+      <video id="ex-video"></video><canvas id="ex-canvas"></canvas>
+      <video id="vc-video-a"></video><canvas id="vc-canvas-a"></canvas>
+      <video id="vc-video-b"></video><canvas id="vc-canvas-b"></canvas>
+      <input id="ma-snap-dest"><input id="ma-snap-overlay" type="checkbox"><input id="ma-file" type="file">
+      <input id="ex-file" type="file"><div id="ex-toolbar"></div>
+      <input id="vc-file-a" type="file"><input id="vc-file-b" type="file"><input id="vc-sync" type="checkbox" checked>
+      <button id="ma-play-btn"></button><span id="ma-play-ic"></span>
+      <button id="ex-play-btn"></button><span id="ex-play-ic"></span>
+      <span id="ex-frame-info"></span>
+    </div>
+
+    <!-- LEGACY removed: AI/Expert/Compare separate panes (replaced by Workspace above) -->
+    <div id="suite-pane-ai" class="suite-pane" style="display:none">
     <div class="card" style="border:1px solid var(--neon);margin-top:0">
       <div class="card-header" style="background:rgba(57,255,122,.08)">
         <h3 style="color:var(--neon)">🎥 Análisis Video AI</h3>
@@ -2616,6 +2722,7 @@
   <script src="js/ExpertAnalysis.js?v=2"></script>
   <script type="module" src="js/VideoCompare.js?v=2"></script>
   <script src="js/Suite.js?v=1"></script>
+  <script src="js/Workspace.js?v=1"></script>
   <script src="js/anatomy-zones.js?v=2"></script>
   <script src="js/AdvancedBodyChart.js?v=4"></script>
   <script src="js/kine.js?v=7"></script>

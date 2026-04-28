@@ -36,7 +36,8 @@
       "Bash(node -c \"C:/Users/Usuario/Documents/Claude/movemetrics/js/MoveAnalysis.js\")",
       "Bash(node -c \"C:/Users/Usuario/Documents/Claude/movemetrics/js/ExpertAnalysis.js\")",
       "Bash(node -c \"C:/Users/Usuario/Documents/Claude/movemetrics/js/VideoCompare.js\")",
-      "Bash(node -c \"C:/Users/Usuario/Documents/Claude/movemetrics/js/Suite.js\")"
+      "Bash(node -c \"C:/Users/Usuario/Documents/Claude/movemetrics/js/Suite.js\")",
+      "Bash(node -c \"C:/Users/Usuario/Documents/Claude/movemetrics/js/Workspace.js\")"
     ]
   }
 }
