@@ -1583,10 +1583,32 @@
   <!-- ══ TAB: FMS ══ -->
   <div id="ptab-fms" class="hidden">
 
-    <!-- ═════ ANÁLISIS VIDEO AI (MediaPipe Pose) ═════ -->
-    <details class="fms-accordion" open>
-      <summary>🎥 Análisis Video AI (auto · MediaPipe)</summary>
-    <div class="card" style="margin-bottom:18px;border:1px solid var(--neon);margin-top:10px">
+    <!-- ═════ SUITE UNIFICADA ANÁLISIS MOVIMIENTO ═════ -->
+    <div class="card" style="margin-bottom:18px;border:2px solid var(--neon);background:linear-gradient(180deg,rgba(57,255,122,.04),transparent 80px)">
+      <div class="card-header" style="background:rgba(57,255,122,.1)">
+        <h3 style="color:var(--neon)">🎬 Suite Análisis Movimiento</h3>
+        <span class="tag" style="background:var(--neon);color:#000">AI · Experto · Comparativo</span>
+      </div>
+      <div class="card-body" style="padding:14px">
+        <!-- mode tabs -->
+        <div style="display:flex;gap:6px;margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px">
+          <button class="btn suite-tab active" data-suite="ai"      onclick="Suite.show('ai',this)">🎥 Análisis IA</button>
+          <button class="btn suite-tab"        data-suite="expert"  onclick="Suite.show('expert',this)">🔬 Experto (drawing)</button>
+          <button class="btn suite-tab"        data-suite="compare" onclick="Suite.show('compare',this)">📊 Comparar 2</button>
+          <span style="flex:1"></span>
+          <!-- snapshot/upload bar (siempre visible) -->
+          <select id="suite-snap-dest" style="padding:6px 8px;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:5px;font-size:11px;font-weight:600">
+            <optgroup label="OHS"><option value="slot-ohs-frente">OHS · Frente</option><option value="slot-ohs-perfil">OHS · Perfil</option></optgroup>
+            <optgroup label="Step Down"><option value="slot-sd-fd">SD · Frente DER</option><option value="slot-sd-pd">SD · Perfil DER</option><option value="slot-sd-fi">SD · Frente IZQ</option><option value="slot-sd-pi">SD · Perfil IZQ</option></optgroup>
+          </select>
+          <input type="file" id="suite-img-up" accept="image/*" style="display:none" onchange="Suite.uploadImage(this.files[0])">
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('suite-img-up').click()" title="Subir imagen al slot FMS">🖼️ Subir img</button>
+          <button class="btn btn-neon btn-sm" onclick="Suite.captureToFMS()" title="Capturar frame del modo activo">📸 → FMS</button>
+        </div>
+
+    <!-- ═════ MODO 1: AI ═════ -->
+    <div id="suite-pane-ai" class="suite-pane">
+    <div class="card" style="border:1px solid var(--neon);margin-top:0">
       <div class="card-header" style="background:rgba(57,255,122,.08)">
         <h3 style="color:var(--neon)">🎥 Análisis Video AI</h3>
         <span class="tag" style="background:var(--neon);color:#000">Auto · MediaPipe</span>
@@ -1675,11 +1697,10 @@
         </div>
       </div>
     </div>
-    </details>
+    </div><!-- /suite-pane-ai -->
 
-    <!-- ═════ ANÁLISIS EXPERTO (Kinovea-style toolkit) ═════ -->
-    <details class="fms-accordion">
-      <summary>🔬 Análisis Experto — Toolkit Kinovea (manual: ángulos, distancias, calibración)</summary>
+    <!-- ═════ MODO 2: EXPERTO ═════ -->
+    <div id="suite-pane-expert" class="suite-pane" style="display:none">
     <div class="card" style="margin-bottom:18px;border:1px solid #5dd4ff;margin-top:10px">
       <div class="card-header" style="background:rgba(93,212,255,.08)">
         <h3 style="color:#5dd4ff">🔬 Análisis Experto</h3>
@@ -1734,11 +1755,10 @@
         <div id="ex-anno-list" style="margin-top:8px"></div>
       </div>
     </div>
-    </details>
+    </div><!-- /suite-pane-expert -->
 
-    <!-- ═════ COMPARACIÓN 2 VIDEOS (Kinovea Tier 2) ═════ -->
-    <details class="fms-accordion">
-      <summary>📊 Comparación de Videos (sync + tabla diferencias)</summary>
+    <!-- ═════ MODO 3: COMPARAR ═════ -->
+    <div id="suite-pane-compare" class="suite-pane" style="display:none">
     <div class="card" style="margin-bottom:18px;border:1px solid #c084fc;margin-top:10px">
       <div class="card-header" style="background:rgba(192,132,252,.08)">
         <h3 style="color:#c084fc">📊 Comparación 2 Videos</h3>
@@ -1778,7 +1798,10 @@
         <div id="vc-table" style="margin-top:12px"></div>
       </div>
     </div>
-    </details>
+    </div><!-- /suite-pane-compare -->
+
+      </div><!-- /card-body suite -->
+    </div><!-- /Suite card -->
 
     <!-- ═════ FMS MANUAL (legacy, fotos + checks) ═════ -->
     <div class="flex-b mb-16">
@@ -2574,6 +2597,9 @@
     .btn:disabled, .ex-tool:disabled { opacity:.4; cursor:not-allowed }
     .btn[onclick*="MEDIR"] { /* legacy support */ }
     .ex-tool { padding:7px 11px; background:var(--bg2); color:var(--text); border:1px solid var(--border); border-radius:5px; cursor:pointer; font-size:12px; font-family:var(--mono); font-weight:600; transition:all .15s; line-height:1 }
+    .suite-tab { padding:9px 18px; font-size:12px; font-weight:700; background:var(--bg2); color:var(--text2); border:1px solid var(--border); border-radius:6px 6px 0 0 }
+    .suite-tab.active { background:var(--neon); color:#000; border-color:var(--neon); border-bottom-color:var(--neon) }
+    .suite-tab:hover:not(.active) { color:var(--neon); border-color:var(--neon) }
     .ex-tool .ti { font-size:14px; line-height:1 }
     .ex-tool:hover { border-color:#5dd4ff; color:#5dd4ff; background:rgba(93,212,255,.06) }
     .ex-tool.active { background:#5dd4ff; color:#000; border-color:#5dd4ff }
@@ -2589,6 +2615,7 @@
   <script type="module" src="js/MoveAnalysis.js?v=9"></script>
   <script src="js/ExpertAnalysis.js?v=2"></script>
   <script type="module" src="js/VideoCompare.js?v=2"></script>
+  <script src="js/Suite.js?v=1"></script>
   <script src="js/anatomy-zones.js?v=2"></script>
   <script src="js/AdvancedBodyChart.js?v=4"></script>
   <script src="js/kine.js?v=7"></script>
