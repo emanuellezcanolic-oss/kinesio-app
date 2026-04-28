@@ -159,33 +159,29 @@ const VC = window.VC = {
     const el = document.getElementById('vc-table'); if (!el) return;
     const keys = Object.keys(aA);
     const fmt = v => v==null ? '—' : v.toFixed(1)+'°';
-    const rows = keys.map(k => {
-      const va = aA[k], vb = aB[k];
-      const d = (va!=null && vb!=null) ? (vb-va) : null;
-      const dCol = d==null ? 'var(--text3)' : Math.abs(d) < 3 ? 'var(--neon)' : Math.abs(d) < 8 ? 'var(--amber)' : 'var(--red)';
-      const dStr = d==null ? '—' : (d>=0?'+':'') + d.toFixed(1)+'°';
-      return `<tr>
-        <td style="padding:6px 10px;border-bottom:1px solid var(--border);font-size:12px">${k}</td>
-        <td style="padding:6px 10px;border-bottom:1px solid var(--border);text-align:right;font-family:var(--mono);color:var(--text2)">${fmt(va)}</td>
-        <td style="padding:6px 10px;border-bottom:1px solid var(--border);text-align:right;font-family:var(--mono);color:var(--text2)">${fmt(vb)}</td>
-        <td style="padding:6px 10px;border-bottom:1px solid var(--border);text-align:right;font-family:var(--mono);font-weight:700;color:${dCol}">${dStr}</td>
-      </tr>`;
-    }).join('');
+    const colCard = (title, side, dataMap, otherMap) => {
+      const rows = keys.map(k => {
+        const v = dataMap[k], v2 = otherMap[k];
+        const d = (v!=null && v2!=null) ? (side==='A' ? v - v2 : v - v2) : null;
+        const dCol = d==null ? 'var(--text3)' : Math.abs(d) < 3 ? 'var(--neon)' : Math.abs(d) < 8 ? 'var(--amber)' : 'var(--red)';
+        const arrow = d==null ? '' : d > 0.5 ? '▲' : d < -0.5 ? '▼' : '=';
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-bottom:1px solid var(--border)">
+          <span style="font-size:11px;color:var(--text2)">${k}</span>
+          <span style="font-family:var(--mono);font-weight:700;font-size:13px;color:var(--text)">${fmt(v)} <span style="font-size:10px;color:${dCol};margin-left:4px">${arrow}</span></span>
+        </div>`;
+      }).join('');
+      return `<div style="background:var(--bg1);border:2px solid ${side==='A'?'#5dd4ff':'#c084fc'};border-radius:8px;overflow:hidden">
+        <div style="padding:10px 14px;background:rgba(${side==='A'?'93,212,255':'192,132,252'},.12);font-weight:700;color:${side==='A'?'#5dd4ff':'#c084fc'};font-size:12px;letter-spacing:.05em">${title}</div>
+        ${rows}
+      </div>`;
+    };
     el.innerHTML = `
-      <div style="background:var(--bg1);border:1px solid #c084fc;border-radius:6px;overflow:hidden">
-        <div style="padding:10px 14px;background:rgba(192,132,252,.1);font-weight:700;color:#c084fc;font-size:13px">📊 Tabla comparativa — diferencias entre A y B</div>
-        <table style="width:100%;border-collapse:collapse">
-          <thead>
-            <tr style="background:var(--bg2)">
-              <th style="padding:8px 10px;text-align:left;font-size:10px;color:var(--text3);text-transform:uppercase">Métrica</th>
-              <th style="padding:8px 10px;text-align:right;font-size:10px;color:var(--text3);text-transform:uppercase">Video A</th>
-              <th style="padding:8px 10px;text-align:right;font-size:10px;color:var(--text3);text-transform:uppercase">Video B</th>
-              <th style="padding:8px 10px;text-align:right;font-size:10px;color:var(--text3);text-transform:uppercase">Δ (B−A)</th>
-            </tr>
-          </thead>
-          <tbody>${rows}</tbody>
-        </table>
-        <div style="padding:6px 10px;font-size:9px;color:var(--text3);border-top:1px solid var(--border)">Δ verde &lt; 3° · amber 3-8° · rojo &gt; 8°</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px">
+        ${colCard('🅰 VIDEO A', 'A', aA, aB)}
+        ${colCard('🅱 VIDEO B', 'B', aB, aA)}
+      </div>
+      <div style="margin-top:8px;padding:8px 12px;background:var(--bg1);border-radius:5px;font-size:10px;color:var(--text3);text-align:center">
+        Flecha ▲▼ vs otro lado · verde &lt;3° · amber 3-8° · rojo &gt;8°
       </div>
     `;
   }

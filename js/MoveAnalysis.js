@@ -891,9 +891,32 @@ const MA = window.MA = {
     const view = document.getElementById('ma-view').value;
     const tpl = TEMPLATES[ex] || TEMPLATES.free;
     const result = tpl.analyze(this._frames, view);
-    this._last = { exercise: ex, view, ts: new Date().toISOString(), kpis: result.kpis, flags: result.flags, framesCount: this._frames.length };
-    this._renderResults(result);
+    // filtrar KPIs/flags no aplicables a la vista
+    const filtered = this._filterByView(result, view);
+    this._last = { exercise: ex, view, ts: new Date().toISOString(), kpis: filtered.kpis, flags: filtered.flags, framesCount: this._frames.length };
+    this._renderResults(filtered);
     this._setStatus(`Analizado. ${this._frames.length} frames procesados.`);
+  },
+
+  _filterByView(result, view){
+    const isLateral = view === 'side_l' || view === 'side_r';
+    const isFrontal = view === 'front' || view === 'back';
+    const out = { kpis:{}, flags: result.flags.slice() };
+    Object.entries(result.kpis).forEach(([k,v]) => {
+      const kl = k.toLowerCase();
+      // valgo, asimetría rodillas, tilt pélvico/hombros = SOLO frontal/posterior
+      if (isLateral && (kl.includes('valgo') || kl.includes('tilt') || kl.includes('caída') || kl.includes('trendelenburg') || kl.includes('asim'))) return;
+      // tronco lean = SOLO lateral (en frontal mide inclinación lateral, no es relevante)
+      if (isFrontal && (kl.includes('tronco') || kl.includes('inclin'))) return;
+      out.kpis[k] = v;
+    });
+    out.flags = result.flags.filter(f => {
+      const ml = (f.msg||'').toLowerCase();
+      if (isLateral && (ml.includes('valgo') || ml.includes('trendelenburg') || ml.includes('hombro') || ml.includes('pelvi'))) return false;
+      if (isFrontal && ml.includes('tronco')) return false;
+      return true;
+    });
+    return out;
   },
 
   _renderResults(res){
@@ -987,7 +1010,19 @@ const MA = window.MA = {
 
     const slot = document.getElementById(dest);
     if (slot) slot.scrollIntoView({behavior:'smooth', block:'center'});
-    this._setStatus(`✓ Frame capturado a ${dest} con ${Object.keys(data).length} medidas`);
+    const slotLabel = (document.getElementById('ma-snap-dest')?.options[document.getElementById('ma-snap-dest').selectedIndex]?.text) || dest;
+    this._setStatus(`✓ ${slotLabel} · ${Object.keys(data).length} medidas`);
+  },
+
+  // sincroniza dropdown vista con destino slot elegido
+  _syncViewFromDest(slotId){
+    const v = document.getElementById('ma-view'); if (!v) return;
+    const s = (slotId || '').toLowerCase();
+    let nv = null;
+    if (s.includes('frente') || s.includes('-fd') || s.includes('-fi')) nv = 'front';
+    else if (s.includes('perfil') || s.includes('-pd')) nv = 'side_r';
+    else if (s.includes('-pi')) nv = 'side_l';
+    if (nv){ v.value = nv; this._setStatus(`Vista auto: ${v.options[v.selectedIndex].text}`); }
   },
 
   // según vista, qué métricas son relevantes
